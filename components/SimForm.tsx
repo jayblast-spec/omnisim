@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { FormSchema } from "@/lib/formSchemas";
 
@@ -14,19 +14,66 @@ export default function SimForm({ schema }: SimFormProps) {
   const [currentSection, setCurrentSection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const loadingSteps = [
-    "INITIALIZING SIMULATION ENGINE...",
-    "LOADING GLOBAL AGENT MATRIX...",
-    "DEPLOYING 20 AI AGENTS WORLDWIDE...",
-    "CALIBRATING AGENT PERSPECTIVES...",
-    "RUNNING PARALLEL SIMULATIONS...",
-    "AGGREGATING GLOBAL SENTIMENT...",
-    "GENERATING INTELLIGENCE REPORT...",
-    "FINALIZING PREDICTIONS...",
+    {
+      title: "Installing OmniSim Intelligence Core",
+      detail: "Mounting the scenario engine and preparing the selected simulation model.",
+      signal: "CORE ONLINE",
+    },
+    {
+      title: "Reading Every Blank You Filled",
+      detail: "Parsing names, motives, risks, context, emotional signals, timeframes, and hidden pressure points.",
+      signal: "INTAKE LOCKED",
+    },
+    {
+      title: "Selecting Human Behavior Agents",
+      detail: "Choosing the agent mix most likely to understand how real people would respond to this matter.",
+      signal: "AGENTS READY",
+    },
+    {
+      title: "Running Live Reaction Tests",
+      detail: "Testing how different personalities, cultures, incentives, and fears respond to this situation.",
+      signal: "REACTIONS ACTIVE",
+    },
+    {
+      title: "Applying Elite Success Parameters",
+      detail: "Checking reputation, timing, trust, leverage, safety, risk, upside, and probability of follow-through.",
+      signal: "SUCCESS FILTER",
+    },
+    {
+      title: "Generating Multiple Outcome Paths",
+      detail: "Building best-case, likely-case, downside, and hidden-opportunity branches before choosing the final signal.",
+      signal: "PATHS FORMED",
+    },
+    {
+      title: "Cross-Examining The Result",
+      detail: "Searching for weak assumptions, missed factors, emotional bias, and second-order consequences.",
+      signal: "COUNTER CHECK",
+    },
+    {
+      title: "Writing The Intelligence Report",
+      detail: "Compressing agent reactions, specialist insight, risks, opportunities, and next actions into one clear outcome.",
+      signal: "REPORT BUILD",
+    },
+    {
+      title: "Final Trust Pass",
+      detail: "Making the answer practical, sober, useful, and ready for a human decision.",
+      signal: "READY",
+    },
   ];
 
+
+  useEffect(() => {
+    if (!isSubmitting) {
+      setElapsedSeconds(0);
+      return;
+    }
+    const timer = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
+    return () => clearInterval(timer);
+  }, [isSubmitting]);
   function handleChange(fieldId: string, value: string | string[]) {
     setFormData((prev) => ({ ...prev, [fieldId]: value }));
   }
@@ -58,10 +105,11 @@ export default function SimForm({ schema }: SimFormProps) {
     setError(null);
 
     let step = 0;
+    setLoadingStep(0);
     const interval = setInterval(() => {
-      step = Math.min(step + 1, loadingSteps.length - 1);
+      step = (step + 1) % loadingSteps.length;
       setLoadingStep(step);
-    }, 800);
+    }, 1350);
 
     try {
       const res = await fetch("/api/simulate", {
@@ -88,54 +136,80 @@ export default function SimForm({ schema }: SimFormProps) {
   }
 
   if (isSubmitting) {
+    const activeStep = loadingSteps[loadingStep];
+    const progress = ((loadingStep + 1) / loadingSteps.length) * 100;
+    const visibleChecks = loadingSteps.slice(0, loadingStep + 1).slice(-4);
+
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-10 px-4">
-        <div className="relative h-36 w-36">
-          <div
-            className="absolute inset-0 rounded-full border-2 border-transparent"
-            style={{
-              borderTopColor: "#00F5FF",
-              animation: "spinRing 2s linear infinite",
-            }}
-          />
-          <div
-            className="absolute inset-5 rounded-full border-2 border-transparent"
-            style={{
-              borderTopColor: "#BF00FF",
-              animation: "spinRing 3s linear infinite reverse",
-            }}
-          />
-          <div
-            className="absolute inset-10 rounded-full border-2 border-transparent"
-            style={{
-              borderTopColor: "#FF0077",
-              animation: "spinRing 1.5s linear infinite",
-            }}
-          />
-          <div
-            className="absolute inset-[52px] rounded-full"
-            style={{ background: "#00F5FF", boxShadow: "0 0 20px #00F5FF" }}
-          />
-        </div>
-        <div className="text-center">
-          <p
-            className="font-orbitron text-xs tracking-[0.4em]"
-            style={{ color: "#00F5FF", textShadow: "0 0 8px #00F5FF" }}
-          >
-            {loadingSteps[loadingStep]}
-          </p>
-          <div className="mx-auto mt-6 h-1 w-72 overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{
-                width: `${((loadingStep + 1) / loadingSteps.length) * 100}%`,
-                background: "linear-gradient(90deg, #00F5FF, #BF00FF)",
-              }}
-            />
+      <div className="mx-auto flex min-h-[72vh] max-w-5xl flex-col items-center justify-center px-4 pb-20 pt-28">
+        <div className="w-full overflow-hidden rounded-2xl border p-5 sm:p-8" style={{ background: "rgba(255,255,255,0.92)", borderColor: "rgba(15,23,42,0.16)", boxShadow: "0 18px 48px rgba(15,23,42,0.16)" }}>
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
+            <div className="relative mx-auto h-44 w-44 shrink-0 lg:mx-0">
+              <div className="absolute inset-0 rounded-full" style={{ background: "conic-gradient(from 120deg, #315FAE, #7C3AED, #DB2777, #C78616, #059669, #315FAE)", animation: "spinRing 6s linear infinite" }} />
+              <div className="absolute inset-3 rounded-full" style={{ background: "#EEF4FB" }} />
+              <div className="absolute inset-7 rounded-full border" style={{ borderColor: "rgba(49,95,174,0.28)", background: "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(227,236,246,0.92))" }} />
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span className="text-4xl font-black" style={{ color: "#315FAE" }}>{Math.round(progress)}%</span>
+                <span className="mt-1 text-[9px] font-black uppercase tracking-[0.18em]" style={{ color: "#40516D" }}>Core Draw</span>
+                <span className="text-[8px] font-bold uppercase tracking-[0.16em]" style={{ color: "#7C3AED" }}>Install Mode</span>
+              </div>
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="section-label">OMNISIM BACKGROUND ENGINE</p>
+              <h2 className="mt-3 text-3xl font-black leading-tight md:text-5xl" style={{ color: "#070A12" }}>
+                {activeStep.title}
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-8" style={{ color: "#1E293B" }}>
+                {activeStep.detail}
+              </p>
+
+              <div className="mt-6 overflow-hidden rounded-full border" style={{ background: "rgba(15,23,42,0.08)", borderColor: "rgba(15,23,42,0.12)" }}>
+                <div
+                  className="h-3 rounded-full transition-all duration-700"
+                  style={{ width: `${progress}%`, background: "linear-gradient(90deg, #315FAE, #7C3AED, #DB2777, #C78616)" }}
+                />
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                {[
+                  ["Simulation", schema.title],
+                  ["Status", `${activeStep.signal} · ${elapsedSeconds}s`],
+                  ["Mode", schema.type === "legacy-view" ? "PRIVATE REFLECTION" : "MULTI-OUTCOME TEST"],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-xl border px-4 py-3" style={{ background: "rgba(255,255,255,0.78)", borderColor: "rgba(15,23,42,0.14)" }}>
+                    <p className="text-[8px] font-black uppercase tracking-[0.18em]" style={{ color: "#40516D" }}>{label}</p>
+                    <p className="mt-1 truncate text-xs font-black uppercase tracking-[0.08em]" style={{ color: "#070A12" }}>{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <p className="mt-4 font-orbitron text-[9px] tracking-widest text-white/20">
-            AGENTS ACTIVE WORLDWIDE
-          </p>
+
+          <div className="mt-8 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="rounded-2xl border p-5" style={{ background: "rgba(255,255,255,0.72)", borderColor: "rgba(15,23,42,0.14)" }}>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "#315FAE" }}>Live System Log</p>
+              <div className="mt-4 space-y-3">
+                {visibleChecks.map((step, i) => (
+                  <div key={`${step.signal}-${i}`} className="flex gap-3 rounded-xl px-3 py-3" style={{ background: i === visibleChecks.length - 1 ? "rgba(49,95,174,0.10)" : "rgba(15,23,42,0.04)" }}>
+                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ background: i === visibleChecks.length - 1 ? "#315FAE" : "#059669", boxShadow: i === visibleChecks.length - 1 ? "0 0 14px rgba(49,95,174,0.45)" : "none" }} />
+                    <div>
+                      <p className="text-xs font-black" style={{ color: "#070A12" }}>{step.signal}</p>
+                      <p className="mt-1 text-xs leading-5" style={{ color: "#40516D" }}>{step.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border p-5" style={{ background: "linear-gradient(135deg, rgba(49,95,174,0.10), rgba(124,58,237,0.10), rgba(199,134,22,0.10))", borderColor: "rgba(15,23,42,0.14)" }}>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "#7C3AED" }}>What is happening</p>
+              <div className="mt-4 space-y-4 text-sm leading-7" style={{ color: "#1E293B" }}>
+                <p>OmniSim is not just waiting. It is running agent reactions, testing assumptions, scanning risk and opportunity, then compressing the strongest signals into a readable intelligence brief.</p>
+                <p>{schema.type === "legacy-view" ? "For this private reflection, the system avoids pretending to contact the deceased. It uses your memory, their values, and your current season to create grounded encouragement and a practical next step." : "For this simulation, the system compares likely human responses, pressure points, second-order effects, and multiple possible outcomes before presenting the final path."}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
