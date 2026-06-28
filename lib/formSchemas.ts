@@ -606,6 +606,59 @@ export const relationshipSchema: FormSchema = {
   ],
 };
 
+
+export const healthSignalSchema: FormSchema = {
+  type: "health-signal",
+  title: "Health Signal Simulation",
+  description: "A careful health intake simulator that organizes symptoms, risk factors, vitals, labs, genotype, blood type, medication context, and urgency signals. This is educational triage support, not diagnosis or medical advice.",
+  icon: "🩺",
+  sections: [
+    {
+      title: "PERSON AND BASELINE",
+      subtitle: "Health answers need real biological context",
+      fields: [
+        { id: "age", label: "Age", type: "number", required: true, placeholder: "e.g. 34" },
+        { id: "sexAtBirth", label: "Sex At Birth", type: "select", required: true, options: ["Female", "Male", "Intersex", "Prefer not to say"] },
+        { id: "currentLocation", label: "Country / Region", type: "text", required: true, placeholder: "e.g. Lagos, Nigeria; Texas, USA; London, UK" },
+        { id: "heightWeight", label: "Height and Weight", type: "text", required: false, placeholder: "e.g. 5ft 10in, 82kg" },
+        { id: "bloodType", label: "Blood Type", type: "select", required: true, options: ["Unknown", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] },
+        { id: "genotype", label: "Genotype / Sickle Cell Status", type: "select", required: true, options: ["Unknown", "AA", "AS", "SS", "AC", "SC", "Other / tested but unsure"] },
+      ],
+    },
+    {
+      title: "SYMPTOMS AND TIMELINE",
+      subtitle: "What is happening, when it started, and what changed",
+      fields: [
+        { id: "mainConcern", label: "Main Health Question", type: "textarea", required: true, rows: 4, placeholder: "Describe the main concern in plain words. What worries you most?" },
+        { id: "symptoms", label: "Symptoms", type: "textarea", required: true, rows: 5, placeholder: "List symptoms, severity 1-10, location, pattern, what improves/worsens it, and whether it is getting better or worse." },
+        { id: "startedWhen", label: "When Did It Start?", type: "select", required: true, options: ["Within the last hour", "Today", "1-3 days ago", "4-7 days ago", "1-4 weeks ago", "More than 1 month", "Long-term / recurring"] },
+        { id: "progression", label: "Progression", type: "select", required: true, options: ["Rapidly worsening", "Slowly worsening", "Comes and goes", "Stable", "Improving", "New symptom after medication / food / exposure"] },
+        { id: "painOrFever", label: "Pain, Fever, or Bleeding Details", type: "textarea", required: false, rows: 3, placeholder: "Temperature, pain score, bleeding amount/color, vomiting/diarrhea frequency, breathing issues, headache pattern, etc." },
+      ],
+    },
+    {
+      title: "MEDICAL CONTEXT",
+      subtitle: "Known conditions, medicines, allergies, and exposures matter",
+      fields: [
+        { id: "knownConditions", label: "Known Medical Conditions", type: "textarea", required: true, rows: 3, placeholder: "e.g. asthma, diabetes, high blood pressure, sickle cell, ulcers, pregnancy, kidney disease, anxiety, surgeries" },
+        { id: "medications", label: "Current Medications / Supplements", type: "textarea", required: true, rows: 3, placeholder: "Name, dose if known, how often, recent antibiotics, painkillers, herbs, contraceptives, or injections." },
+        { id: "allergies", label: "Drug / Food Allergies", type: "textarea", required: true, rows: 2, placeholder: "Write none if none known." },
+        { id: "pregnancyStatus", label: "Pregnancy / Postpartum Status", type: "select", required: true, options: ["Not applicable", "No", "Possibly pregnant", "Pregnant", "Postpartum under 6 weeks", "Prefer not to say"] },
+        { id: "exposures", label: "Recent Exposures", type: "textarea", required: false, rows: 3, placeholder: "Travel, sick contacts, new food, alcohol/drugs, insect bites, injury, sexual exposure, chemicals, new medication, intense exercise." },
+      ],
+    },
+    {
+      title: "VITALS, TESTS, AND RED FLAGS",
+      subtitle: "Use measured facts where available",
+      fields: [
+        { id: "vitals", label: "Vitals If Known", type: "textarea", required: false, rows: 3, placeholder: "Temperature, blood pressure, pulse, oxygen level, blood sugar, weight change, urine output." },
+        { id: "labs", label: "Recent Labs / Test Results", type: "textarea", required: false, rows: 4, placeholder: "Blood tests, malaria test, pregnancy test, COVID test, genotype result, scans, ECG, urinalysis, doctor notes." },
+        { id: "redFlags", label: "Emergency Red Flags Present?", type: "multiselect", required: true, options: ["None known", "Chest pain", "Severe trouble breathing", "Fainting / confusion", "Stroke signs", "Severe allergic reaction", "Severe bleeding", "Severe abdominal pain", "Pregnancy bleeding/pain", "Seizure", "Suicidal thoughts", "High fever in baby", "Very stiff neck", "Worst headache of life"] },
+        { id: "careAccess", label: "Access To Care Right Now", type: "select", required: true, options: ["Emergency care available now", "Clinic available today", "Pharmacy only", "Telehealth only", "No easy access", "Not sure"] },
+      ],
+    },
+  ],
+};
 export const legacyViewSchema: FormSchema = {
   type: "legacy-view",
   title: "Loved One Legacy View",
@@ -653,6 +706,40 @@ export const legacyViewSchema: FormSchema = {
     },
   ],
 };
+
+const truthCalibrationSection: FormSection = {
+  title: "TRUTH CALIBRATION",
+  subtitle: "The deeper and more honest this section is, the more useful the simulation becomes",
+  fields: [
+    { id: "knownFacts", label: "Known Facts", type: "textarea", required: true, rows: 3, placeholder: "List the facts you know are true. Include numbers, dates, names, amounts, messages, symptoms, evidence, constraints, or history." },
+    { id: "unknowns", label: "Unknowns / Missing Information", type: "textarea", required: true, rows: 3, placeholder: "What do you not know yet? What could change the answer if discovered?" },
+    { id: "evidenceQuality", label: "Evidence Quality", type: "select", required: true, options: ["Measured data / documents", "Direct personal experience", "Trusted witness", "Mixed evidence", "Mostly assumptions", "Rumor / unverified"] },
+    { id: "constraints", label: "Real-World Constraints", type: "textarea", required: true, rows: 3, placeholder: "Money, time, health, law, location, skills, family, safety, tools, access, culture, politics, reputation, or deadlines." },
+    { id: "idealOutcome", label: "Ideal Outcome", type: "textarea", required: true, rows: 2, placeholder: "What would a genuinely good outcome look like, not just an emotional win?" },
+    { id: "unacceptableOutcome", label: "Unacceptable Outcome / Boundary", type: "textarea", required: true, rows: 2, placeholder: "What must not happen? What boundary, loss, risk, or harm should the simulator avoid?" },
+  ],
+};
+
+function attachTruthCalibration(schema: FormSchema) {
+  if (!schema.sections.some((section) => section.title === truthCalibrationSection.title)) {
+    schema.sections.push(truthCalibrationSection);
+  }
+}
+
+[
+  publicReactionSchema,
+  electionSchema,
+  marketsSchema,
+  sportsSchema,
+  policySchema,
+  productLaunchSchema,
+  geopoliticalSchema,
+  profitPathSchema,
+  relationshipSchema,
+  healthSignalSchema,
+  legacyViewSchema,
+  customSchema,
+].forEach(attachTruthCalibration);
 export const formSchemas: Record<string, FormSchema> = {
   "public-reaction": publicReactionSchema,
   election: electionSchema,
@@ -663,6 +750,7 @@ export const formSchemas: Record<string, FormSchema> = {
   geopolitical: geopoliticalSchema,
   "profit-path": profitPathSchema,
   relationship: relationshipSchema,
+  "health-signal": healthSignalSchema,
   "legacy-view": legacyViewSchema,
   custom: customSchema,
 };
