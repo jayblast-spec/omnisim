@@ -46,6 +46,28 @@ export interface CounterIntelligence {
   flipScenario: string;
 }
 
+export interface PhoneReachIntelligence {
+  worldPopulation: number;
+  internetUsers: number;
+  offlinePopulation: number;
+  uniqueMobileSubscribers: number;
+  smartphoneReach: number;
+  basicPhoneReach: number;
+  estimatedActiveOnlineNow: number;
+  smartphoneActiveNow: number;
+  basicPhoneActiveNow: number;
+  offlineReachDelay: string;
+  firstHourReach: number;
+  firstDayReach: number;
+  smartphoneShareOfMobile: number;
+  digitalReachShare: number;
+  smsReachShare: number;
+  offlineShare: number;
+  likelyAmplification: "low" | "medium" | "high" | "explosive";
+  reachNarrative: string;
+  assumptions: string[];
+}
+
 type FormValue = string | string[];
 
 function fv(val: FormValue | undefined): string {
@@ -94,6 +116,70 @@ function getRegionPopulation(location: string): number {
   return 40;
 }
 
+
+// ─── Phone Reach Intelligence Layer ──────────────────────────────────────────
+function calcPhoneReachIntelligence(
+  type: string,
+  agentResults: AgentResult[],
+  populationWeightedSentiment: { positive: number; neutral: number; negative: number }
+): PhoneReachIntelligence {
+  const worldPopulation = 8100;
+  const internetUsers = 6000;
+  const uniqueMobileSubscribers = 5830;
+  const smartphoneReach = 5340;
+  const basicPhoneReach = Math.max(0, uniqueMobileSubscribers - smartphoneReach);
+  const offlinePopulation = Math.max(0, worldPopulation - internetUsers);
+
+  const now = new Date();
+  const utcHour = now.getUTCHours();
+  const asiaPrime = utcHour >= 11 && utcHour <= 16;
+  const europeAfricaPrime = utcHour >= 16 && utcHour <= 22;
+  const americasPrime = utcHour >= 22 || utcHour <= 4;
+  const activeFactor = asiaPrime ? 0.38 : europeAfricaPrime ? 0.34 : americasPrime ? 0.31 : 0.27;
+
+  const avgIntensity = agentResults.length
+    ? agentResults.reduce((sum, agent) => sum + agent.intensity, 0) / agentResults.length
+    : 5;
+  const polarity = Math.max(populationWeightedSentiment.positive, populationWeightedSentiment.negative) / 100;
+  const controversyBoost = 0.75 + polarity * 0.35 + Math.min(0.25, avgIntensity / 40);
+
+  const estimatedActiveOnlineNow = Math.round(internetUsers * activeFactor);
+  const smartphoneActiveNow = Math.round(smartphoneReach * activeFactor * 0.92);
+  const basicPhoneActiveNow = Math.round(basicPhoneReach * activeFactor * 0.45);
+  const firstHourReach = Math.round(Math.min(internetUsers, smartphoneActiveNow * controversyBoost + basicPhoneActiveNow * 0.15));
+  const firstDayReach = Math.round(Math.min(internetUsers, firstHourReach * (type === "public-reaction" || type === "geopolitical" ? 3.2 : 2.4)));
+
+  const explosiveScore = firstHourReach / internetUsers + avgIntensity / 20 + polarity / 2;
+  const likelyAmplification = explosiveScore > 1.15 ? "explosive" : explosiveScore > 0.9 ? "high" : explosiveScore > 0.65 ? "medium" : "low";
+
+  return {
+    worldPopulation,
+    internetUsers,
+    offlinePopulation,
+    uniqueMobileSubscribers,
+    smartphoneReach,
+    basicPhoneReach,
+    estimatedActiveOnlineNow,
+    smartphoneActiveNow,
+    basicPhoneActiveNow,
+    offlineReachDelay: "Offline and low-data populations usually receive the event through radio, TV, SMS, family networks, workplace discussion, religious/community leaders, and delayed reposts.",
+    firstHourReach,
+    firstDayReach,
+    smartphoneShareOfMobile: Math.round((smartphoneReach / uniqueMobileSubscribers) * 100),
+    digitalReachShare: Math.round((internetUsers / worldPopulation) * 100),
+    smsReachShare: Math.round((basicPhoneReach / worldPopulation) * 100),
+    offlineShare: Math.round((offlinePopulation / worldPopulation) * 100),
+    likelyAmplification,
+    reachNarrative: `At this moment, roughly ${estimatedActiveOnlineNow}M people may be online globally, with about ${smartphoneActiveNow}M reachable through smartphone feeds, push alerts, video, search, and messaging apps. Another ${basicPhoneActiveNow}M basic-phone users may be reachable through SMS, voice, USSD, radio-linked community relay, or second-hand sharing. This is an estimate for event spread, not an exact census.`,
+    assumptions: [
+      "World population baseline: 8.1B humans.",
+      "Internet-user baseline: about 6.0B people online globally.",
+      "Mobile baseline: about 5.83B unique mobile subscribers.",
+      "Smartphone/mobile-web baseline: about 5.34B people; remaining mobile users are treated as basic/SMS-first reach.",
+      "Active-now estimates vary by UTC hour, region awake cycles, event intensity, and sentiment polarity."
+    ],
+  };
+}
 function calcPopulationWeightedSentiment(agents: AgentResult[]): { positive: number; neutral: number; negative: number } {
   if (!agents.length) return { positive: 0, neutral: 0, negative: 0 };
   let total = 0, pos = 0, neu = 0, neg = 0;
@@ -434,6 +520,7 @@ WORLD POPULATION: 8.1 billion humans
 AGENT SAMPLE: ${agentResults.length} agents representing ~${totalRepresentedPop}M people
 RAW AGENT SENTIMENT: ${sentimentData.positive}% positive | ${sentimentData.neutral}% neutral | ${sentimentData.negative}% negative
 POPULATION-WEIGHTED GLOBAL SENTIMENT: ${populationWeightedSentiment.positive}% positive | ${populationWeightedSentiment.neutral}% neutral | ${populationWeightedSentiment.negative}% negative
+PHONE REACH REALITY: Every event must be analyzed through smartphone reach, basic/SMS phone reach, active-online-now spread, and delayed offline relay. Do not assume the whole world sees the event at once.
 
 SCENARIO:
 ${scenarioText.slice(0, 800)}
@@ -580,6 +667,7 @@ export async function POST(request: Request) {
     };
 
     const populationWeightedSentiment = calcPopulationWeightedSentiment(agentResults);
+    const phoneReachIntelligence = calcPhoneReachIntelligence(type, agentResults, populationWeightedSentiment);
 
     // Master synthesis (includes cascade effects)
     const prediction = await generateFinalPrediction(
@@ -597,6 +685,7 @@ export async function POST(request: Request) {
       id, type, ...prediction,
       confidenceScore: calibratedConfidence,
       sentimentData, populationWeightedSentiment,
+      phoneReachIntelligence,
       historicalIntelligenceUsed: historicalIntel.count,
       specialistResults,
       counterIntelligence,
