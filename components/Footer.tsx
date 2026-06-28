@@ -35,6 +35,8 @@ export default function Footer() {
                 ["Policy Impact", "/simulate/policy"],
                 ["Product Launch", "/simulate/product-launch"],
                 ["Geopolitical Event", "/simulate/geopolitical"],
+                ["$1K Profit Path", "/simulate/profit-path"],
+                ["Relationship Future", "/simulate/relationship"],
                 ["Custom Scenario", "/simulate/custom"],
               ].map(([label, href]) => (
                 <Link
