@@ -89,7 +89,7 @@ type FormValue = string | string[];
 
 
 function truthCalibrationText(data: Record<string, FormValue>): string {
-  return `\n\nTRUTH CALIBRATION\nKNOWN FACTS: ${fv(data.knownFacts)}\nUNKNOWNS / MISSING INFORMATION: ${fv(data.unknowns)}\nEVIDENCE QUALITY: ${fv(data.evidenceQuality)}\nREAL-WORLD CONSTRAINTS: ${fv(data.constraints)}\nIDEAL OUTCOME: ${fv(data.idealOutcome)}\nUNACCEPTABLE OUTCOME / BOUNDARY: ${fv(data.unacceptableOutcome)}\n\nINSTRUCTION: Treat measured facts and direct evidence as stronger than assumptions. When facts are missing, say what uncertainty remains. Respect constraints and boundaries. Do not overclaim certainty.`;
+  return `\n\nTRUTH CALIBRATION\nKNOWN FACTS: ${fv(data.knownFacts)}\nUNKNOWNS / MISSING INFORMATION: ${fv(data.unknowns)}\nEVIDENCE QUALITY: ${fv(data.evidenceQuality)}\nREAL-WORLD CONSTRAINTS: ${fv(data.constraints)}\nIDEAL OUTCOME: ${fv(data.idealOutcome)}\nUNACCEPTABLE OUTCOME / BOUNDARY: ${fv(data.unacceptableOutcome)}\nTRUTH STAGE CHECKPOINTS: ${fv(data.__truthStageChecks)}\n\nINSTRUCTION: Treat measured facts and direct evidence as stronger than assumptions. If any stage checkpoint is "unknown" or "skip", explicitly lower certainty for that stage and say what facts must be verified. When facts are missing, say what uncertainty remains. Respect constraints and boundaries. Do not overclaim certainty.`;
 }
 function fv(val: FormValue | undefined): string {
   if (!val) return "Not specified";
