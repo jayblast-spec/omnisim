@@ -122,20 +122,20 @@ function categoryDepthInstruction(type: string): string {
 
 const universalDeepReadJson = `,
   "deepRead": {
-    "title": "<category-specific title, not generic>",
-    "coreDiagnosis": "<10-14 sentences. Be specific to the user's facts, unknowns, constraints, evidence quality, and category. Explain what is really happening, why it matters, and what would change the outcome. No filler.>",
+    "title": "<specific category title>",
+    "coreDiagnosis": "<8-10 specific sentences using the user's facts, unknowns, constraints, and evidence quality. No generic filler.>",
     "truthMap": [
-      { "signal": "<known fact or evidence>", "meaning": "<why it matters>", "confidence": <0-100> },
-      { "signal": "<unknown or weak assumption>", "meaning": "<how it could change the result>", "confidence": <0-100> },
-      { "signal": "<constraint or boundary>", "meaning": "<how it limits action>", "confidence": <0-100> }
+      { "signal": "<fact/unknown/constraint>", "meaning": "<why it matters>", "confidence": <0-100> },
+      { "signal": "<fact/unknown/constraint>", "meaning": "<why it matters>", "confidence": <0-100> },
+      { "signal": "<fact/unknown/constraint>", "meaning": "<why it matters>", "confidence": <0-100> }
     ],
-    "hiddenLevers": ["<lever 1>", "<lever 2>", "<lever 3>", "<lever 4>"],
-    "failureMode": "<5-8 sentences explaining exactly how this fails if the user does nothing or acts emotionally>",
-    "bestPath": "<5-8 sentences explaining the most realistic path to a good outcome>",
-    "decisionRules": ["<if/then rule 1>", "<if/then rule 2>", "<if/then rule 3>", "<if/then rule 4>"],
-    "sevenDayActionPlan": ["<day 1 action>", "<day 2 action>", "<day 3 action>", "<day 4 action>", "<day 5 action>", "<day 6 action>", "<day 7 action>"],
-    "questionsToAnswerNext": ["<question 1>", "<question 2>", "<question 3>", "<question 4>"],
-    "stoicResilienceNote": "<specific note: what to control, what to stop chasing, what action proves growth>"
+    "hiddenLevers": ["<lever 1>", "<lever 2>", "<lever 3>"],
+    "failureMode": "<4-6 specific sentences on how this fails if nothing changes>",
+    "bestPath": "<4-6 specific sentences on the most realistic path to a good outcome>",
+    "decisionRules": ["<if/then rule 1>", "<if/then rule 2>", "<if/then rule 3>"],
+    "sevenDayActionPlan": ["<day 1>", "<day 2>", "<day 3>", "<day 4>", "<day 5>", "<day 6>", "<day 7>"],
+    "questionsToAnswerNext": ["<question 1>", "<question 2>", "<question 3>"],
+    "stoicResilienceNote": "<what to control, what to stop chasing, and what action proves growth>"
   }`;
 function privateScenarioInstruction(type: string): string {
   if (type === "relationship") {
@@ -396,9 +396,9 @@ const SPECIALISTS = [
 ] as const;
 
 async function runSpecialist(specialist: (typeof SPECIALISTS)[number], scenarioText: string): Promise<SpecialistResult> {
-  const userMessage = `SCENARIO:\n${scenarioText.slice(0, 800)}\n\nAnalyze this scenario exclusively through your domain expertise. Return ONLY valid JSON:\n{\n  "analysis": "<3-4 sentence deep-domain analysis from your unique lens>",\n  "keyInsight": "<1 sentence — the single most important insight only your domain reveals>",\n  "riskFlag": "<1 sentence — primary risk you see that others would miss>",\n  "opportunityFlag": "<1 sentence — primary opportunity you see that others would miss>",\n  "confidenceModifier": <integer -15 to +15 — how much does your domain analysis shift overall prediction confidence>\n}`;
+  const userMessage = `SCENARIO:\n${scenarioText.slice(0, 620)}\n\nAnalyze this scenario exclusively through your domain expertise. Return ONLY valid JSON:\n{\n  "analysis": "<3-4 sentence deep-domain analysis from your unique lens>",\n  "keyInsight": "<1 sentence — the single most important insight only your domain reveals>",\n  "riskFlag": "<1 sentence — primary risk you see that others would miss>",\n  "opportunityFlag": "<1 sentence — primary opportunity you see that others would miss>",\n  "confidenceModifier": <integer -15 to +15 — how much does your domain analysis shift overall prediction confidence>\n}`;
 
-  const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  let resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -595,7 +595,7 @@ Return ONLY valid JSON:
 }`;
 
   try {
-    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    let resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -635,7 +635,7 @@ async function runAgent(agent: AgentProfile, scenarioText: string): Promise<Agen
 
   const userMessage = `Scenario:\n\n${scenarioText}\n\nAs ${agent.name}, respond authentically. Return ONLY valid JSON:\n{\n  "sentiment": "positive" or "negative" or "neutral",\n  "intensity": <1-10>,\n  "reaction": "<2-3 sentence first-person reaction>",\n  "likelyAction": "<one specific action you would take>"\n}`;
 
-  const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  let resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -715,7 +715,7 @@ ${isPrivateHumanScenario(type) ? "PATTERN-WEIGHTED SENTIMENT: use as internal si
 ${type === "legacy-view" ? "RESILIENT OPERATING PHILOSOPHY: OmniSim must think like a stoic high performer: face facts, control what can be controlled, identify leverage, respect constraints, learn from prior simulations, and turn uncertainty into disciplined next action. Avoid shallow hype. Prefer useful truth over pleasing answers.`nPRIVATE REFLECTION REALITY: This is not an event-spread simulation. Treat it as a grief-safe legacy mirror. Do not claim supernatural contact or certainty. Focus on stoic encouragement, practical resilience, and grounded next steps." : type === "health-signal" ? "RESILIENT OPERATING PHILOSOPHY: OmniSim must think like a stoic high performer: face facts, control what can be controlled, identify leverage, respect constraints, learn from prior simulations, and turn uncertainty into disciplined next action. Avoid shallow hype. Prefer useful truth over pleasing answers.`nPRIVATE HEALTH REALITY: This is not an event-spread simulation. Treat it as educational triage support, not diagnosis. Prioritize red flags, clinician questions, measured facts, and uncertainty boundaries." : "RESILIENT OPERATING PHILOSOPHY: OmniSim must think like a stoic high performer: face facts, control what can be controlled, identify leverage, respect constraints, learn from prior simulations, and turn uncertainty into disciplined next action. Avoid shallow hype. Prefer useful truth over pleasing answers.`nPHONE REACH REALITY: Every event must be analyzed through smartphone reach, basic/SMS phone reach, active-online-now spread, and delayed offline relay. Do not assume the whole world sees the event at once."}
 
 SCENARIO:
-${scenarioText.slice(0, 800)}
+${scenarioText.slice(0, 620)}
 
 FIELD AGENT REACTIONS WITH POPULATION WEIGHTS:
 ${agentSummary}${historicalContext}
@@ -770,20 +770,35 @@ MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n${categoryDepthInstructi
     { "phase": "Short-Term (1-4 weeks)", "events": "<3-5 specific sentences>" },
     { "phase": "Medium-Term (1-3 months)", "events": "<3-5 specific sentences>" },
     { "phase": "Long-Term (3-12 months)", "events": "<3-5 specific sentences>" }
-  ]${universalDeepReadJson}${type === "relationship" ? relationshipDeepDiveJson : ""}
+  ]${universalDeepReadJson}
 }`;
 
-  const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  let resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 2500,
+      max_tokens: 1700,
       temperature: 0.7,
       response_format: { type: "json_object" },
     }),
   });
+
+  if (resp.status === 429 || resp.status >= 500) {
+    await new Promise((resolve) => setTimeout(resolve, 9500));
+    resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 1400,
+        temperature: 0.62,
+        response_format: { type: "json_object" },
+      }),
+    });
+  }
 
   if (!resp.ok) {
     const errText = await resp.text();
