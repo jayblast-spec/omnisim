@@ -324,13 +324,13 @@ export default function SimForm({ schema }: SimFormProps) {
                         key={opt}
                         type="button"
                         onClick={() => handleMultiSelect(field.id, opt)}
-                        className="rounded-sm px-3 py-2 text-[11px] font-bold tracking-wide transition-all"
+                        className="rounded-xl px-3 py-2 text-[11px] font-bold tracking-wide transition-all"
                         style={{
-                          color: selected ? "#00F5FF" : "rgba(255,255,255,0.45)",
-                          background: selected ? "rgba(0,245,255,0.1)" : "rgba(255,255,255,0.04)",
+                          color: selected ? "#070A12" : "#1E293B",
+                          background: selected ? "linear-gradient(135deg, rgba(49,95,174,0.22), rgba(124,58,237,0.16))" : "rgba(255,255,255,0.88)",
                           border: selected
-                            ? "1px solid rgba(0,245,255,0.5)"
-                            : "1px solid rgba(255,255,255,0.08)",
+                            ? "1px solid rgba(49,95,174,0.50)"
+                            : "1px solid rgba(15,23,42,0.22)",
                         }}
                       >
                         {opt}
