@@ -13,6 +13,33 @@ interface KeyFactor { factor: string; impact: number; probability: number; expla
 interface RiskItem { risk: string; severity: "critical" | "high" | "medium" | "low"; probability: number; mitigation: string; }
 interface OpportunityItem { opportunity: string; potential: "high" | "medium" | "low"; window: string; howToCapture: string; }
 
+export interface SpecialistResult {
+  specialistId: string;
+  name: string;
+  domain: string;
+  color: string;
+  analysis: string;
+  keyInsight: string;
+  riskFlag: string;
+  opportunityFlag: string;
+  confidenceModifier: number;
+}
+
+export interface CascadeEffect {
+  step: number;
+  title: string;
+  description: string;
+  probability: number;
+  timeframe: string;
+  domain: string;
+}
+
+export interface CounterIntelligence {
+  challenges: string[];
+  missedFactor: string;
+  flipScenario: string;
+}
+
 export interface AgentResult {
   agentId: string;
   agentName: string;
@@ -37,6 +64,7 @@ export interface SimulationResult {
   confidenceLabel: string;
   confidenceScore: number;
   confidenceReasoning?: string;
+  cascadeEffects?: CascadeEffect[];
   scenarioBranches?: ScenarioBranch[];
   keyFactors: (string | KeyFactor)[];
   risks: (string | RiskItem)[];
@@ -49,12 +77,22 @@ export interface SimulationResult {
   createdAt: string;
   populationWeightedSentiment?: { positive: number; neutral: number; negative: number };
   historicalIntelligenceUsed?: number;
+  specialistResults?: SpecialistResult[];
+  counterIntelligence?: CounterIntelligence;
 }
 
 function sCol(s: string) { return s === "positive" ? GREEN : s === "negative" ? PINK : NEON; }
 function sevCol(s: string) { return s === "critical" ? PINK : s === "high" ? "#FF6B35" : s === "medium" ? GOLD : NEON; }
 function potCol(p: string) { return p === "high" ? GREEN : p === "medium" ? NEON : GOLD; }
 function ccCol(n: number) { return n >= 75 ? GREEN : n >= 50 ? NEON : n >= 30 ? GOLD : PINK; }
+function domainCol(d: string) {
+  if (d === "economic") return NEON;
+  if (d === "political") return PURPLE;
+  if (d === "social") return GREEN;
+  if (d === "military") return PINK;
+  if (d === "media") return GOLD;
+  return NEON;
+}
 
 export function ResultsDashboard({ result }: { result: SimulationResult }) {
   const [tab, setTab] = useState<"overview" | "agents" | "factors">("overview");
@@ -71,6 +109,9 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
   const phases = Array.isArray(result.timeline) ? (result.timeline as TimelinePhase[]) : null;
   const timelineStr = typeof result.timeline === "string" ? result.timeline : null;
   const pwSent = result.populationWeightedSentiment;
+  const specialists = result.specialistResults ?? [];
+  const cascades = (result.cascadeEffects ?? []) as CascadeEffect[];
+  const counterIntel = result.counterIntelligence;
 
   return (
     <div>
@@ -78,7 +119,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
       <div className="rounded-2xl p-6 mb-6" style={{ background: `linear-gradient(135deg,${cc}0F,${cc}05)`, border: `1px solid ${cc}44`, boxShadow: `0 0 48px ${cc}15` }}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
           <div className="flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: cc }}>OMNISIM Intelligence Assessment</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: cc }}>OMNISIM Intelligence Assessment · Real Deal v2</p>
             <div className="flex items-end gap-4">
               <span className="text-6xl font-black font-mono leading-none" style={{ color: cc, textShadow: `0 0 24px ${cc}` }}>{result.confidenceScore}%</span>
               <div>
@@ -118,9 +159,14 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                 <p className="text-[9px] mt-1 font-mono" style={{ color: "rgba(255,255,255,0.3)" }}>Population-weighted (8.1B humans)</p>
               </div>
             )}
-            {result.historicalIntelligenceUsed != null && result.historicalIntelligenceUsed > 0 && (
-              <p className="text-[9px] font-mono" style={{ color: PURPLE }}>&#9670; {result.historicalIntelligenceUsed} prior simulations in memory</p>
-            )}
+            <div className="flex items-center gap-3 flex-wrap">
+              {result.historicalIntelligenceUsed != null && result.historicalIntelligenceUsed > 0 && (
+                <p className="text-[9px] font-mono" style={{ color: PURPLE }}>&#9670; {result.historicalIntelligenceUsed} prior simulations in memory</p>
+              )}
+              {specialists.length > 0 && (
+                <p className="text-[9px] font-mono" style={{ color: GOLD }}>&#9733; {specialists.length} specialist analysts</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -153,6 +199,53 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
             </div>
           )}
 
+          {/* Expert Panel — 5 Specialists */}
+          {specialists.length > 0 && (
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-1 h-5 rounded-full" style={{ background: GOLD }} />
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: GOLD }}>Expert Panel — Domain Specialists</p>
+                <span className="text-[8px] font-mono px-2 py-0.5 rounded-full" style={{ background: `${GOLD}18`, color: GOLD, border: `1px solid ${GOLD}33` }}>{specialists.length} analysts</span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {specialists.map((s) => {
+                  const sc = s.color;
+                  const mod = s.confidenceModifier;
+                  return (
+                    <div key={s.specialistId} className="rounded-xl p-4" style={{ background: "#0D0B1A", border: `1px solid ${sc}28`, boxShadow: `0 0 16px ${sc}08` }}>
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div>
+                          <p className="font-black text-white text-sm">{s.name}</p>
+                          <p className="text-[9px] uppercase tracking-[0.18em] mt-0.5" style={{ color: sc }}>{s.domain}</p>
+                        </div>
+                        <span className="text-[10px] font-black font-mono px-2 py-1 rounded shrink-0" style={{ background: `${mod >= 0 ? GREEN : PINK}18`, color: mod >= 0 ? GREEN : PINK, border: `1px solid ${mod >= 0 ? GREEN : PINK}33` }}>
+                          {mod >= 0 ? "+" : ""}{mod}
+                        </span>
+                      </div>
+                      <p className="text-xs leading-6 mb-3" style={{ color: "rgba(255,255,255,0.72)" }}>{s.analysis}</p>
+                      <div className="space-y-2">
+                        <div className="rounded-lg px-3 py-2" style={{ background: `${sc}0A`, border: `1px solid ${sc}1E` }}>
+                          <p className="text-[8px] uppercase tracking-[0.18em] mb-0.5 font-black" style={{ color: sc }}>Key Insight</p>
+                          <p className="text-[10px] leading-5" style={{ color: "rgba(255,255,255,0.78)" }}>{s.keyInsight}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="rounded-lg px-2 py-1.5" style={{ background: `${PINK}08`, border: `1px solid ${PINK}18` }}>
+                            <p className="text-[7px] uppercase tracking-wider mb-0.5 font-black" style={{ color: PINK }}>Risk</p>
+                            <p className="text-[9px] leading-4" style={{ color: "rgba(255,255,255,0.6)" }}>{s.riskFlag}</p>
+                          </div>
+                          <div className="rounded-lg px-2 py-1.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}18` }}>
+                            <p className="text-[7px] uppercase tracking-wider mb-0.5 font-black" style={{ color: GREEN }}>Opportunity</p>
+                            <p className="text-[9px] leading-4" style={{ color: "rgba(255,255,255,0.6)" }}>{s.opportunityFlag}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Primary Prediction */}
           <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${PURPLE}28` }}>
             <div className="flex items-center gap-3 mb-4">
@@ -161,6 +254,49 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
             </div>
             <p className="text-base leading-9" style={{ color: "rgba(255,255,255,0.9)" }}>{result.prediction}</p>
           </div>
+
+          {/* Cascade Effects Chain */}
+          {cascades.length > 0 && (
+            <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${NEON}14` }}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-1 h-5 rounded-full" style={{ background: NEON }} />
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: NEON }}>Cascade Effect Chain</p>
+                <span className="text-[8px] font-mono px-2 py-0.5 rounded-full" style={{ background: `${NEON}12`, color: `${NEON}BB`, border: `1px solid ${NEON}28` }}>{cascades.length} orders deep</span>
+              </div>
+              <div className="space-y-0">
+                {cascades.map((ce, i) => {
+                  const dc = domainCol(ce.domain);
+                  return (
+                    <div key={i} className="flex gap-4">
+                      <div className="flex flex-col items-center shrink-0">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black" style={{ background: `${dc}18`, color: dc, border: `1px solid ${dc}44`, boxShadow: `0 0 12px ${dc}22` }}>{ce.step}</div>
+                        {i < cascades.length - 1 && (
+                          <div className="flex flex-col items-center py-1" style={{ minHeight: "2rem" }}>
+                            <div className="w-px flex-1" style={{ background: `linear-gradient(to bottom,${dc}44,${domainCol(cascades[i + 1].domain)}44)` }} />
+                            <span className="text-[8px] font-black" style={{ color: "rgba(255,255,255,0.2)" }}>&#8595;</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="pb-4 flex-1">
+                        <div className="flex items-center gap-3 mb-1.5">
+                          <h4 className="font-black text-white text-sm">{ce.title}</h4>
+                          <span className="text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold" style={{ background: `${dc}12`, color: dc, border: `1px solid ${dc}28` }}>{ce.domain}</span>
+                          <span className="text-[8px] font-mono ml-auto" style={{ color: "rgba(255,255,255,0.35)" }}>{ce.timeframe}</span>
+                        </div>
+                        <p className="text-sm leading-7 mb-2" style={{ color: "rgba(255,255,255,0.72)" }}>{ce.description}</p>
+                        <div className="flex items-center gap-2">
+                          <div className="h-1 flex-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.07)" }}>
+                            <div className="h-full rounded-full" style={{ width: `${ce.probability}%`, background: dc, boxShadow: `0 0 6px ${dc}` }} />
+                          </div>
+                          <span className="text-[9px] font-mono shrink-0" style={{ color: dc }}>{ce.probability}% prob.</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Scenario Probability Matrix */}
           {result.scenarioBranches && result.scenarioBranches.length > 0 && (
@@ -241,6 +377,35 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
             </div>
           )}
 
+          {/* Devil's Advocate — Counter-Intelligence */}
+          {counterIntel && (
+            <div className="rounded-2xl p-6" style={{ background: `${PINK}08`, border: `1px solid ${PINK}30` }}>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-1 h-5 rounded-full" style={{ background: PINK }} />
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: PINK }}>Devil&apos;s Advocate — Counter-Intelligence Layer</p>
+                <span className="text-[8px] font-mono px-2 py-0.5 rounded-full" style={{ background: `${PINK}18`, color: PINK, border: `1px solid ${PINK}33` }}>CHALLENGE MODE</span>
+              </div>
+              <div className="space-y-3 mb-5">
+                {counterIntel.challenges.map((c, i) => (
+                  <div key={i} className="flex gap-3 items-start rounded-xl px-4 py-3" style={{ background: `${PINK}0A`, border: `1px solid ${PINK}22` }}>
+                    <span className="text-xs font-black font-mono shrink-0 mt-0.5" style={{ color: PINK }}>C{String(i + 1).padStart(2, "0")}</span>
+                    <p className="text-sm leading-6" style={{ color: "rgba(255,255,255,0.82)" }}>{c}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl p-4" style={{ background: "#0D0B1A", border: `1px solid ${PINK}22` }}>
+                  <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: PINK }}>Missed Variable</p>
+                  <p className="text-sm leading-6" style={{ color: "rgba(255,255,255,0.78)" }}>{counterIntel.missedFactor}</p>
+                </div>
+                <div className="rounded-xl p-4" style={{ background: "#0D0B1A", border: `1px solid ${PINK}22` }}>
+                  <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: PINK }}>Flip Scenario</p>
+                  <p className="text-sm leading-6" style={{ color: "rgba(255,255,255,0.78)" }}>{counterIntel.flipScenario}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Recommendation */}
           <div className="rounded-2xl p-6" style={{ background: `${PURPLE}08`, border: `1px solid ${PURPLE}30` }}>
             <div className="flex items-center gap-3 mb-3">
@@ -301,7 +466,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-1 mb-3 pl-0">
+                  <div className="flex flex-wrap gap-1 mb-3">
                     {agent.politicalLeaning && <span className="text-[8px] px-2 py-0.5 rounded-full font-semibold" style={{ background: `${PURPLE}12`, color: PURPLE, border: `1px solid ${PURPLE}28` }}>{agent.politicalLeaning}</span>}
                     {agent.economicStatus && <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.48)" }}>{agent.economicStatus}</span>}
                     {agent.mediaDiet && <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: `${NEON}0A`, color: `${NEON}BB` }}>{agent.mediaDiet}</span>}

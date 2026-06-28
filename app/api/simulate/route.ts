@@ -19,6 +19,33 @@ export interface AgentResult {
   likelyAction: string;
 }
 
+export interface SpecialistResult {
+  specialistId: string;
+  name: string;
+  domain: string;
+  color: string;
+  analysis: string;
+  keyInsight: string;
+  riskFlag: string;
+  opportunityFlag: string;
+  confidenceModifier: number;
+}
+
+export interface CascadeEffect {
+  step: number;
+  title: string;
+  description: string;
+  probability: number;
+  timeframe: string;
+  domain: string;
+}
+
+export interface CounterIntelligence {
+  challenges: string[];
+  missedFactor: string;
+  flipScenario: string;
+}
+
 type FormValue = string | string[];
 
 function fv(val: FormValue | undefined): string {
@@ -27,7 +54,6 @@ function fv(val: FormValue | undefined): string {
 }
 
 // ─── Population Intelligence Layer ───────────────────────────────────────────
-// Real-world population weights by city/country (millions)
 function getRegionPopulation(location: string): number {
   const loc = location.toLowerCase();
   if (/china|beijing|shanghai|hong kong|shenzhen/.test(loc)) return 1411;
@@ -65,7 +91,7 @@ function getRegionPopulation(location: string): number {
   if (/singapore/.test(loc)) return 6;
   if (/new zealand|auckland|wellington/.test(loc)) return 5;
   if (/norway|oslo/.test(loc)) return 5;
-  return 40; // conservative default
+  return 40;
 }
 
 function calcPopulationWeightedSentiment(agents: AgentResult[]): { positive: number; neutral: number; negative: number } {
@@ -143,6 +169,184 @@ function buildScenarioText(type: string, data: Record<string, FormValue>): strin
   }
 }
 
+// ─── Elite Specialist Domain Agents ──────────────────────────────────────────
+const SPECIALISTS = [
+  {
+    id: "economist",
+    name: "Dr. Elena Voss",
+    domain: "Global Economics & Market Dynamics",
+    color: "#00F5FF",
+    systemPrompt: `You are Dr. Elena Voss, Chief Economist at the World Economic Intelligence Institute. You have 25 years analyzing global macroeconomic patterns, market cascades, currency dynamics, and supply chain disruptions. You think in GDP multipliers, velocity of money, behavioral economics at scale, and second-order market effects. You have advised 14 heads of state and 3 IMF directors. Your analysis cuts through noise to find the economic truth that others miss.`,
+  },
+  {
+    id: "geopolitical",
+    name: "General Marcus Chen",
+    domain: "Geopolitical Strategy & Power Dynamics",
+    color: "#BF00FF",
+    systemPrompt: `You are General Marcus Chen, former Deputy Director of Strategic Intelligence at a major Western alliance. You have 30 years analyzing power structures, alliance dynamics, military posturing, and geopolitical game theory. You think in leverage points, red lines, deterrence theory, and multi-actor strategic calculations. You see the moves that others miss — hidden alliances, strategic feints, real motivations beneath public statements.`,
+  },
+  {
+    id: "sociologist",
+    name: "Dr. Amara Osei",
+    domain: "Social Dynamics & Mass Behavior",
+    color: "#00FF7F",
+    systemPrompt: `You are Dr. Amara Osei, Director of Global Social Dynamics Research at Cambridge. You have 20 years studying mass psychology, social movements, polarization dynamics, and collective behavior at scale. You understand how information spreads through social networks, how sentiment becomes action, and how populations fracture or cohere under pressure. You have predicted 3 major social upheavals before they happened by reading signal patterns others missed.`,
+  },
+  {
+    id: "media",
+    name: "Alexandra Pierce",
+    domain: "Media Intelligence & Narrative Control",
+    color: "#FFD700",
+    systemPrompt: `You are Alexandra Pierce, former head of Strategic Communications at a G7 intelligence agency. You have 18 years analyzing how narratives form, spread, mutate, and collapse in the global information ecosystem. You understand media cycles, manufactured consent, information warfare, social media amplification dynamics, and how narrative control shapes reality perception at population scale.`,
+  },
+  {
+    id: "blackswan",
+    name: "Dr. Viktor Kazakov",
+    domain: "Black Swan Risk & Systemic Fragility",
+    color: "#FF0077",
+    systemPrompt: `You are Dr. Viktor Kazakov, founder of the Global Tail Risk Institute. You specialize in identifying hidden systemic fragilities, non-linear cascade risks, and tail-event probability in complex adaptive systems. You think in system fragility maps, correlation breakdown scenarios, and the specific conditions under which unlikely events become inevitable. Your job is to find what everyone else is missing.`,
+  },
+] as const;
+
+async function runSpecialist(specialist: (typeof SPECIALISTS)[number], scenarioText: string): Promise<SpecialistResult> {
+  const userMessage = `SCENARIO:\n${scenarioText.slice(0, 800)}\n\nAnalyze this scenario exclusively through your domain expertise. Return ONLY valid JSON:\n{\n  "analysis": "<3-4 sentence deep-domain analysis from your unique lens>",\n  "keyInsight": "<1 sentence — the single most important insight only your domain reveals>",\n  "riskFlag": "<1 sentence — primary risk you see that others would miss>",\n  "opportunityFlag": "<1 sentence — primary opportunity you see that others would miss>",\n  "confidenceModifier": <integer -15 to +15 — how much does your domain analysis shift overall prediction confidence>\n}`;
+
+  const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        { role: "system", content: specialist.systemPrompt },
+        { role: "user", content: userMessage },
+      ],
+      max_tokens: 500,
+      temperature: 0.72,
+      response_format: { type: "json_object" },
+    }),
+  });
+
+  if (!resp.ok) throw new Error(`Specialist ${specialist.id} error ${resp.status}`);
+  const data = (await resp.json()) as { choices: { message: { content: string } }[] };
+  const content = data.choices[0]?.message?.content?.trim() || "{}";
+
+  try {
+    const p = JSON.parse(content) as {
+      analysis?: string; keyInsight?: string; riskFlag?: string;
+      opportunityFlag?: string; confidenceModifier?: number;
+    };
+    return {
+      specialistId: specialist.id, name: specialist.name, domain: specialist.domain, color: specialist.color,
+      analysis: p.analysis || "Domain analysis complete.",
+      keyInsight: p.keyInsight || "Key signals identified.",
+      riskFlag: p.riskFlag || "Risks logged.",
+      opportunityFlag: p.opportunityFlag || "Opportunities noted.",
+      confidenceModifier: Math.min(15, Math.max(-15, Number(p.confidenceModifier) || 0)),
+    };
+  } catch {
+    return {
+      specialistId: specialist.id, name: specialist.name, domain: specialist.domain, color: specialist.color,
+      analysis: "Domain analysis complete.", keyInsight: "Key signals identified.",
+      riskFlag: "Risks logged.", opportunityFlag: "Opportunities noted.", confidenceModifier: 0,
+    };
+  }
+}
+
+async function runSpecialistBatch(scenarioText: string): Promise<SpecialistResult[]> {
+  const results = await Promise.allSettled(SPECIALISTS.map((s) => runSpecialist(s, scenarioText)));
+  return results
+    .filter((r): r is PromiseFulfilledResult<SpecialistResult> => r.status === "fulfilled")
+    .map((r) => r.value);
+}
+
+// ─── Mathematical Confidence Calibration ─────────────────────────────────────
+function calcMathematicalConfidence(
+  agentResults: AgentResult[],
+  specialistResults: SpecialistResult[],
+  baseScore: number
+): number {
+  if (!agentResults.length) return baseScore;
+
+  // Std deviation of agent intensities — low stdDev = high consensus = confidence bonus
+  const intensities = agentResults.map((a) => a.intensity);
+  const mean = intensities.reduce((s, v) => s + v, 0) / intensities.length;
+  const variance = intensities.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / intensities.length;
+  const stdDev = Math.sqrt(variance);
+  const consensusBonus = stdDev < 1.5 ? 8 : stdDev < 2.5 ? 4 : stdDev < 3.5 ? 0 : -6;
+
+  // Sentiment dominance bonus
+  const total = agentResults.length;
+  const posRatio = agentResults.filter((a) => a.sentiment === "positive").length / total;
+  const negRatio = agentResults.filter((a) => a.sentiment === "negative").length / total;
+  const dominance = Math.max(posRatio, negRatio);
+  const dominanceBonus = dominance > 0.75 ? 7 : dominance > 0.6 ? 4 : dominance > 0.5 ? 1 : -3;
+
+  // Specialist modifier (sum of all, capped)
+  const specialistModifier = Math.min(15, Math.max(-15,
+    specialistResults.reduce((s, r) => s + r.confidenceModifier, 0)
+  ));
+
+  return Math.min(98, Math.max(12, Math.round(baseScore + consensusBonus + dominanceBonus + specialistModifier)));
+}
+
+// ─── Counter-Intelligence Layer ───────────────────────────────────────────────
+async function runCounterIntelligence(
+  scenarioText: string,
+  prediction: string,
+  confidenceLabel: string
+): Promise<CounterIntelligence> {
+  const prompt = `You are the Devil's Advocate — a contrarian intelligence analyst whose sole purpose is to challenge the main prediction and expose its fatal flaws. Be specific and surgically critical.
+
+MAIN PREDICTION: ${prediction.slice(0, 400)}
+CONFIDENCE LEVEL: ${confidenceLabel}
+SCENARIO: ${scenarioText.slice(0, 400)}
+
+Return ONLY valid JSON:
+{
+  "challenges": [
+    "<Challenge 1: specific flaw in the main prediction's core assumption>",
+    "<Challenge 2: contrary evidence or dynamic that was underweighted>",
+    "<Challenge 3: alternative interpretation of the same data that leads to the opposite conclusion>"
+  ],
+  "missedFactor": "<The single most important variable the main analysis completely missed or ignored>",
+  "flipScenario": "<2-3 sentences: the world where this prediction is completely wrong — what does it look like and what caused it>"
+}`;
+
+  try {
+    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 600,
+        temperature: 0.82,
+        response_format: { type: "json_object" },
+      }),
+    });
+    if (!resp.ok) throw new Error("Counter-intel call failed");
+    const data = (await resp.json()) as { choices: { message: { content: string } }[] };
+    const p = JSON.parse(data.choices[0]?.message?.content?.trim() || "{}") as {
+      challenges?: string[]; missedFactor?: string; flipScenario?: string;
+    };
+    return {
+      challenges: Array.isArray(p.challenges) ? p.challenges.slice(0, 3) : ["Core assumptions require additional scrutiny."],
+      missedFactor: p.missedFactor || "Structural tail risks may be underweighted.",
+      flipScenario: p.flipScenario || "Alternative trajectories cannot be ruled out without further data.",
+    };
+  } catch {
+    return {
+      challenges: [
+        "Core assumptions may not hold under sustained pressure.",
+        "Counter-signals exist in the population data that deserve deeper investigation.",
+        "Historical precedent suggests this trajectory has been challenged before.",
+      ],
+      missedFactor: "Systemic fragility and second-order cascade effects may be underweighted.",
+      flipScenario: "If key assumptions break down, the opposite outcome becomes more probable than the model suggests. Monitor leading indicators carefully.",
+    };
+  }
+}
+
 // ─── Agent Runner ─────────────────────────────────────────────────────────────
 async function runAgent(agent: AgentProfile, scenarioText: string): Promise<AgentResult> {
   const systemPrompt = `You are ${agent.name}, ${agent.age} years old, ${agent.occupation} from ${agent.location}.\nPolitical leaning: ${agent.politicalLeaning}\nEconomic status: ${agent.economicStatus}\nMedia diet: ${agent.mediaDiet}\nValues: ${agent.values.join(", ")}\nDisposition: ${agent.disposition}\n\nRespond authentically as this exact person.`;
@@ -202,6 +406,7 @@ async function generateFinalPrediction(
   type: string,
   scenarioText: string,
   agentResults: AgentResult[],
+  specialistResults: SpecialistResult[],
   sentimentData: { positive: number; negative: number; neutral: number },
   populationWeightedSentiment: { positive: number; neutral: number; negative: number },
   historicalContext: string
@@ -212,28 +417,42 @@ async function generateFinalPrediction(
 
   const totalRepresentedPop = agentResults.reduce((s, a) => s + getRegionPopulation(a.location), 0);
 
-  const prompt = `You are OMNISIM — the world's most advanced real-time geopolitical and scenario intelligence system. You learn from every simulation and accumulate understanding across all prior runs.
+  const specialistSummary = specialistResults
+    .map((s) => `[${s.name} | ${s.domain}] ${s.analysis} KEY INSIGHT: ${s.keyInsight} RISK: ${s.riskFlag} OPP: ${s.opportunityFlag} ConfMod: ${s.confidenceModifier >= 0 ? "+" : ""}${s.confidenceModifier}`)
+    .join("\n");
+
+  const totalSpecialistMod = specialistResults.reduce((s, r) => s + r.confidenceModifier, 0);
+
+  const prompt = `You are OMNISIM — the world's most advanced real-time geopolitical and scenario intelligence system. You learn from every simulation, accumulate cross-domain expertise, and synthesize intelligence at a level no single human analyst can match.
 
 SCENARIO TYPE: ${type.toUpperCase()}
 WORLD POPULATION: 8.1 billion humans
 AGENT SAMPLE: ${agentResults.length} agents representing ~${totalRepresentedPop}M people
 RAW AGENT SENTIMENT: ${sentimentData.positive}% positive | ${sentimentData.neutral}% neutral | ${sentimentData.negative}% negative
 POPULATION-WEIGHTED GLOBAL SENTIMENT: ${populationWeightedSentiment.positive}% positive | ${populationWeightedSentiment.neutral}% neutral | ${populationWeightedSentiment.negative}% negative
-(Population-weighted sentiment reflects actual scale of human populations represented by each agent's region)
 
 SCENARIO:
-${scenarioText.slice(0, 900)}
+${scenarioText.slice(0, 800)}
 
-AGENT REACTIONS WITH POPULATION WEIGHTS:
+FIELD AGENT REACTIONS WITH POPULATION WEIGHTS:
 ${agentSummary}${historicalContext}
 
-Synthesize all data — agent reactions, population weights, AND historical archive — into a world-class intelligence brief. Return ONLY valid JSON:
+ELITE SPECIALIST PANEL (5 domain experts — integrate their analysis into synthesis):
+${specialistSummary}
+(Combined specialist confidence modifier: ${totalSpecialistMod >= 0 ? "+" : ""}${totalSpecialistMod})
+
+Synthesize all data — agent reactions, population weights, specialist domain analysis, AND historical archive — into a world-class multi-layer intelligence brief. Return ONLY valid JSON:
 {
-  "executiveSummary": "<3 paragraphs separated by \\n\\n. Para 1: what this scenario fundamentally represents and its global stakes at scale of 8.1B humans. Para 2: dominant dynamics and fracture lines revealed by population-weighted agent analysis. Para 3: critical inflection point — what single variable determines the final outcome and why>",
+  "executiveSummary": "<3 paragraphs separated by \\n\\n. Para 1: what this scenario fundamentally represents and its global stakes. Para 2: dominant dynamics and fracture lines revealed by population-weighted agent analysis integrated with specialist domain insights. Para 3: the critical inflection point — what single variable determines the final outcome, and why each specialist domain converges or diverges on this>",
   "prediction": "<5-6 sentence multi-dimensional prediction: primary outcome at global scale, secondary effects, population-level impact, who wins and loses, what signals confirm this trajectory>",
   "confidenceLabel": "HIGH CONFIDENCE" or "MODERATE CONFIDENCE" or "LOW CONFIDENCE" or "VOLATILE — UNPREDICTABLE",
   "confidenceScore": <0-100>,
-  "confidenceReasoning": "<2-3 sentences: what specific evidence from agent reactions AND historical archive supports this confidence level, and what uncertainty remains>",
+  "confidenceReasoning": "<2-3 sentences: what specific evidence from agents AND specialists supports this confidence level, and what uncertainty remains>",
+  "cascadeEffects": [
+    { "step": 1, "title": "<2-4 word title>", "description": "<1-2 sentences — 1st order direct effect>", "probability": <0-100>, "timeframe": "<e.g. 48 hours>", "domain": "<economic|political|social|military|media>" },
+    { "step": 2, "title": "<2-4 word title>", "description": "<1-2 sentences — 2nd order effect caused by step 1>", "probability": <0-100>, "timeframe": "<e.g. 2 weeks>", "domain": "<domain>" },
+    { "step": 3, "title": "<2-4 word title>", "description": "<1-2 sentences — 3rd order effect caused by step 2>", "probability": <0-100>, "timeframe": "<e.g. 3 months>", "domain": "<domain>" }
+  ],
   "scenarioBranches": [
     { "label": "Most Likely", "probability": <40-65>, "description": "<2-3 sentences concrete outcome at population scale>", "trigger": "<what must hold true>" },
     { "label": "Alternative Path", "probability": <20-35>, "description": "<2-3 sentences alternative outcome>", "trigger": "<what catalyst shifts this>" },
@@ -262,7 +481,7 @@ Synthesize all data — agent reactions, population weights, AND historical arch
     "<Action 4>",
     "<Action 5>"
   ],
-  "recommendation": "<3-4 sentence high-level strategic synthesis drawing on accumulated intelligence — the single most important conclusion and what to do about it now>",
+  "recommendation": "<3-4 sentence high-level strategic synthesis drawing on all specialist domains and accumulated intelligence — the single most important conclusion and what to do about it now>",
   "timeline": [
     { "phase": "Immediate (0–48 hours)", "events": "<2-3 sentences>" },
     { "phase": "Short-Term (1–4 weeks)", "events": "<2-3 sentences>" },
@@ -277,7 +496,7 @@ Synthesize all data — agent reactions, population weights, AND historical arch
     body: JSON.stringify({
       model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 2000,
+      max_tokens: 2500,
       temperature: 0.7,
       response_format: { type: "json_object" },
     }),
@@ -296,6 +515,7 @@ Synthesize all data — agent reactions, population weights, AND historical arch
     const p = JSON.parse(match?.[0] || content) as {
       executiveSummary?: string; prediction?: string; confidenceLabel?: string;
       confidenceScore?: number; confidenceReasoning?: string;
+      cascadeEffects?: unknown[];
       scenarioBranches?: unknown[]; keyFactors?: unknown[]; risks?: unknown[];
       opportunities?: unknown[]; strategicActions?: string[]; recommendation?: string; timeline?: unknown[];
     };
@@ -305,6 +525,7 @@ Synthesize all data — agent reactions, population weights, AND historical arch
       confidenceLabel: p.confidenceLabel || "MODERATE CONFIDENCE",
       confidenceScore: Math.min(100, Math.max(0, Number(p.confidenceScore) || 65)),
       confidenceReasoning: p.confidenceReasoning || "",
+      cascadeEffects: Array.isArray(p.cascadeEffects) ? p.cascadeEffects : [],
       scenarioBranches: Array.isArray(p.scenarioBranches) ? p.scenarioBranches : [],
       keyFactors: Array.isArray(p.keyFactors) ? p.keyFactors : ["Multiple factors identified"],
       risks: Array.isArray(p.risks) ? p.risks : ["Monitor situation closely"],
@@ -317,6 +538,7 @@ Synthesize all data — agent reactions, population weights, AND historical arch
     return {
       executiveSummary: "", prediction: content.slice(0, 500) || "Analysis complete.",
       confidenceLabel: "MODERATE CONFIDENCE", confidenceScore: 65, confidenceReasoning: "",
+      cascadeEffects: [],
       scenarioBranches: [], keyFactors: ["Review agent reactions"], risks: ["Monitor closely"],
       opportunities: ["Detailed breakdown in agent tab"], strategicActions: [],
       recommendation: "Review the agent reactions tab for specific insights.", timeline: [],
@@ -332,14 +554,19 @@ export async function POST(request: Request) {
     if (!type || !data) return NextResponse.json({ error: "Missing type or data" }, { status: 400 });
     if (!process.env.GROQ_API_KEY) return NextResponse.json({ error: "GROQ_API_KEY not configured" }, { status: 500 });
 
-    // Fetch historical intelligence in parallel with scenario prep
+    // Parallel: fetch history + select agents
     const [historicalIntel, agents] = await Promise.all([
       fetchHistoricalIntelligence(type),
       Promise.resolve(selectAgentsForSimulation(type, 20)),
     ]);
 
     const scenarioText = buildScenarioText(type, data);
-    const agentResults = await runAgentBatch(agents, scenarioText);
+
+    // Parallel: run field agents + specialist panel simultaneously
+    const [agentResults, specialistResults] = await Promise.all([
+      runAgentBatch(agents, scenarioText),
+      runSpecialistBatch(scenarioText),
+    ]);
 
     const total = agentResults.length || 1;
     const sentimentData = {
@@ -350,15 +577,27 @@ export async function POST(request: Request) {
 
     const populationWeightedSentiment = calcPopulationWeightedSentiment(agentResults);
 
+    // Master synthesis (includes cascade effects)
     const prediction = await generateFinalPrediction(
-      type, scenarioText, agentResults, sentimentData, populationWeightedSentiment, historicalIntel.context
+      type, scenarioText, agentResults, specialistResults, sentimentData, populationWeightedSentiment, historicalIntel.context
     );
+
+    // Mathematical confidence calibration (overrides LLM base score)
+    const calibratedConfidence = calcMathematicalConfidence(agentResults, specialistResults, prediction.confidenceScore);
+
+    // Counter-intelligence layer (Devil's Advocate)
+    const counterIntelligence = await runCounterIntelligence(scenarioText, prediction.prediction, prediction.confidenceLabel);
 
     const id = crypto.randomUUID();
     const simulationResult = {
-      id, type, ...prediction, sentimentData, populationWeightedSentiment,
+      id, type, ...prediction,
+      confidenceScore: calibratedConfidence,
+      sentimentData, populationWeightedSentiment,
       historicalIntelligenceUsed: historicalIntel.count,
-      agentResults, createdAt: new Date().toISOString(),
+      specialistResults,
+      counterIntelligence,
+      agentResults,
+      createdAt: new Date().toISOString(),
     };
 
     try {
