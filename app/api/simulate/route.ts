@@ -96,6 +96,42 @@ function fv(val: FormValue | undefined): string {
   return Array.isArray(val) ? val.join(", ") : val;
 }
 
+
+function isPrivateHumanScenario(type: string): boolean {
+  return ["relationship", "legacy-view", "health-signal"].includes(type);
+}
+
+function privateScenarioInstruction(type: string): string {
+  if (type === "relationship") {
+    return `RELATIONSHIP DEEP READ MODE: This is a private human relationship, not a public event. Do not write generic therapy-like advice. Do not use population-scale language. Use the user's specific trust level, conflict pattern, repair attempts, affection/friendship, pressure sources, shared values, change willingness, safety answer, desired outcome, and truth calibration. Be direct, emotionally intelligent, and practical. Show what is likely happening under the surface, what each person may be protecting, what will break the relationship, what could repair it, and exactly what to do next. If safety risk exists, prioritize safety and outside support over repair.`;
+  }
+  if (type === "legacy-view") {
+    return `LEGACY DEEP READ MODE: This is a private grief and resilience reflection, not a public event. Do not claim supernatural contact. Write with grounded dignity, stoic courage, memory-based reflection, and practical next steps.`;
+  }
+  if (type === "health-signal") {
+    return `HEALTH TRIAGE MODE: This is private health triage support, not a public event and not diagnosis. Focus on urgency, red flags, measured facts, uncertainty, care access, and clinician questions.`;
+  }
+  return `PUBLIC / MARKET / SOCIAL EVENT MODE: Analyze spread, population response, second-order effects, and real-world adoption through phone reach and social relay.`;
+}
+
+const relationshipDeepDiveJson = `,
+  "relationshipDeepDive": {
+    "coreDiagnosis": "<8-12 sentences. Name the exact relationship pattern using the user's details. Explain the emotional loop, trust condition, pressure sources, safety context, and what is actually being tested. No generic filler.>",
+    "whatEachPersonMayFeel": [
+      { "side": "Person A / user", "likelyFeeling": "<specific emotional state>", "protectiveStrategy": "<how they protect themselves>", "hiddenNeed": "<what they need but may not say>" },
+      { "side": "Partner / other person", "likelyFeeling": "<specific emotional state>", "protectiveStrategy": "<how they protect themselves>", "hiddenNeed": "<what they need but may not say>" }
+    ],
+    "patternLoop": ["<trigger>", "<reaction>", "<counter-reaction>", "<damage created>", "<how the loop repeats>"],
+    "repairPlan": [
+      { "step": "<specific step>", "whyItMatters": "<why>", "timeframe": "<when>", "successSignal": "<observable proof>" },
+      { "step": "<specific step>", "whyItMatters": "<why>", "timeframe": "<when>", "successSignal": "<observable proof>" },
+      { "step": "<specific step>", "whyItMatters": "<why>", "timeframe": "<when>", "successSignal": "<observable proof>" }
+    ],
+    "breakdownPath": "<5-7 sentences explaining exactly how it breaks if nothing changes>",
+    "conversationScript": ["<sentence to open conversation>", "<sentence naming accountability>", "<sentence asking for truth>", "<sentence setting boundary>", "<sentence defining next action>"],
+    "sevenDayActionPlan": ["<day 1 action>", "<day 2 action>", "<day 3 action>", "<day 4 action>", "<day 5 action>", "<day 6 action>", "<day 7 action>"],
+    "stoicResilienceNote": "<specific stoic high-performance note: what to control, what to stop chasing, what action proves growth>"
+  }`;
 // ─── Population Intelligence Layer ───────────────────────────────────────────
 function getRegionPopulation(location: string): number {
   const loc = location.toLowerCase();
@@ -636,10 +672,10 @@ async function generateFinalPrediction(
   const prompt = `You are OMNISIM — the world's most advanced real-time geopolitical and scenario intelligence system. You learn from every simulation, accumulate cross-domain expertise, and synthesize intelligence at a level no single human analyst can match.
 
 SCENARIO TYPE: ${type.toUpperCase()}
-WORLD POPULATION: 8.1 billion humans
-AGENT SAMPLE: ${agentResults.length} agents representing ~${totalRepresentedPop}M people
+${isPrivateHumanScenario(type) ? "PRIVATE SCENARIO: do not frame this as an 8.1B population event" : "WORLD POPULATION: 8.1 billion humans"}
+AGENT SAMPLE: ${agentResults.length} agents${isPrivateHumanScenario(type) ? " testing behavioral patterns" : ` representing ~${totalRepresentedPop}M people`}
 RAW AGENT SENTIMENT: ${sentimentData.positive}% positive | ${sentimentData.neutral}% neutral | ${sentimentData.negative}% negative
-POPULATION-WEIGHTED GLOBAL SENTIMENT: ${populationWeightedSentiment.positive}% positive | ${populationWeightedSentiment.neutral}% neutral | ${populationWeightedSentiment.negative}% negative
+${isPrivateHumanScenario(type) ? "PATTERN-WEIGHTED SENTIMENT: use as internal signal only, not as global population claim" : `POPULATION-WEIGHTED GLOBAL SENTIMENT: ${populationWeightedSentiment.positive}% positive | ${populationWeightedSentiment.neutral}% neutral | ${populationWeightedSentiment.negative}% negative`}
 ${type === "legacy-view" ? "RESILIENT OPERATING PHILOSOPHY: OmniSim must think like a stoic high performer: face facts, control what can be controlled, identify leverage, respect constraints, learn from prior simulations, and turn uncertainty into disciplined next action. Avoid shallow hype. Prefer useful truth over pleasing answers.`nPRIVATE REFLECTION REALITY: This is not an event-spread simulation. Treat it as a grief-safe legacy mirror. Do not claim supernatural contact or certainty. Focus on stoic encouragement, practical resilience, and grounded next steps." : type === "health-signal" ? "RESILIENT OPERATING PHILOSOPHY: OmniSim must think like a stoic high performer: face facts, control what can be controlled, identify leverage, respect constraints, learn from prior simulations, and turn uncertainty into disciplined next action. Avoid shallow hype. Prefer useful truth over pleasing answers.`nPRIVATE HEALTH REALITY: This is not an event-spread simulation. Treat it as educational triage support, not diagnosis. Prioritize red flags, clinician questions, measured facts, and uncertainty boundaries." : "RESILIENT OPERATING PHILOSOPHY: OmniSim must think like a stoic high performer: face facts, control what can be controlled, identify leverage, respect constraints, learn from prior simulations, and turn uncertainty into disciplined next action. Avoid shallow hype. Prefer useful truth over pleasing answers.`nPHONE REACH REALITY: Every event must be analyzed through smartphone reach, basic/SMS phone reach, active-online-now spread, and delayed offline relay. Do not assume the whole world sees the event at once."}
 
 SCENARIO:
@@ -652,10 +688,10 @@ ELITE SPECIALIST PANEL (5 domain experts — integrate their analysis into synth
 ${specialistSummary}
 (Combined specialist confidence modifier: ${totalSpecialistMod >= 0 ? "+" : ""}${totalSpecialistMod})
 
-Synthesize all data — agent reactions, population weights, specialist domain analysis, AND historical archive — into a world-class multi-layer intelligence brief. Return ONLY valid JSON:
+MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n\nSynthesize all data — agent reactions, specialist domain analysis, truth calibration, constraints, counter-signals, and historical archive — into a world-class multi-layer intelligence brief. For private human scenarios, write like a precise decision coach, not a global news analyst. Return ONLY valid JSON:
 {
-  "executiveSummary": "<3 paragraphs separated by \\n\\n. Para 1: what this scenario fundamentally represents and its global stakes. Para 2: dominant dynamics and fracture lines revealed by population-weighted agent analysis integrated with specialist domain insights. Para 3: the critical inflection point — what single variable determines the final outcome, and why each specialist domain converges or diverges on this>",
-  "prediction": "<5-6 sentence multi-dimensional prediction: primary outcome at global scale, secondary effects, population-level impact, who wins and loses, what signals confirm this trajectory>",
+  "executiveSummary": "<3 substantial paragraphs separated by \\n\\n. For relationship/private scenarios: Para 1 names the exact human pattern; Para 2 explains the hidden emotional incentives and constraints; Para 3 states the critical decision point and what must happen next. For public scenarios: use global stakes and population dynamics.>",
+  "prediction": "<8-12 sentence specific prediction. For relationship/private scenarios: explain likely emotional trajectory, repair probability, breakdown probability, what each side must change, and the observable signs to watch. For public scenarios: include primary outcome, secondary effects, population impact, winners/losers, and confirmation signals.>",
   "confidenceLabel": "HIGH CONFIDENCE" or "MODERATE CONFIDENCE" or "LOW CONFIDENCE" or "VOLATILE — UNPREDICTABLE",
   "confidenceScore": <0-100>,
   "confidenceReasoning": "<2-3 sentences: what specific evidence from agents AND specialists supports this confidence level, and what uncertainty remains>",
@@ -694,11 +730,11 @@ Synthesize all data — agent reactions, population weights, specialist domain a
   ],
   "recommendation": "<3-4 sentence high-level strategic synthesis drawing on all specialist domains and accumulated intelligence — the single most important conclusion and what to do about it now>",
   "timeline": [
-    { "phase": "Immediate (0–48 hours)", "events": "<2-3 sentences>" },
-    { "phase": "Short-Term (1–4 weeks)", "events": "<2-3 sentences>" },
-    { "phase": "Medium-Term (1–3 months)", "events": "<2-3 sentences>" },
-    { "phase": "Long-Term (3–12 months)", "events": "<2-3 sentences>" }
-  ]
+    { "phase": "Immediate (0-48 hours)", "events": "<3-5 specific sentences>" },
+    { "phase": "Short-Term (1-4 weeks)", "events": "<3-5 specific sentences>" },
+    { "phase": "Medium-Term (1-3 months)", "events": "<3-5 specific sentences>" },
+    { "phase": "Long-Term (3-12 months)", "events": "<3-5 specific sentences>" }
+  ]${type === "relationship" ? relationshipDeepDiveJson : ""}
 }`;
 
   const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -728,7 +764,7 @@ Synthesize all data — agent reactions, population weights, specialist domain a
       confidenceScore?: number; confidenceReasoning?: string;
       cascadeEffects?: unknown[];
       scenarioBranches?: unknown[]; keyFactors?: unknown[]; risks?: unknown[];
-      opportunities?: unknown[]; strategicActions?: string[]; recommendation?: string; timeline?: unknown[];
+      opportunities?: unknown[]; strategicActions?: string[]; recommendation?: string; timeline?: unknown[]; relationshipDeepDive?: unknown;
     };
     return {
       executiveSummary: p.executiveSummary || "",
@@ -743,7 +779,7 @@ Synthesize all data — agent reactions, population weights, specialist domain a
       opportunities: Array.isArray(p.opportunities) ? p.opportunities : ["Strategic positioning available"],
       strategicActions: Array.isArray(p.strategicActions) ? p.strategicActions : [],
       recommendation: p.recommendation || "Review agent reactions for detailed insights.",
-      timeline: Array.isArray(p.timeline) ? p.timeline : [],
+      timeline: Array.isArray(p.timeline) ? p.timeline : [],\n      relationshipDeepDive: p.relationshipDeepDive,
     };
   } catch {
     return {
@@ -787,7 +823,7 @@ export async function POST(request: Request) {
     };
 
     const populationWeightedSentiment = calcPopulationWeightedSentiment(agentResults);
-    const phoneReachIntelligence = ["legacy-view", "health-signal"].includes(type) ? undefined : calcPhoneReachIntelligence(type, agentResults, populationWeightedSentiment);
+    const phoneReachIntelligence = isPrivateHumanScenario(type) ? undefined : calcPhoneReachIntelligence(type, agentResults, populationWeightedSentiment);
 
     // Master synthesis (includes cascade effects)
     const prediction = await generateFinalPrediction(
