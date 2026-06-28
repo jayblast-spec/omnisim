@@ -226,7 +226,7 @@ Respond authentically as this exact person. React based on your specific backgro
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "llama3-8b-8192",
+      model: "llama-3.1-8b-instant",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage },
@@ -236,7 +236,7 @@ Respond authentically as this exact person. React based on your specific backgro
     }),
   });
 
-  if (!resp.ok) throw new Error(`Groq error ${resp.status}`);
+  if (!resp.ok) throw new Error(`Groq agent error ${resp.status}`);
 
   const data = (await resp.json()) as { choices: { message: { content: string } }[] };
   const content = data.choices[0]?.message?.content?.trim() || "";
@@ -295,22 +295,27 @@ async function generateFinalPrediction(
   agentResults: AgentResult[],
   sentimentData: { positive: number; negative: number; neutral: number }
 ) {
+  // Truncate each agent line to keep synthesis prompt well within context limits
   const agentSummary = agentResults
-    .map((a) => `${a.agentName} (${a.location}, ${a.sentiment}, intensity ${a.intensity}/10): "${a.reaction}" Action: ${a.likelyAction}`)
+    .map((a) => {
+      const reaction = a.reaction.slice(0, 120);
+      const action = a.likelyAction.slice(0, 60);
+      return `${a.agentName} (${a.location}, ${a.sentiment}, ${a.intensity}/10): ${reaction} → ${action}`;
+    })
     .join("\n");
 
-  const prompt = `You are OMNISIM's master intelligence synthesizer. You have collected reactions from ${agentResults.length} diverse global agents to a scenario.
+  const prompt = `You are OMNISIM's master intelligence synthesizer. ${agentResults.length} diverse global agents have reacted to a scenario.
 
 SCENARIO TYPE: ${type}
 GLOBAL SENTIMENT: ${sentimentData.positive}% positive, ${sentimentData.neutral}% neutral, ${sentimentData.negative}% negative
 
-SCENARIO:
-${scenarioText}
+SCENARIO SUMMARY:
+${scenarioText.slice(0, 800)}
 
 AGENT REACTIONS:
 ${agentSummary}
 
-Based on these global perspectives, generate a comprehensive intelligence report. Return ONLY valid JSON (no other text):
+Generate a comprehensive intelligence report. Return ONLY valid JSON:
 {
   "prediction": "<3-4 sentence definitive prediction of what will happen>",
   "confidenceLabel": "HIGH CONFIDENCE" or "MODERATE CONFIDENCE" or "LOW CONFIDENCE" or "VOLATILE — UNPREDICTABLE",
@@ -319,7 +324,7 @@ Based on these global perspectives, generate a comprehensive intelligence report
   "risks": ["<risk 1>", "<risk 2>", "<risk 3>"],
   "opportunities": ["<opportunity 1>", "<opportunity 2>", "<opportunity 3>"],
   "recommendation": "<2-3 sentence strategic recommendation>",
-  "timeline": "<2-3 sentence description of how events will unfold over the specified timeframe>"
+  "timeline": "<2-3 sentence description of how events will unfold>"
 }`;
 
   const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -329,14 +334,17 @@ Based on these global perspectives, generate a comprehensive intelligence report
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "llama3-8b-8192",
+      model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
       max_tokens: 900,
       temperature: 0.7,
     }),
   });
 
-  if (!resp.ok) throw new Error(`Groq synthesis error ${resp.status}`);
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`Groq synthesis error ${resp.status}: ${errText}`);
+  }
 
   const data = (await resp.json()) as { choices: { message: { content: string } }[] };
   const content = data.choices[0]?.message?.content?.trim() || "";
