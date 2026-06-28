@@ -105,6 +105,16 @@ export default function SimForm({ schema }: SimFormProps) {
   }
 
 
+
+  function serializeTruthChecks(checks: Record<number, TruthCheckValue>) {
+    return JSON.stringify(
+      Object.entries(checks).map(([sectionIndex, answer]) => ({
+        sectionIndex: Number(sectionIndex),
+        sectionTitle: schema.sections[Number(sectionIndex)]?.title ?? `Section ${Number(sectionIndex) + 1}`,
+        answer,
+      }))
+    );
+  }
   function openTruthCheck(action: "next" | "submit") {
     if (!validateSection()) return;
     if (truthChecks[currentSection]) {
@@ -120,20 +130,14 @@ export default function SimForm({ schema }: SimFormProps) {
     setTruthChecks(nextChecks);
     setFormData((prev) => ({
       ...prev,
-      __truthStageChecks: JSON.stringify(
-        Object.entries(nextChecks).map(([sectionIndex, answer]) => ({
-          sectionIndex: Number(sectionIndex),
-          sectionTitle: schema.sections[Number(sectionIndex)]?.title ?? `Section ${Number(sectionIndex) + 1}`,
-          answer,
-        }))
-      ),
+      __truthStageChecks: serializeTruthChecks(nextChecks),
     }));
     const action = pendingAction;
     setPendingAction(null);
     if (action === "next") setCurrentSection((p) => p + 1);
-    if (action === "submit") void handleSubmit();
+    if (action === "submit") void handleSubmit(nextChecks);
   }
-  async function handleSubmit() {
+  async function handleSubmit(finalTruthChecks = truthChecks) {
     setIsSubmitting(true);
     setError(null);
 
@@ -148,7 +152,7 @@ export default function SimForm({ schema }: SimFormProps) {
       const res = await fetch("/api/simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: schema.type, data: formData }),
+        body: JSON.stringify({ type: schema.type, data: { ...formData, __truthStageChecks: serializeTruthChecks(finalTruthChecks) } }),
       });
 
       clearInterval(interval);
