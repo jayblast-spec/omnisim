@@ -239,7 +239,7 @@ export default function SimForm({ schema }: SimFormProps) {
               style={{
                 background:
                   i < currentSection
-                    ? "#00F5FF"
+                    ? "#315FAE"
                     : i === currentSection
                     ? "linear-gradient(90deg, #00F5FF, #BF00FF)"
                     : "rgba(255,255,255,0.08)",
@@ -247,7 +247,7 @@ export default function SimForm({ schema }: SimFormProps) {
             />
             <p
               className="text-center font-orbitron text-[8px] tracking-widest transition-colors"
-              style={{ color: i <= currentSection ? "#00F5FF" : "rgba(255,255,255,0.2)" }}
+              style={{ color: i <= currentSection ? "#315FAE" : "rgba(255,255,255,0.2)" }}
             >
               {String(i + 1).padStart(2, "0")}
             </p>
@@ -364,30 +364,34 @@ export default function SimForm({ schema }: SimFormProps) {
                   {field.options?.map((opt) => (
                     <label
                       key={opt}
-                      className="flex cursor-pointer items-center gap-3"
+                      className="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 transition-all"
                       onClick={() => handleChange(field.id, opt)}
+                      style={{
+                        background: formData[field.id] === opt ? "linear-gradient(135deg, rgba(49,95,174,0.18), rgba(124,58,237,0.12))" : "rgba(255,255,255,0.88)",
+                        border: formData[field.id] === opt ? "1px solid rgba(49,95,174,0.52)" : "1px solid rgba(15,23,42,0.20)",
+                      }}
                     >
                       <div
-                        className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border transition-all"
+                        className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border transition-all"
                         style={{
                           borderColor:
                             formData[field.id] === opt
-                              ? "#00F5FF"
-                              : "rgba(255,255,255,0.2)",
+                              ? "#315FAE"
+                              : "rgba(15,23,42,0.38)",
                           background:
                             formData[field.id] === opt
-                              ? "rgba(0,245,255,0.1)"
-                              : "transparent",
+                              ? "rgba(49,95,174,0.16)"
+                              : "rgba(255,255,255,0.92)",
                         }}
                       >
                         {formData[field.id] === opt && (
                           <div
-                            className="h-1.5 w-1.5 rounded-full"
-                            style={{ background: "#00F5FF" }}
+                            className="h-2.5 w-2.5 rounded-full"
+                            style={{ background: "#315FAE" }}
                           />
                         )}
                       </div>
-                      <span className="text-sm text-white/60">{opt}</span>
+                      <span className="text-sm font-semibold leading-6" style={{ color: "#1E293B" }}>{opt}</span>
                     </label>
                   ))}
                 </div>
@@ -432,12 +436,12 @@ export default function SimForm({ schema }: SimFormProps) {
             onClick={() => setCurrentSection(i)}
             className="rounded-sm px-3 py-1 font-orbitron text-[8px] tracking-widest transition-all"
             style={{
-              color: i === currentSection ? "#00F5FF" : i < currentSection ? "rgba(0,245,255,0.4)" : "rgba(255,255,255,0.15)",
+              color: i === currentSection ? "#315FAE" : i < currentSection ? "rgba(0,245,255,0.4)" : "rgba(255,255,255,0.15)",
               border:
                 i === currentSection
                   ? "1px solid rgba(0,245,255,0.4)"
                   : "1px solid rgba(255,255,255,0.06)",
-              background: i === currentSection ? "rgba(0,245,255,0.06)" : "transparent",
+              background: i === currentSection ? "rgba(0,245,255,0.06)" : "rgba(255,255,255,0.92)",
             }}
           >
             {s.title}
