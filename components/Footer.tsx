@@ -37,6 +37,7 @@ export default function Footer() {
                 ["Geopolitical Event", "/simulate/geopolitical"],
                 ["$1K Profit Path", "/simulate/profit-path"],
                 ["Relationship Future", "/simulate/relationship"],
+                ["Loved One Legacy View", "/simulate/legacy-view"],
                 ["Custom Scenario", "/simulate/custom"],
               ].map(([label, href]) => (
                 <Link
