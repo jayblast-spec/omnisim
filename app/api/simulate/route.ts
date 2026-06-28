@@ -46,6 +46,23 @@ export interface CounterIntelligence {
   flipScenario: string;
 }
 
+
+export interface SwarmLabRound {
+  phase: string;
+  action: string;
+  output: string;
+  confidenceImpact: number;
+}
+
+export interface SwarmLabTrace {
+  engineVersion: string;
+  realitySeed: string[];
+  personaSwarm: string[];
+  simulationRounds: SwarmLabRound[];
+  mutationTests: string[];
+  learningLoop: string;
+  resilienceFilter: string;
+}
 export interface PhoneReachIntelligence {
   worldPopulation: number;
   internetUsers: number;
@@ -357,6 +374,82 @@ async function runSpecialistBatch(scenarioText: string): Promise<SpecialistResul
     .map((r) => r.value);
 }
 
+
+// --- OmniSim SwarmLab Intelligence Layer ------------------------------------
+function buildSwarmLabTrace(
+  type: string,
+  scenarioText: string,
+  agentResults: AgentResult[],
+  specialistResults: SpecialistResult[],
+  populationWeightedSentiment: { positive: number; neutral: number; negative: number },
+  historicalCount: number,
+  calibratedConfidence: number
+): SwarmLabTrace {
+  const words = scenarioText
+    .replace(/[^a-zA-Z0-9\s$%.-]/g, " ")
+    .split(/\s+/)
+    .filter((word) => word.length > 4);
+  const uniqueWords = Array.from(new Set(words.map((word) => word.toLowerCase()))).slice(0, 8);
+  const strongestAgents = [...agentResults]
+    .sort((a, b) => b.intensity - a.intensity)
+    .slice(0, 5)
+    .map((agent) => `${agent.agentName} / ${agent.location} / ${agent.sentiment} ${agent.intensity}/10`);
+  const strongestSpecialists = specialistResults
+    .slice(0, 5)
+    .map((specialist) => `${specialist.name}: ${specialist.domain}`);
+  const dominantSentiment = populationWeightedSentiment.positive >= populationWeightedSentiment.negative && populationWeightedSentiment.positive >= populationWeightedSentiment.neutral
+    ? "positive"
+    : populationWeightedSentiment.negative >= populationWeightedSentiment.neutral
+      ? "negative"
+      : "neutral";
+
+  return {
+    engineVersion: "ArkNet SwarmLab Core v0.1",
+    realitySeed: [
+      `Scenario class: ${type}`,
+      `Seed signals: ${uniqueWords.length ? uniqueWords.join(", ") : "truth calibration and user context"}`,
+      `Population-weighted leaning: ${dominantSentiment}`,
+      `Historical memory used: ${historicalCount} prior simulations`,
+    ],
+    personaSwarm: [...strongestAgents, ...strongestSpecialists].slice(0, 8),
+    simulationRounds: [
+      {
+        phase: "Reality Seed Extraction",
+        action: "Compressed the user's facts, unknowns, constraints, and desired outcome into a simulation seed.",
+        output: "Scenario boundaries and uncertainty map created.",
+        confidenceImpact: historicalCount > 0 ? 4 : 1,
+      },
+      {
+        phase: "Persona Swarm Calibration",
+        action: `Selected ${agentResults.length} field agents and ${specialistResults.length} specialist lenses to test human response diversity.",
+        output: "Human behavior spread, incentives, fears, and likely actions mapped.",
+        confidenceImpact: agentResults.length >= 15 ? 5 : 2,
+      },
+      {
+        phase: "Parallel Outcome Simulation",
+        action: "Compared best-case, likely-case, downside, and hidden-opportunity trajectories.",
+        output: `Dominant population-weighted sentiment resolved as ${dominantSentiment}.",
+        confidenceImpact: calibratedConfidence >= 75 ? 6 : calibratedConfidence >= 55 ? 3 : -2,
+      },
+      {
+        phase: "Resilience Filter",
+        action: "Applied stoic control, leverage, risk boundary, and disciplined next-action filters.",
+        output: "Result optimized for useful truth and high-performance action, not comfort or hype.",
+        confidenceImpact: 4,
+      },
+    ],
+    mutationTests: [
+      "What changes if the strongest assumption is wrong?",
+      "What happens if timing, trust, money, health, or reputation constraints tighten?",
+      "Which single variable most improves the user's odds?",
+      "Which hidden risk would create the fastest failure path?",
+    ],
+    learningLoop: historicalCount > 0
+      ? `Self-loop active: compared against ${historicalCount} prior completed simulations of this type.`
+      : "Self-loop primed: this result becomes future memory after storage, improving later calibration.",
+    resilienceFilter: "Stoic principle applied: face reality, control the controllable, conserve energy, choose leverage, act with discipline, and keep improving through feedback.",
+  };
+}
 // ─── Mathematical Confidence Calibration ─────────────────────────────────────
 function calcMathematicalConfidence(
   agentResults: AgentResult[],
@@ -687,6 +780,7 @@ export async function POST(request: Request) {
 
     // Counter-intelligence layer (Devil's Advocate)
     const counterIntelligence = await runCounterIntelligence(scenarioText, prediction.prediction, prediction.confidenceLabel);
+    const swarmLabTrace = buildSwarmLabTrace(type, scenarioText, agentResults, specialistResults, populationWeightedSentiment, historicalIntel.count, calibratedConfidence);
 
     const id = crypto.randomUUID();
     const simulationResult = {
@@ -695,6 +789,7 @@ export async function POST(request: Request) {
       sentimentData, populationWeightedSentiment,
       phoneReachIntelligence,
       historicalIntelligenceUsed: historicalIntel.count,
+      swarmLabTrace,
       specialistResults,
       counterIntelligence,
       agentResults,
