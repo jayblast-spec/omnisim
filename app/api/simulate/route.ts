@@ -101,6 +101,42 @@ function isPrivateHumanScenario(type: string): boolean {
   return ["relationship", "legacy-view", "health-signal"].includes(type);
 }
 
+
+function categoryDepthInstruction(type: string): string {
+  const map: Record<string, string> = {
+    "public-reaction": "PUBLIC REACTION DEEP READ: identify narrative ignition point, audience factions, likely backlash/support, platform spread, media angle, trust risk, and exact response strategy.",
+    election: "ELECTION DEEP READ: identify voter blocs, turnout levers, persuasion barriers, opposition attack lines, polling uncertainty, swing factors, and campaign moves.",
+    markets: "MARKET DEEP READ: identify asset sensitivity, liquidity risk, positioning, macro trigger, downside protection, confirmation signals, and trade/investment risk rules without financial-advice guarantees.",
+    sports: "SPORTS DEEP READ: identify tactical matchup, form, injuries, pressure, coaching decisions, momentum windows, and upset conditions.",
+    policy: "POLICY DEEP READ: identify affected groups, enforcement friction, political incentives, adoption blockers, litigation/media risk, and implementation sequence.",
+    "product-launch": "PRODUCT LAUNCH DEEP READ: identify buyer pain, adoption friction, pricing risk, channel strategy, retention signal, competitive moat, and launch sequence.",
+    geopolitical: "GEOPOLITICAL DEEP READ: identify actor incentives, red lines, escalation ladders, alliance moves, economic pressure, information warfare, and off-ramp conditions.",
+    "profit-path": "PROFIT PATH DEEP READ: identify capital protection, offer-market fit, first buyer path, automation stack, weekly execution plan, failure rules, reinvestment discipline, and scam/risk avoidance.",
+    relationship: "RELATIONSHIP DEEP READ: identify emotional loop, trust state, safety context, pressure sources, repair path, breakdown path, conversation script, and behavior proof.",
+    "health-signal": "HEALTH SIGNAL DEEP READ: identify urgency, red flags, missing vitals/tests, likely categories to discuss with clinicians, monitoring plan, and care-access decision points. No diagnosis or prescription.",
+    "legacy-view": "LEGACY VIEW DEEP READ: identify remembered values, current burden, resilience lesson, grounded encouragement, boundary, and next action without pretending contact with the deceased.",
+    custom: "CUSTOM DEEP READ: identify system map, hidden variables, constraints, likely path, alternative path, failure mode, leverage point, and next action.",
+  };
+  return map[type] || map.custom;
+}
+
+const universalDeepReadJson = `,
+  "deepRead": {
+    "title": "<category-specific title, not generic>",
+    "coreDiagnosis": "<10-14 sentences. Be specific to the user's facts, unknowns, constraints, evidence quality, and category. Explain what is really happening, why it matters, and what would change the outcome. No filler.>",
+    "truthMap": [
+      { "signal": "<known fact or evidence>", "meaning": "<why it matters>", "confidence": <0-100> },
+      { "signal": "<unknown or weak assumption>", "meaning": "<how it could change the result>", "confidence": <0-100> },
+      { "signal": "<constraint or boundary>", "meaning": "<how it limits action>", "confidence": <0-100> }
+    ],
+    "hiddenLevers": ["<lever 1>", "<lever 2>", "<lever 3>", "<lever 4>"],
+    "failureMode": "<5-8 sentences explaining exactly how this fails if the user does nothing or acts emotionally>",
+    "bestPath": "<5-8 sentences explaining the most realistic path to a good outcome>",
+    "decisionRules": ["<if/then rule 1>", "<if/then rule 2>", "<if/then rule 3>", "<if/then rule 4>"],
+    "sevenDayActionPlan": ["<day 1 action>", "<day 2 action>", "<day 3 action>", "<day 4 action>", "<day 5 action>", "<day 6 action>", "<day 7 action>"],
+    "questionsToAnswerNext": ["<question 1>", "<question 2>", "<question 3>", "<question 4>"],
+    "stoicResilienceNote": "<specific note: what to control, what to stop chasing, what action proves growth>"
+  }`;
 function privateScenarioInstruction(type: string): string {
   if (type === "relationship") {
     return `RELATIONSHIP DEEP READ MODE: This is a private human relationship, not a public event. Do not write generic therapy-like advice. Do not use population-scale language. Use the user's specific trust level, conflict pattern, repair attempts, affection/friendship, pressure sources, shared values, change willingness, safety answer, desired outcome, and truth calibration. Be direct, emotionally intelligent, and practical. Show what is likely happening under the surface, what each person may be protecting, what will break the relationship, what could repair it, and exactly what to do next. If safety risk exists, prioritize safety and outside support over repair.`;
@@ -688,7 +724,7 @@ ELITE SPECIALIST PANEL (5 domain experts â€” integrate their analysis into synth
 ${specialistSummary}
 (Combined specialist confidence modifier: ${totalSpecialistMod >= 0 ? "+" : ""}${totalSpecialistMod})
 
-MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n\nSynthesize all data â€” agent reactions, specialist domain analysis, truth calibration, constraints, counter-signals, and historical archive â€” into a world-class multi-layer intelligence brief. For private human scenarios, write like a precise decision coach, not a global news analyst. Return ONLY valid JSON:
+MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n${categoryDepthInstruction(type)}\n\nSynthesize all data â€” agent reactions, specialist domain analysis, truth calibration, constraints, counter-signals, and historical archive â€” into a world-class multi-layer intelligence brief. For private human scenarios, write like a precise decision coach, not a global news analyst. Return ONLY valid JSON:
 {
   "executiveSummary": "<3 substantial paragraphs separated by \\n\\n. For relationship/private scenarios: Para 1 names the exact human pattern; Para 2 explains the hidden emotional incentives and constraints; Para 3 states the critical decision point and what must happen next. For public scenarios: use global stakes and population dynamics.>",
   "prediction": "<8-12 sentence specific prediction. For relationship/private scenarios: explain likely emotional trajectory, repair probability, breakdown probability, what each side must change, and the observable signs to watch. For public scenarios: include primary outcome, secondary effects, population impact, winners/losers, and confirmation signals.>",
@@ -734,7 +770,7 @@ MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n\nSynthesize all data â€
     { "phase": "Short-Term (1-4 weeks)", "events": "<3-5 specific sentences>" },
     { "phase": "Medium-Term (1-3 months)", "events": "<3-5 specific sentences>" },
     { "phase": "Long-Term (3-12 months)", "events": "<3-5 specific sentences>" }
-  ]${type === "relationship" ? relationshipDeepDiveJson : ""}
+  ]${universalDeepReadJson}${type === "relationship" ? relationshipDeepDiveJson : ""}
 }`;
 
   const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -764,7 +800,7 @@ MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n\nSynthesize all data â€
       confidenceScore?: number; confidenceReasoning?: string;
       cascadeEffects?: unknown[];
       scenarioBranches?: unknown[]; keyFactors?: unknown[]; risks?: unknown[];
-      opportunities?: unknown[]; strategicActions?: string[]; recommendation?: string; timeline?: unknown[]; relationshipDeepDive?: unknown;
+      opportunities?: unknown[]; strategicActions?: string[]; recommendation?: string; timeline?: unknown[]; deepRead?: unknown; relationshipDeepDive?: unknown;
     };
     return {
       executiveSummary: p.executiveSummary || "",
@@ -779,7 +815,7 @@ MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n\nSynthesize all data â€
       opportunities: Array.isArray(p.opportunities) ? p.opportunities : ["Strategic positioning available"],
       strategicActions: Array.isArray(p.strategicActions) ? p.strategicActions : [],
       recommendation: p.recommendation || "Review agent reactions for detailed insights.",
-      timeline: Array.isArray(p.timeline) ? p.timeline : [],\n      relationshipDeepDive: p.relationshipDeepDive,
+      timeline: Array.isArray(p.timeline) ? p.timeline : [],\n      deepRead: p.deepRead,\n      relationshipDeepDive: p.relationshipDeepDive,
     };
   } catch {
     return {
