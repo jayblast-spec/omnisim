@@ -75,7 +75,7 @@ export default function Footer() {
             &copy; 2026 OMNISIM. ALL RIGHTS RESERVED.
           </p>
           <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#6B7894]">
-            POWERED BY GROQ AI &middot; SUPABASE &middot; NEXT.JS
+            POWERED BY ARKNET.DIGITAL
           </p>
         </div>
       </div>
