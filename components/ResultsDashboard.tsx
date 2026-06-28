@@ -1,11 +1,28 @@
 "use client";
-
 import { useState } from "react";
 
-interface AgentResult {
+const NEON = "#00F5FF";
+const PURPLE = "#BF00FF";
+const PINK = "#FF0077";
+const GREEN = "#00FF7F";
+const GOLD = "#FFD700";
+
+interface TimelinePhase { phase: string; events: string; }
+interface ScenarioBranch { label: string; probability: number; description: string; trigger: string; }
+interface KeyFactor { factor: string; impact: number; probability: number; explanation: string; }
+interface RiskItem { risk: string; severity: "critical" | "high" | "medium" | "low"; probability: number; mitigation: string; }
+interface OpportunityItem { opportunity: string; potential: "high" | "medium" | "low"; window: string; howToCapture: string; }
+
+export interface AgentResult {
   agentId: string;
   agentName: string;
   location: string;
+  age?: number;
+  occupation?: string;
+  politicalLeaning?: string;
+  economicStatus?: string;
+  mediaDiet?: string;
+  values?: string[];
   sentiment: "positive" | "negative" | "neutral";
   intensity: number;
   reaction: string;
@@ -15,255 +32,432 @@ interface AgentResult {
 export interface SimulationResult {
   id: string;
   type: string;
+  executiveSummary?: string;
   prediction: string;
   confidenceLabel: string;
   confidenceScore: number;
-  keyFactors: string[];
-  risks: string[];
-  opportunities: string[];
+  confidenceReasoning?: string;
+  scenarioBranches?: ScenarioBranch[];
+  keyFactors: (string | KeyFactor)[];
+  risks: (string | RiskItem)[];
+  opportunities: (string | OpportunityItem)[];
+  strategicActions?: string[];
   recommendation: string;
-  timeline: string;
-  sentimentData: {
-    positive: number;
-    negative: number;
-    neutral: number;
-  };
+  timeline: string | TimelinePhase[];
+  sentimentData: { positive: number; negative: number; neutral: number };
   agentResults: AgentResult[];
   createdAt: string;
+  populationWeightedSentiment?: { positive: number; neutral: number; negative: number };
+  historicalIntelligenceUsed?: number;
 }
 
-interface ResultsDashboardProps {
-  result: SimulationResult;
-}
+function sCol(s: string) { return s === "positive" ? GREEN : s === "negative" ? PINK : NEON; }
+function sevCol(s: string) { return s === "critical" ? PINK : s === "high" ? "#FF6B35" : s === "medium" ? GOLD : NEON; }
+function potCol(p: string) { return p === "high" ? GREEN : p === "medium" ? NEON : GOLD; }
+function ccCol(n: number) { return n >= 75 ? GREEN : n >= 50 ? NEON : n >= 30 ? GOLD : PINK; }
 
-export default function ResultsDashboard({ result }: ResultsDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"overview" | "agents" | "factors">("overview");
-  const { sentimentData, agentResults, prediction, confidenceLabel, keyFactors, risks, opportunities, recommendation, timeline } = result;
+export function ResultsDashboard({ result }: { result: SimulationResult }) {
+  const [tab, setTab] = useState<"overview" | "agents" | "factors">("overview");
+  const [agentFilter, setAgentFilter] = useState<"all" | "positive" | "neutral" | "negative">("all");
 
-  const sentimentColor = {
-    positive: "#00FF7F",
-    negative: "#FF0077",
-    neutral: "#00F5FF",
-  };
-
-  const confidenceGlow = {
-    "HIGH CONFIDENCE": "0 0 30px rgba(0,255,127,0.4)",
-    "MODERATE CONFIDENCE": "0 0 30px rgba(0,245,255,0.4)",
-    "LOW CONFIDENCE": "0 0 30px rgba(255,0,119,0.4)",
-    "VOLATILE — UNPREDICTABLE": "0 0 30px rgba(191,0,255,0.4)",
-  };
-
-  const confidenceTextColor = {
-    "HIGH CONFIDENCE": "#00FF7F",
-    "MODERATE CONFIDENCE": "#00F5FF",
-    "LOW CONFIDENCE": "#FF0077",
-    "VOLATILE — UNPREDICTABLE": "#BF00FF",
-  };
-
-  const glowColor = (confidenceGlow as Record<string, string>)[confidenceLabel] || confidenceGlow["MODERATE CONFIDENCE"];
-  const textColor = (confidenceTextColor as Record<string, string>)[confidenceLabel] || "#00F5FF";
+  const cc = ccCol(result.confidenceScore);
+  const pos = result.agentResults.filter((a) => a.sentiment === "positive").length;
+  const neg = result.agentResults.filter((a) => a.sentiment === "negative").length;
+  const neu = result.agentResults.filter((a) => a.sentiment === "neutral").length;
+  const avgInt = result.agentResults.length > 0
+    ? (result.agentResults.reduce((s, a) => s + a.intensity, 0) / result.agentResults.length).toFixed(1)
+    : "0";
+  const filtered = agentFilter === "all" ? result.agentResults : result.agentResults.filter((a) => a.sentiment === agentFilter);
+  const phases = Array.isArray(result.timeline) ? (result.timeline as TimelinePhase[]) : null;
+  const timelineStr = typeof result.timeline === "string" ? result.timeline : null;
+  const pwSent = result.populationWeightedSentiment;
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-24 pt-28">
-      {/* Header */}
-      <div className="mb-12 text-center">
-        <p className="section-label">SIMULATION COMPLETE</p>
-        <h1 className="mt-4 font-orbitron text-4xl font-black text-white md:text-5xl">
-          INTELLIGENCE REPORT
-        </h1>
-        <p className="mt-3 font-orbitron text-[9px] tracking-widest text-white/20">
-          SIMULATION ID: {result.id.toUpperCase()}
-        </p>
-      </div>
-
-      {/* Confidence Banner */}
-      <div className="cyber-card mb-8 p-8 text-center">
-        <p className="font-orbitron text-[9px] tracking-[0.5em] text-white/30">
-          PREDICTION CONFIDENCE
-        </p>
-        <p
-          className="mt-3 font-orbitron text-3xl font-black md:text-5xl"
-          style={{ color: textColor, textShadow: glowColor }}
-        >
-          {confidenceLabel}
-        </p>
-        <p className="mx-auto mt-6 max-w-2xl text-sm leading-8 text-white/65">{prediction}</p>
-      </div>
-
-      {/* Sentiment breakdown */}
-      <div className="cyber-card mb-8 p-6">
-        <p className="mb-5 font-orbitron text-[9px] tracking-[0.45em] text-white/30">
-          GLOBAL SENTIMENT BREAKDOWN — {agentResults.length} AGENTS
-        </p>
-        <div className="mb-4 flex h-5 overflow-hidden rounded-sm">
-          {sentimentData.positive > 0 && (
-            <div
-              className="h-full transition-all duration-1000"
-              style={{ width: `${sentimentData.positive}%`, background: "#00FF7F" }}
-            />
-          )}
-          {sentimentData.neutral > 0 && (
-            <div
-              className="h-full transition-all duration-1000"
-              style={{ width: `${sentimentData.neutral}%`, background: "#00F5FF" }}
-            />
-          )}
-          {sentimentData.negative > 0 && (
-            <div
-              className="h-full transition-all duration-1000"
-              style={{ width: `${sentimentData.negative}%`, background: "#FF0077" }}
-            />
-          )}
-        </div>
-        <div className="flex justify-between">
-          <span className="font-orbitron text-[10px] font-bold" style={{ color: "#00FF7F" }}>
-            POSITIVE {sentimentData.positive}%
-          </span>
-          <span className="font-orbitron text-[10px] font-bold" style={{ color: "#00F5FF" }}>
-            NEUTRAL {sentimentData.neutral}%
-          </span>
-          <span className="font-orbitron text-[10px] font-bold" style={{ color: "#FF0077" }}>
-            NEGATIVE {sentimentData.negative}%
-          </span>
+    <div>
+      {/* ── CONFIDENCE BANNER ── */}
+      <div className="rounded-2xl p-6 mb-6" style={{ background: `linear-gradient(135deg,${cc}0F,${cc}05)`, border: `1px solid ${cc}44`, boxShadow: `0 0 48px ${cc}15` }}>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+          <div className="flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: cc }}>OMNISIM Intelligence Assessment</p>
+            <div className="flex items-end gap-4">
+              <span className="text-6xl font-black font-mono leading-none" style={{ color: cc, textShadow: `0 0 24px ${cc}` }}>{result.confidenceScore}%</span>
+              <div>
+                <p className="font-bold text-base text-white tracking-wide">{result.confidenceLabel}</p>
+                {result.confidenceReasoning && (
+                  <p className="text-xs mt-1 leading-5 max-w-md" style={{ color: "rgba(255,255,255,0.55)" }}>{result.confidenceReasoning}</p>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="w-full sm:w-52 shrink-0 space-y-3">
+            <div>
+              <div className="flex justify-between text-[9px] font-mono mb-1">
+                <span style={{ color: GREEN }}>+{result.sentimentData.positive}% positive</span>
+                <span style={{ color: NEON }}>{result.sentimentData.neutral}% neutral</span>
+                <span style={{ color: PINK }}>{result.sentimentData.negative}% neg</span>
+              </div>
+              <div className="h-2 rounded-full overflow-hidden flex" style={{ background: "rgba(255,255,255,0.06)" }}>
+                <div style={{ width: `${result.sentimentData.positive}%`, background: GREEN }} />
+                <div style={{ width: `${result.sentimentData.neutral}%`, background: NEON }} />
+                <div style={{ width: `${result.sentimentData.negative}%`, background: PINK }} />
+              </div>
+              <p className="text-[9px] mt-1 font-mono" style={{ color: "rgba(255,255,255,0.3)" }}>Agent sentiment · {result.agentResults.length} agents · avg {avgInt}/10</p>
+            </div>
+            {pwSent && (
+              <div>
+                <div className="flex justify-between text-[9px] font-mono mb-1">
+                  <span style={{ color: GREEN }}>+{pwSent.positive}%</span>
+                  <span style={{ color: NEON }}>{pwSent.neutral}%</span>
+                  <span style={{ color: PINK }}>{pwSent.negative}%</span>
+                </div>
+                <div className="h-2 rounded-full overflow-hidden flex" style={{ background: "rgba(255,255,255,0.06)" }}>
+                  <div style={{ width: `${pwSent.positive}%`, background: `${GREEN}99` }} />
+                  <div style={{ width: `${pwSent.neutral}%`, background: `${NEON}99` }} />
+                  <div style={{ width: `${pwSent.negative}%`, background: `${PINK}99` }} />
+                </div>
+                <p className="text-[9px] mt-1 font-mono" style={{ color: "rgba(255,255,255,0.3)" }}>Population-weighted (8.1B humans)</p>
+              </div>
+            )}
+            {result.historicalIntelligenceUsed != null && result.historicalIntelligenceUsed > 0 && (
+              <p className="text-[9px] font-mono" style={{ color: PURPLE }}>&#9670; {result.historicalIntelligenceUsed} prior simulations in memory</p>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="mb-6 flex gap-2">
-        {(["overview", "agents", "factors"] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className="rounded-sm px-5 py-2.5 font-orbitron text-[10px] tracking-widest transition-all"
-            style={{
-              color: activeTab === tab ? "#00F5FF" : "rgba(255,255,255,0.3)",
-              background: activeTab === tab ? "rgba(0,245,255,0.08)" : "transparent",
-              border:
-                activeTab === tab
-                  ? "1px solid rgba(0,245,255,0.4)"
-                  : "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            {tab.toUpperCase()}
+      {/* ── TABS ── */}
+      <div className="flex gap-0 mb-6 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+        {(["overview", "agents", "factors"] as const).map((t) => (
+          <button key={t} onClick={() => setTab(t)}
+            className="px-5 py-3 text-[11px] font-bold uppercase tracking-[0.2em] border-b-2 -mb-px transition-all"
+            style={tab === t ? { color: NEON, borderColor: NEON } : { color: "rgba(255,255,255,0.38)", borderColor: "transparent" }}>
+            {t === "overview" ? "Intelligence Brief" : t === "agents" ? `Field Agents (${result.agentResults.length})` : "Risk & Factor Matrix"}
           </button>
         ))}
       </div>
 
-      {activeTab === "overview" && (
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="cyber-card p-6">
-            <p className="mb-4 font-orbitron text-[9px] tracking-[0.45em]" style={{ color: "#00FF7F" }}>
-              STRATEGIC RECOMMENDATION
-            </p>
-            <p className="text-sm leading-8 text-white/75">{recommendation}</p>
-          </div>
-          <div className="cyber-card p-6">
-            <p className="mb-4 font-orbitron text-[9px] tracking-[0.45em]" style={{ color: "#00F5FF" }}>
-              TIMELINE PROJECTION
-            </p>
-            <p className="text-sm leading-8 text-white/75">{timeline}</p>
-          </div>
-        </div>
-      )}
+      {/* ══ OVERVIEW ══ */}
+      {tab === "overview" && (
+        <div className="space-y-5">
 
-      {activeTab === "agents" && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {agentResults.map((agent) => (
-            <div key={agent.agentId} className="cyber-card p-5">
-              <div className="mb-3 flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-orbitron text-sm font-bold text-white">{agent.agentName}</p>
-                  <p className="mt-0.5 font-orbitron text-[9px] tracking-widest text-white/25">
-                    {agent.location}
-                  </p>
-                </div>
-                <span
-                  className="flex-shrink-0 rounded-sm px-2 py-1 font-orbitron text-[8px] font-black uppercase tracking-widest"
-                  style={{
-                    color: sentimentColor[agent.sentiment],
-                    background: `${sentimentColor[agent.sentiment]}15`,
-                    border: `1px solid ${sentimentColor[agent.sentiment]}40`,
-                  }}
-                >
-                  {agent.sentiment}
-                </span>
+          {/* Executive Summary */}
+          {result.executiveSummary && (
+            <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${NEON}18` }}>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-1 h-6 rounded-full" style={{ background: NEON }} />
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: NEON }}>Executive Intelligence Summary</p>
               </div>
-              <div
-                className="mb-2 h-1 rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, ${sentimentColor[agent.sentiment]}, transparent)`,
-                  width: `${agent.intensity * 10}%`,
-                  opacity: 0.5,
-                }}
-              />
-              <p className="text-xs leading-6 text-white/55">{agent.reaction}</p>
-              <p className="mt-3 font-orbitron text-[8px] tracking-widest text-white/25">
-                ▸ {agent.likelyAction}
-              </p>
+              {result.executiveSummary.split("\n\n").map((para, i) => (
+                <p key={i} className={`text-sm leading-8 ${i > 0 ? "mt-5" : ""}`} style={{ color: "rgba(255,255,255,0.82)" }}>{para}</p>
+              ))}
             </div>
-          ))}
+          )}
+
+          {/* Primary Prediction */}
+          <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${PURPLE}28` }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-1 h-6 rounded-full" style={{ background: PURPLE }} />
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: PURPLE }}>Primary Prediction</p>
+            </div>
+            <p className="text-base leading-9" style={{ color: "rgba(255,255,255,0.9)" }}>{result.prediction}</p>
+          </div>
+
+          {/* Scenario Probability Matrix */}
+          {result.scenarioBranches && result.scenarioBranches.length > 0 && (
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-1 h-5 rounded-full" style={{ background: GOLD }} />
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: GOLD }}>Scenario Probability Matrix</p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {result.scenarioBranches.map((b) => {
+                  const bc = b.label.includes("Most") ? GREEN : b.label.includes("Black") ? PINK : GOLD;
+                  return (
+                    <div key={b.label} className="rounded-xl p-5" style={{ background: "#0D0B1A", border: `1px solid ${bc}33` }}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[9px] font-black uppercase tracking-[0.18em]" style={{ color: bc }}>{b.label}</span>
+                        <span className="text-3xl font-black font-mono" style={{ color: bc, textShadow: `0 0 12px ${bc}` }}>{b.probability}%</span>
+                      </div>
+                      <div className="h-1 rounded-full mb-4" style={{ background: "rgba(255,255,255,0.07)" }}>
+                        <div className="h-full rounded-full" style={{ width: `${b.probability}%`, background: bc, boxShadow: `0 0 6px ${bc}` }} />
+                      </div>
+                      <p className="text-xs leading-6 mb-3" style={{ color: "rgba(255,255,255,0.78)" }}>{b.description}</p>
+                      <div className="rounded-lg px-3 py-2" style={{ background: `${bc}0C`, border: `1px solid ${bc}22` }}>
+                        <p className="text-[8px] uppercase tracking-[0.2em] mb-1 font-black" style={{ color: bc }}>Trigger Condition</p>
+                        <p className="text-[10px] leading-5" style={{ color: "rgba(255,255,255,0.58)" }}>{b.trigger}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Strategic Timeline */}
+          {phases && phases.length > 0 && (
+            <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${NEON}14` }}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-1 h-5 rounded-full" style={{ background: NEON }} />
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: NEON }}>Strategic Timeline</p>
+              </div>
+              <div className="space-y-0">
+                {phases.map((ph, i) => (
+                  <div key={i} className="flex gap-4">
+                    <div className="flex flex-col items-center">
+                      <div className="w-3 h-3 rounded-full shrink-0 mt-1" style={{ background: NEON, boxShadow: `0 0 10px ${NEON}` }} />
+                      {i < phases.length - 1 && <div className="w-px mt-1 mb-0" style={{ background: `${NEON}28`, minHeight: "2.5rem", flex: 1 }} />}
+                    </div>
+                    <div className="pb-6">
+                      <p className="text-[10px] font-black uppercase tracking-[0.22em] mb-1" style={{ color: NEON }}>{ph.phase}</p>
+                      <p className="text-sm leading-7" style={{ color: "rgba(255,255,255,0.72)" }}>{ph.events}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {timelineStr && (
+            <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${NEON}14` }}>
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-3" style={{ color: NEON }}>Timeline</p>
+              <p className="text-sm leading-7" style={{ color: "rgba(255,255,255,0.72)" }}>{timelineStr}</p>
+            </div>
+          )}
+
+          {/* Strategic Directives */}
+          {result.strategicActions && result.strategicActions.length > 0 && (
+            <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${GREEN}1E` }}>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-1 h-5 rounded-full" style={{ background: GREEN }} />
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: GREEN }}>Strategic Directives</p>
+              </div>
+              <div className="space-y-3">
+                {result.strategicActions.map((action, i) => (
+                  <div key={i} className="flex gap-4 items-start rounded-xl px-4 py-3" style={{ background: `${GREEN}07`, border: `1px solid ${GREEN}18` }}>
+                    <span className="text-sm font-black font-mono shrink-0 mt-0.5" style={{ color: GREEN }}>{String(i + 1).padStart(2, "0")}</span>
+                    <p className="text-sm leading-6" style={{ color: "rgba(255,255,255,0.85)" }}>{action}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recommendation */}
+          <div className="rounded-2xl p-6" style={{ background: `${PURPLE}08`, border: `1px solid ${PURPLE}30` }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-1 h-5 rounded-full" style={{ background: PURPLE }} />
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: PURPLE }}>Strategic Recommendation</p>
+            </div>
+            <p className="text-sm leading-8" style={{ color: "rgba(255,255,255,0.85)" }}>{result.recommendation}</p>
+          </div>
         </div>
       )}
 
-      {activeTab === "factors" && (
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="cyber-card p-6">
-            <p className="mb-5 font-orbitron text-[9px] tracking-[0.45em]" style={{ color: "#00F5FF" }}>
-              KEY FACTORS
-            </p>
-            <ul className="space-y-4">
-              {keyFactors.map((f, i) => (
-                <li key={i} className="flex items-start gap-3 text-xs leading-7 text-white/65">
-                  <span style={{ color: "#00F5FF" }} className="mt-0.5 flex-shrink-0">
-                    ▸
-                  </span>
-                  {f}
-                </li>
-              ))}
-            </ul>
+      {/* ══ AGENTS ══ */}
+      {tab === "agents" && (
+        <div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+            {([{ label: "Positive", count: pos, color: GREEN }, { label: "Neutral", count: neu, color: NEON }, { label: "Negative", count: neg, color: PINK }, { label: "Avg Intensity", count: avgInt, color: GOLD, suffix: "/10" }] as {label:string;count:string|number;color:string;suffix?:string}[]).map(({ label, count, color, suffix }) => (
+              <div key={label} className="rounded-xl p-3 text-center" style={{ background: "#0D0B1A", border: `1px solid ${color}22` }}>
+                <p className="text-2xl font-black font-mono" style={{ color }}>{count}{suffix}</p>
+                <p className="text-[9px] uppercase tracking-[0.2em] mt-1" style={{ color: "rgba(255,255,255,0.38)" }}>{label}</p>
+              </div>
+            ))}
           </div>
-          <div className="cyber-card p-6">
-            <p className="mb-5 font-orbitron text-[9px] tracking-[0.45em]" style={{ color: "#FF0077" }}>
-              RISKS
-            </p>
-            <ul className="space-y-4">
-              {risks.map((r, i) => (
-                <li key={i} className="flex items-start gap-3 text-xs leading-7 text-white/65">
-                  <span style={{ color: "#FF0077" }} className="mt-0.5 flex-shrink-0">
-                    ▸
-                  </span>
-                  {r}
-                </li>
-              ))}
-            </ul>
+
+          <div className="flex gap-2 mb-5 flex-wrap">
+            {(["all", "positive", "neutral", "negative"] as const).map((f) => {
+              const fc = f === "positive" ? GREEN : f === "negative" ? PINK : f === "neutral" ? NEON : "rgba(255,255,255,0.6)";
+              const cnt = f === "all" ? result.agentResults.length : f === "positive" ? pos : f === "negative" ? neg : neu;
+              return (
+                <button key={f} onClick={() => setAgentFilter(f)}
+                  className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.15em] transition-all"
+                  style={agentFilter === f
+                    ? { background: `${fc}1E`, color: fc, border: `1px solid ${fc}55` }
+                    : { background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.38)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  {f === "all" ? `All (${cnt})` : `${f} (${cnt})`}
+                </button>
+              );
+            })}
           </div>
-          <div className="cyber-card p-6">
-            <p className="mb-5 font-orbitron text-[9px] tracking-[0.45em]" style={{ color: "#00FF7F" }}>
-              OPPORTUNITIES
-            </p>
-            <ul className="space-y-4">
-              {opportunities.map((o, i) => (
-                <li key={i} className="flex items-start gap-3 text-xs leading-7 text-white/65">
-                  <span style={{ color: "#00FF7F" }} className="mt-0.5 flex-shrink-0">
-                    ▸
-                  </span>
-                  {o}
-                </li>
-              ))}
-            </ul>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {filtered.map((agent, i) => {
+              const col = sCol(agent.sentiment);
+              return (
+                <div key={agent.agentId} className="rounded-xl p-5" style={{ background: "#0D0B1A", border: `1px solid ${col}28`, boxShadow: `0 0 20px ${col}08` }}>
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0" style={{ background: `${col}1A`, color: col, border: `1px solid ${col}44` }}>{i + 1}</span>
+                        <h4 className="font-bold text-white text-sm">{agent.agentName}</h4>
+                      </div>
+                      <p className="text-[11px] pl-8" style={{ color: "rgba(255,255,255,0.42)" }}>
+                        {agent.location}{agent.age ? ` · ${agent.age}yr` : ""}{agent.occupation ? ` · ${agent.occupation}` : ""}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="block text-[8px] font-black uppercase px-2 py-0.5 rounded mb-1" style={{ background: `${col}1A`, color: col, border: `1px solid ${col}33` }}>{agent.sentiment}</span>
+                      <span className="text-[10px] font-mono" style={{ color: "rgba(255,255,255,0.38)" }}>{agent.intensity}/10</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1 mb-3 pl-0">
+                    {agent.politicalLeaning && <span className="text-[8px] px-2 py-0.5 rounded-full font-semibold" style={{ background: `${PURPLE}12`, color: PURPLE, border: `1px solid ${PURPLE}28` }}>{agent.politicalLeaning}</span>}
+                    {agent.economicStatus && <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.48)" }}>{agent.economicStatus}</span>}
+                    {agent.mediaDiet && <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: `${NEON}0A`, color: `${NEON}BB` }}>{agent.mediaDiet}</span>}
+                  </div>
+
+                  {agent.values && agent.values.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {agent.values.slice(0, 5).map((v) => (
+                        <span key={v} className="text-[8px] px-1.5 py-0.5 rounded font-mono" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.07)" }}>{v}</span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="h-px mb-4" style={{ background: `linear-gradient(to right,${col}28,transparent)` }} />
+
+                  <blockquote className="text-sm leading-7 italic mb-4" style={{ color: "rgba(255,255,255,0.82)" }}>
+                    &ldquo;{agent.reaction}&rdquo;
+                  </blockquote>
+
+                  <div className="rounded-lg px-3 py-2 mb-4" style={{ background: `${col}0A`, border: `1px solid ${col}1E` }}>
+                    <p className="text-[8px] uppercase tracking-[0.2em] mb-1 font-black" style={{ color: col }}>Likely Action</p>
+                    <p className="text-[11px] leading-5" style={{ color: "rgba(255,255,255,0.65)" }}>{agent.likelyAction}</p>
+                  </div>
+
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.07)" }}>
+                    <div className="h-full rounded-full" style={{ width: `${agent.intensity * 10}%`, background: `linear-gradient(to right,${col}55,${col})`, boxShadow: `0 0 6px ${col}` }} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
+          {filtered.length === 0 && <p className="text-center py-10 text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>No agents with this sentiment in the simulation.</p>}
         </div>
       )}
 
-      {/* CTAs */}
-      <div className="mt-16 flex flex-wrap justify-center gap-4">
-        <a href="/simulate" className="btn-solid">
-          RUN NEW SIMULATION
-        </a>
-        <a href="/history" className="btn-neon">
-          VIEW HISTORY
-        </a>
-      </div>
+      {/* ══ FACTORS ══ */}
+      {tab === "factors" && (
+        <div className="space-y-10">
+
+          {/* Key Factors */}
+          <div>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-1 h-5 rounded-full" style={{ background: NEON }} />
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: NEON }}>Key Driving Factors</p>
+            </div>
+            <div className="space-y-3">
+              {result.keyFactors.map((f, i) => {
+                if (typeof f === "string") return (
+                  <div key={i} className="flex gap-4 items-center rounded-xl px-5 py-4" style={{ background: "#0D0B1A", border: `1px solid ${NEON}18` }}>
+                    <span className="font-mono font-black text-sm shrink-0" style={{ color: NEON }}>F{String(i + 1).padStart(2, "0")}</span>
+                    <p className="text-sm" style={{ color: "rgba(255,255,255,0.8)" }}>{f}</p>
+                  </div>
+                );
+                const kf = f as KeyFactor;
+                return (
+                  <div key={i} className="rounded-xl p-5" style={{ background: "#0D0B1A", border: `1px solid ${NEON}18` }}>
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono font-black text-sm shrink-0" style={{ color: NEON }}>F{String(i + 1).padStart(2, "0")}</span>
+                        <h4 className="font-bold text-white">{kf.factor}</h4>
+                      </div>
+                      <div className="flex gap-5 shrink-0">
+                        <div className="text-right"><p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>Impact</p><p className="font-mono font-black text-lg leading-none" style={{ color: NEON }}>{kf.impact}<span className="text-xs">/10</span></p></div>
+                        <div className="text-right"><p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>Prob.</p><p className="font-mono font-black text-lg leading-none" style={{ color: PURPLE }}>{kf.probability}<span className="text-xs">%</span></p></div>
+                      </div>
+                    </div>
+                    <div className="h-1 rounded-full mb-4 overflow-hidden" style={{ background: "rgba(255,255,255,0.07)" }}>
+                      <div className="h-full rounded-full" style={{ width: `${kf.impact * 10}%`, background: `linear-gradient(to right,${NEON}44,${NEON})`, boxShadow: `0 0 8px ${NEON}` }} />
+                    </div>
+                    <p className="text-sm leading-7" style={{ color: "rgba(255,255,255,0.65)" }}>{kf.explanation}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Risk Intelligence */}
+          <div>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-1 h-5 rounded-full" style={{ background: PINK }} />
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: PINK }}>Risk Intelligence</p>
+            </div>
+            <div className="space-y-3">
+              {result.risks.map((r, i) => {
+                if (typeof r === "string") return (
+                  <div key={i} className="flex gap-4 items-center rounded-xl px-5 py-4" style={{ background: "#0D0B1A", border: `1px solid ${PINK}22` }}>
+                    <span style={{ color: PINK }}>&#9650;</span>
+                    <p className="text-sm" style={{ color: "rgba(255,255,255,0.8)" }}>{r}</p>
+                  </div>
+                );
+                const ri = r as RiskItem;
+                const rc = sevCol(ri.severity);
+                return (
+                  <div key={i} className="rounded-xl p-5" style={{ background: "#0D0B1A", border: `1px solid ${rc}28` }}>
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[8px] font-black uppercase px-2 py-1 rounded shrink-0" style={{ background: `${rc}1A`, color: rc, border: `1px solid ${rc}44` }}>{ri.severity}</span>
+                        <h4 className="font-bold text-white">{ri.risk}</h4>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>Probability</p>
+                        <p className="font-mono font-black text-lg leading-none" style={{ color: rc }}>{ri.probability}<span className="text-xs">%</span></p>
+                      </div>
+                    </div>
+                    <div className="h-1 rounded-full mb-4 overflow-hidden" style={{ background: "rgba(255,255,255,0.07)" }}>
+                      <div className="h-full rounded-full" style={{ width: `${ri.probability}%`, background: rc }} />
+                    </div>
+                    <div className="rounded-lg px-3 py-2" style={{ background: `${rc}0A`, border: `1px solid ${rc}22` }}>
+                      <p className="text-[8px] uppercase tracking-[0.15em] mb-1 font-black" style={{ color: rc }}>Mitigation Strategy</p>
+                      <p className="text-xs leading-5" style={{ color: "rgba(255,255,255,0.65)" }}>{ri.mitigation}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Opportunity Landscape */}
+          <div>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-1 h-5 rounded-full" style={{ background: GREEN }} />
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: GREEN }}>Opportunity Landscape</p>
+            </div>
+            <div className="space-y-3">
+              {result.opportunities.map((o, i) => {
+                if (typeof o === "string") return (
+                  <div key={i} className="flex gap-4 items-center rounded-xl px-5 py-4" style={{ background: "#0D0B1A", border: `1px solid ${GREEN}22` }}>
+                    <span style={{ color: GREEN }}>&#9670;</span>
+                    <p className="text-sm" style={{ color: "rgba(255,255,255,0.8)" }}>{o}</p>
+                  </div>
+                );
+                const oi = o as OpportunityItem;
+                const oc = potCol(oi.potential);
+                return (
+                  <div key={i} className="rounded-xl p-5" style={{ background: "#0D0B1A", border: `1px solid ${oc}28` }}>
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[8px] font-black uppercase px-2 py-1 rounded shrink-0" style={{ background: `${oc}1A`, color: oc, border: `1px solid ${oc}44` }}>{oi.potential} potential</span>
+                        <h4 className="font-bold text-white">{oi.opportunity}</h4>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>Window</p>
+                        <p className="text-xs font-mono font-bold" style={{ color: oc }}>{oi.window}</p>
+                      </div>
+                    </div>
+                    <div className="rounded-lg px-3 py-2" style={{ background: `${oc}0A`, border: `1px solid ${oc}22` }}>
+                      <p className="text-[8px] uppercase tracking-[0.15em] mb-1 font-black" style={{ color: oc }}>How to Capture</p>
+                      <p className="text-xs leading-5" style={{ color: "rgba(255,255,255,0.65)" }}>{oi.howToCapture}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
