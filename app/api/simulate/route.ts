@@ -846,6 +846,58 @@ MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n${categoryDepthInstructi
   }
 }
 
+
+function buildGuaranteedDeepRead(
+  type: string,
+  data: Record<string, FormValue>,
+  prediction: { prediction?: string; recommendation?: string; keyFactors?: unknown[]; risks?: unknown[]; opportunities?: unknown[] },
+  confidenceScore: number
+) {
+  const knownFacts = fv(data.knownFacts);
+  const unknowns = fv(data.unknowns);
+  const constraints = fv(data.constraints);
+  const idealOutcome = fv(data.idealOutcome);
+  const unacceptableOutcome = fv(data.unacceptableOutcome);
+  const title = `${type.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())} Deep Read`;
+  const pred = String(prediction.prediction || "");
+  const rec = String(prediction.recommendation || "");
+  const factors = Array.isArray(prediction.keyFactors) ? prediction.keyFactors.slice(0, 3).map((item) => typeof item === "string" ? item : JSON.stringify(item)) : [];
+  const risks = Array.isArray(prediction.risks) ? prediction.risks.slice(0, 2).map((item) => typeof item === "string" ? item : JSON.stringify(item)) : [];
+  const opportunities = Array.isArray(prediction.opportunities) ? prediction.opportunities.slice(0, 2).map((item) => typeof item === "string" ? item : JSON.stringify(item)) : [];
+
+  return {
+    title,
+    coreDiagnosis: `OmniSim reads this as a ${type} problem shaped by facts (${knownFacts}), unknowns (${unknowns}), and constraints (${constraints}). The current prediction is: ${pred} The operating recommendation is: ${rec} The useful truth is not just the outcome; it is the next evidence-producing action. If the user wants a smarter result, the most important upgrade is to verify the unknowns and rerun the simulation with harder facts.`,
+    truthMap: [
+      { signal: knownFacts, meaning: "Known facts anchor the simulation and should carry more weight than emotion or hope.", confidence: Math.min(95, Math.max(35, confidenceScore)) },
+      { signal: unknowns, meaning: "These unknowns are where the result can change fastest. OmniSim treats them as uncertainty, not truth.", confidence: Math.max(20, confidenceScore - 25) },
+      { signal: constraints, meaning: "Constraints define what can actually be done in the real world.", confidence: Math.max(30, confidenceScore - 10) },
+    ],
+    hiddenLevers: [...factors, ...opportunities].filter(Boolean).slice(0, 4),
+    failureMode: risks.length ? `The likely failure path is ${risks.join("; ")}. It worsens if the user ignores constraints, acts from emotion, or refuses to collect missing evidence.` : `The likely failure path is acting from emotion while the key unknowns remain unresolved. That turns a simulation into a wish, not intelligence.`,
+    bestPath: `The best path is to protect against ${unacceptableOutcome}, move toward ${idealOutcome}, and take one small action this week that creates new evidence. The action must be observable, low-risk, and specific enough to update the next OmniSim run.`,
+    decisionRules: [
+      "If the next action does not create evidence, it is too vague.",
+      "If new facts contradict the current prediction, rerun the simulation.",
+      "If downside risk rises faster than upside, pause and protect the boundary.",
+    ],
+    sevenDayActionPlan: [
+      "Write the known facts without interpretation.",
+      "List the unknowns that could change the answer.",
+      "Choose one low-risk test that creates evidence.",
+      "Ask one direct question that reduces uncertainty.",
+      "Remove one action driven only by fear, ego, or pressure.",
+      "Measure the result of the test.",
+      "Rerun OmniSim with the new evidence.",
+    ],
+    questionsToAnswerNext: [
+      "What fact would change this result most?",
+      "What is the highest-risk assumption?",
+      "What action creates evidence fastest?",
+    ],
+    stoicResilienceNote: "Control the next honest action, not the entire outcome. Stop chasing comfort; build evidence, protect your boundary, and update from reality.",
+  };
+}
 // ─── POST Handler ─────────────────────────────────────────────────────────────
 export async function POST(request: Request) {
   try {
@@ -891,12 +943,14 @@ export async function POST(request: Request) {
     const swarmLabTrace = buildSwarmLabTrace(type, scenarioText, agentResults, specialistResults, populationWeightedSentiment, historicalIntel.count, calibratedConfidence);
 
     const id = crypto.randomUUID();
+    const guaranteedDeepRead = prediction.deepRead ?? buildGuaranteedDeepRead(type, data, prediction, calibratedConfidence);
     const simulationResult = {
       id, type, ...prediction,
       confidenceScore: calibratedConfidence,
       sentimentData, populationWeightedSentiment,
       phoneReachIntelligence,
       historicalIntelligenceUsed: historicalIntel.count,
+      deepRead: guaranteedDeepRead,
       swarmLabTrace,
       specialistResults,
       counterIntelligence,
