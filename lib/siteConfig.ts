@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "OMNISIM",
   tagline: "Simulate Before It Happens",
   description:
-    "The world's most powerful AI simulation platform. Deploy 35+ intelligent agents to simulate real-world scenarios before they unfold — from PR crises and elections to market movements and geopolitical events.",
+    "The world's most powerful AI simulation platform. Deploy 35+ intelligent agents to simulate real-world scenarios before they unfold — from PR crises and elections to market movements, relationship futures, and $1K profit paths.",
   url: "https://omnisim.vercel.app",
 };
 
@@ -71,6 +71,23 @@ export const simTypes = [
     usedBy: "Defense Agencies · Embassies · Intelligence Firms · CEOs",
   },
   {
+    id: "profit-path",
+    icon: "💸",
+    title: "$1K Profit Path",
+    description:
+      "Simulate how limited capital can become a practical cash-flow plan using AI tools, automation, service offers, and disciplined reinvestment.",
+    color: "#00FF7F",
+    usedBy: "Founders · Side Hustlers · Operators · Creators",
+  },
+  {
+    id: "relationship",
+    icon: "❤️",
+    title: "Relationship Future",
+    description:
+      "Model trust, conflict recovery, repair attempts, shared values, safety signals, and likely relationship futures without pretending people are equations.",
+    color: "#FF0077",
+    usedBy: "Couples · Coaches · Founders · Families",
+  },  {
     id: "custom",
     icon: "⚡",
     title: "Custom Scenario",
