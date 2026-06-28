@@ -1,46 +1,38 @@
 import type { Metadata } from "next";
-import { Orbitron, JetBrains_Mono, Share_Tech_Mono } from "next/font/google";
+import { Outfit, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const orbitron = Orbitron({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-orbitron",
+  variable: "--font-outfit",
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
   weight: ["400", "500", "600", "700", "800", "900"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
-  weight: ["400", "500", "600", "700"],
-});
-
-const shareTechMono = Share_Tech_Mono({
-  subsets: ["latin"],
-  variable: "--font-share-tech",
-  weight: ["400"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
   title: "OMNISIM — Simulate Before It Happens",
   description:
-    "The world's most powerful AI simulation platform. Deploy 35+ intelligent agents to simulate real-world scenarios before they unfold.",
+    "The world's most powerful AI simulation platform. Deploy intelligent agents to simulate real-world scenarios before they unfold.",
   openGraph: {
     title: "OMNISIM — Simulate Before It Happens",
     description:
-      "Deploy 35+ AI agents to simulate PR crises, elections, market movements, sports matches, and geopolitical events.",
+      "Simulate PR crises, elections, market movements, sports matches, relationship futures, profit paths, and geopolitical events.",
     type: "website",
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${orbitron.variable} ${jetbrainsMono.variable} ${shareTechMono.variable}`}
-    >
-      <body className="scanlines">
+    <html lang="en" className={`${outfit.variable} ${playfair.variable}`}>
+      <body>
         <Navbar />
         <main>{children}</main>
         <Footer />
