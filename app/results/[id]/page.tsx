@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import ResultsDashboard, { SimulationResult } from "@/components/ResultsDashboard";
+import { ResultsDashboard, SimulationResult } from "@/components/ResultsDashboard";
 import Link from "next/link";
 
 export default function ResultsPage() {
@@ -54,18 +54,26 @@ export default function ResultsPage() {
   if (notFound || !result) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-4 text-center">
-        <p className="font-orbitron text-lg text-[#FF0077]">
-          SIMULATION NOT FOUND
-        </p>
-        <p className="text-sm text-white/35">
-          Results may have expired or the simulation ID is invalid.
-        </p>
-        <Link href="/simulate" className="btn-solid">
-          RUN NEW SIMULATION
-        </Link>
+        <p className="font-orbitron text-lg text-[#FF0077]">SIMULATION NOT FOUND</p>
+        <p className="text-sm text-white/35">Results may have expired or the simulation ID is invalid.</p>
+        <Link href="/simulate" className="btn-solid">RUN NEW SIMULATION</Link>
       </div>
     );
   }
 
-  return <ResultsDashboard result={result} />;
+  return (
+    <div className="min-h-screen px-4 py-12 sm:px-8">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-8 flex items-center justify-between">
+          <Link href="/simulate" className="text-[10px] font-bold uppercase tracking-[0.25em] transition" style={{ color: "rgba(255,255,255,0.4)" }}>
+            ← New Simulation
+          </Link>
+          <Link href="/history" className="text-[10px] font-bold uppercase tracking-[0.25em] transition" style={{ color: "rgba(255,255,255,0.4)" }}>
+            History →
+          </Link>
+        </div>
+        <ResultsDashboard result={result} />
+      </div>
+    </div>
+  );
 }
