@@ -404,7 +404,7 @@ function buildSwarmLabTrace(
       : "neutral";
 
   return {
-    engineVersion: "ArkNet SwarmLab Core v0.2",
+    engineVersion: "OmniSim SwarmLab Core v0.2",
     realitySeed: [
       `Scenario class: ${type}`,
       `Seed signals: ${uniqueWords.length ? uniqueWords.join(", ") : "truth calibration and user context"}`,
