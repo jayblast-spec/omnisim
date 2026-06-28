@@ -1,0 +1,510 @@
+export type FieldType = "text" | "textarea" | "select" | "multiselect" | "date" | "number" | "radio";
+
+export interface FormField {
+  id: string;
+  label: string;
+  type: FieldType;
+  required?: boolean;
+  placeholder?: string;
+  rows?: number;
+  options?: string[];
+  hint?: string;
+}
+
+export interface FormSection {
+  title: string;
+  subtitle?: string;
+  fields: FormField[];
+}
+
+export interface FormSchema {
+  type: string;
+  title: string;
+  description: string;
+  icon: string;
+  sections: FormSection[];
+}
+
+export const publicReactionSchema: FormSchema = {
+  type: "public-reaction",
+  title: "Public Reaction Simulation",
+  description: "Simulate how the world will react to a person, brand, or organization before you publish anything.",
+  icon: "📡",
+  sections: [
+    {
+      title: "THE SUBJECT",
+      subtitle: "Who or what is being put to the test?",
+      fields: [
+        { id: "subjectName", label: "Subject Name", type: "text", required: true, placeholder: "e.g. Elon Musk, Nike, OpenAI, Senator Jane Smith", hint: "The person, brand, or organization at the center of this simulation" },
+        { id: "subjectType", label: "Subject Type", type: "select", required: true, options: ["Individual (Celebrity / Public Figure)", "Individual (Politician)", "Corporation (Global)", "Corporation (SMB)", "Government / Institution", "Sports Team / Athlete", "Media Organization", "NGO / Non-Profit", "AI Company / Tech", "Other"] },
+        { id: "industry", label: "Industry / Sector", type: "select", required: true, options: ["Technology", "Finance / Banking", "Entertainment", "Sports", "Politics / Government", "Healthcare", "Retail / Consumer", "Media / Journalism", "Military / Defense", "Energy", "Fashion / Lifestyle", "Food & Beverage", "Real Estate", "Education", "Other"] },
+        { id: "currentPerception", label: "Current Public Perception", type: "select", required: true, options: ["Very Positive — loved, celebrated", "Positive — generally well-regarded", "Neutral — largely unknown or uncontroversial", "Mixed — polarizing figure", "Negative — under criticism", "Very Negative — under major attack"] },
+        { id: "subjectReach", label: "Audience Reach / Influence", type: "select", required: true, options: ["Global icon (1B+ impressions)", "Major national figure (100M+)", "Regional influencer (10M–100M)", "Niche influencer (1M–10M)", "Emerging / Local (under 1M)"] },
+      ],
+    },
+    {
+      title: "THE INCIDENT",
+      subtitle: "What happened — or is about to happen?",
+      fields: [
+        { id: "eventDescription", label: "Describe the Event / Statement / Action", type: "textarea", required: true, rows: 5, placeholder: "Describe exactly what happened, what was said, what was announced, or what you are about to release. Be specific — the more detail, the more accurate the simulation.", hint: "Include exact words, actions, or decisions. Treat this like a legal brief." },
+        { id: "incidentType", label: "Type of Incident", type: "select", required: true, options: ["Public Statement / Tweet / Post", "Product Announcement", "Leaked Information", "Scandal / Misconduct", "Corporate Decision (Layoffs, Mergers, etc.)", "Policy Change", "Celebrity Controversy", "Legal Charge / Arrest", "Financial Revelation", "Environmental / Ethical Breach", "Partnership / Endorsement", "Award / Achievement", "Other"] },
+        { id: "incidentDate", label: "Event Date / Planned Release Date", type: "date", required: false, hint: "When did this happen or when do you plan to release this?" },
+        { id: "revelationMethod", label: "How Will This Be Revealed?", type: "select", required: true, options: ["Press release", "Social media post", "News article / investigative report", "Live speech / event", "Leaked internally", "Leaked by press", "Court filing", "Annual report / financial disclosure", "Not yet decided"] },
+        { id: "mediaCoverage", label: "Expected Media Coverage", type: "select", required: true, options: ["Breaking news / top story globally", "Major national coverage", "Industry-specific press only", "Social media first, then press", "Minimal — small story", "Unknown at this stage"] },
+      ],
+    },
+    {
+      title: "BACKGROUND & CONTEXT",
+      subtitle: "Give the AI full context to simulate accurately",
+      fields: [
+        { id: "backgroundContext", label: "Background / History / Context", type: "textarea", required: true, rows: 5, placeholder: "What is the history behind this? What has this person or organization done before that is relevant? What is the public mood right now?", hint: "The AI uses this to calibrate agent reactions. More context = more accurate prediction." },
+        { id: "patternStatus", label: "Is This Part of a Pattern?", type: "select", required: true, options: ["First-time incident — no prior pattern", "Second occurrence — possible pattern emerging", "Repeated behavior — clear pattern established", "Contradicts previous behavior — surprise factor", "Consistent with their known persona"] },
+        { id: "comparison", label: "Similar Past Events for Reference", type: "textarea", required: false, rows: 3, placeholder: "Optional: Name similar incidents from history. e.g. 'Similar to United Airlines dragging a passenger (2017)'" },
+        { id: "plannedResponse", label: "Planned Crisis Response (if any)", type: "select", required: false, options: ["Full public apology", "Partial apology with justification", "Denial — claim it is false", "No comment at this time", "Legal action against accusers", "Deflect / attack opposition", "Silent — no response planned", "Not yet decided"] },
+      ],
+    },
+    {
+      title: "SIMULATION PARAMETERS",
+      subtitle: "Define who and where you want to simulate",
+      fields: [
+        { id: "targetRegions", label: "Target Regions to Simulate", type: "multiselect", required: true, options: ["North America", "Europe", "Sub-Saharan Africa", "Middle East / North Africa", "South Asia", "East Asia", "Southeast Asia", "Latin America", "Oceania", "Global (all regions)"], hint: "Select all regions where you want to measure reaction" },
+        { id: "targetDemographics", label: "Target Demographics", type: "multiselect", required: true, options: ["Gen Z (18–25)", "Millennials (26–40)", "Gen X (41–55)", "Baby Boomers (56+)", "Working class", "Middle class", "Upper class", "Political left", "Political right", "Business community", "Academic / intellectual", "Religious communities"] },
+        { id: "primaryQuestion", label: "Primary Simulation Question", type: "select", required: true, options: ["How will the public react emotionally?", "Will this damage or help the brand/reputation?", "Will there be boycotts or cancellations?", "How will different political groups respond?", "What will the media narrative be?", "Will this go viral — positive or negative?", "What is the long-term reputational impact?"] },
+        { id: "timeframe", label: "Simulation Timeframe", type: "select", required: true, options: ["First 24 hours", "First 72 hours (3 days)", "First week", "First month", "6-month arc", "Long-term (12+ months)"] },
+      ],
+    },
+    {
+      title: "ADDITIONAL INTELLIGENCE",
+      subtitle: "Optional — adds precision to agent reactions",
+      fields: [
+        { id: "mediaAllies", label: "Known Media Allies / Supporters", type: "textarea", required: false, rows: 2, placeholder: "e.g. Fox News, MSNBC, specific influencers or publications that are sympathetic" },
+        { id: "mediaAdversaries", label: "Known Media Adversaries", type: "textarea", required: false, rows: 2, placeholder: "e.g. The Guardian, CNN, specific critics or opposition voices" },
+        { id: "additionalNotes", label: "Anything Else the AI Should Know", type: "textarea", required: false, rows: 3, placeholder: "Any additional context, sensitivities, key stakeholders, internal concerns, or specific angles to explore" },
+      ],
+    },
+  ],
+};
+
+export const electionSchema: FormSchema = {
+  type: "election",
+  title: "Election Outcome Simulation",
+  description: "Predict election results, voter behavior, and swing dynamics before a single ballot is cast.",
+  icon: "🗳️",
+  sections: [
+    {
+      title: "THE ELECTION",
+      subtitle: "Define the race being simulated",
+      fields: [
+        { id: "electionName", label: "Election Name", type: "text", required: true, placeholder: "e.g. 2024 US Presidential Election, UK General Election 2025, Lagos Governorship 2027" },
+        { id: "electionType", label: "Type of Election", type: "select", required: true, options: ["Presidential", "Parliamentary / Legislative", "Gubernatorial / State", "Local / Municipal", "Referendum / Ballot Measure", "Party Primary", "Other"] },
+        { id: "country", label: "Country / Region", type: "text", required: true, placeholder: "e.g. United States, United Kingdom, Nigeria, France" },
+        { id: "electionDate", label: "Election Date", type: "date", required: false },
+        { id: "electionSystem", label: "Electoral System", type: "select", required: true, options: ["First Past the Post (winner-takes-all)", "Proportional Representation", "Two-Round System (Runoff)", "Electoral College", "Mixed System", "Ranked Choice Voting", "Other"] },
+      ],
+    },
+    {
+      title: "THE CANDIDATES",
+      subtitle: "Who is running and what do they represent?",
+      fields: [
+        { id: "candidates", label: "List All Candidates / Parties", type: "textarea", required: true, rows: 4, placeholder: "List all major candidates or parties. Include their name, party, ideology, and key position. One per line." },
+        { id: "leadingCandidate", label: "Currently Leading Candidate / Party", type: "text", required: true, placeholder: "Who is currently ahead in polls or perception?" },
+        { id: "trailingCandidate", label: "Currently Trailing Candidate / Party", type: "text", required: true, placeholder: "Who is behind? What is their gap?" },
+        { id: "wildCardCandidate", label: "Wild Card / Third Party (if any)", type: "text", required: false, placeholder: "Any independent or minor party that could affect the outcome?" },
+        { id: "incumbentStatus", label: "Incumbent Running?", type: "select", required: true, options: ["Yes — incumbent is running for re-election", "No — open seat, no incumbent", "Incumbent is term-limited", "Incumbent party but different candidate"] },
+      ],
+    },
+    {
+      title: "THE ISSUES",
+      subtitle: "What is this election really about?",
+      fields: [
+        { id: "majorIssues", label: "Major Issues in This Election", type: "multiselect", required: true, options: ["Economy / Cost of living", "Immigration", "Healthcare", "Crime / Public safety", "Climate / Environment", "Education", "Corruption / Governance", "Foreign policy / War", "Jobs / Unemployment", "Housing", "Religious / Cultural values", "Race / Identity politics"] },
+        { id: "politicalClimate", label: "Current Political Climate", type: "select", required: true, options: ["Highly polarized — deeply divided electorate", "Moderate — center holds", "Populist surge — anti-establishment mood", "Nationalist wave", "Progressive momentum", "Voter apathy / low engagement", "Post-crisis / recovery mood"] },
+        { id: "mediaLandscape", label: "Media Landscape", type: "select", required: true, options: ["Balanced and independent", "Skewed toward incumbent", "Skewed toward opposition", "Fragmented — each side has its own media", "State-controlled", "Social media dominant"] },
+        { id: "currentPolling", label: "Current Polling Numbers", type: "textarea", required: false, rows: 3, placeholder: "e.g. Candidate A: 48%, Candidate B: 42%, Undecided: 10%. Include margin of error if known." },
+      ],
+    },
+    {
+      title: "VOTER DYNAMICS",
+      subtitle: "Who votes, how, and why",
+      fields: [
+        { id: "voterDemographics", label: "Key Voter Blocs", type: "multiselect", required: true, options: ["Urban voters", "Rural voters", "Suburban swing voters", "Young voters (18–30)", "Senior voters (60+)", "Women", "Ethnic minorities", "Working class whites", "College-educated", "Evangelical / religious", "Union members", "Business owners"] },
+        { id: "turnoutExpectation", label: "Expected Voter Turnout", type: "select", required: true, options: ["Very high (80%+)", "High (65–80%)", "Average (50–65%)", "Low (35–50%)", "Very low (under 35%)"] },
+        { id: "keySwingGroups", label: "Key Swing Groups That Could Decide This", type: "textarea", required: true, rows: 3, placeholder: "Which demographic or geographic groups are undecided or persuadable? What would move them?" },
+        { id: "foreignInterference", label: "External Interference Risk", type: "select", required: false, options: ["High — confirmed foreign interference attempts", "Medium — suspected interference", "Low — minimal external concern", "None identified"] },
+      ],
+    },
+    {
+      title: "ADDITIONAL FACTORS",
+      subtitle: "Historical context and wild cards",
+      fields: [
+        { id: "historicalContext", label: "Historical Electoral Context", type: "textarea", required: false, rows: 3, placeholder: "How has this region voted historically? What patterns exist? Any realignment signals?" },
+        { id: "scandals", label: "Active Scandals / Controversies", type: "textarea", required: false, rows: 3, placeholder: "Any pending investigations, controversies, or October surprises that could shift votes?" },
+        { id: "economicConditions", label: "Economic Conditions at Time of Vote", type: "select", required: true, options: ["Strong growth, low unemployment", "Moderate growth, stable", "Stagnant, concern rising", "Recession / contraction", "High inflation, cost-of-living crisis", "Economic recovery underway"] },
+        { id: "additionalNotes", label: "Anything Else the AI Should Factor In", type: "textarea", required: false, rows: 3, placeholder: "Any specific local dynamics, endorsements, or factors not covered above" },
+      ],
+    },
+  ],
+};
+
+export const marketsSchema: FormSchema = {
+  type: "markets",
+  title: "Market Movement Simulation",
+  description: "Simulate how markets, assets, and investor sentiment respond to events before they move.",
+  icon: "📈",
+  sections: [
+    {
+      title: "THE SCENARIO",
+      subtitle: "What market event are you simulating?",
+      fields: [
+        { id: "marketScenario", label: "Scenario Title", type: "text", required: true, placeholder: "e.g. Federal Reserve surprise rate hike, China invades Taiwan, Apple launches AI chip" },
+        { id: "assetClass", label: "Asset Classes Affected", type: "multiselect", required: true, options: ["US Equities", "Global Equities", "Cryptocurrencies", "US Bonds / Treasuries", "Commodities (Oil, Gold, etc.)", "Real Estate / REITs", "Forex / Currency pairs", "Emerging Market assets", "Tech / Growth stocks", "Energy stocks", "Financial sector"] },
+        { id: "specificAssets", label: "Specific Assets / Tickers", type: "textarea", required: false, rows: 2, placeholder: "e.g. BTC, ETH, AAPL, NVDA, S&P 500, EUR/USD, Gold spot, WTI Crude" },
+        { id: "triggerEvent", label: "The Trigger Event", type: "textarea", required: true, rows: 4, placeholder: "Describe exactly what the triggering event is. What happened, who announced it, when, and how it was revealed. Be specific about the nature of the surprise or confirmation." },
+        { id: "eventDate", label: "Event Date / Expected Date", type: "date", required: false },
+      ],
+    },
+    {
+      title: "CURRENT MARKET CONDITIONS",
+      subtitle: "Where are markets right now?",
+      fields: [
+        { id: "currentMarketState", label: "Current Market State", type: "select", required: true, options: ["Bull market — strong uptrend", "Bear market — sustained downtrend", "Sideways / consolidation", "Near all-time highs", "Post-crash recovery", "Elevated volatility (VIX high)", "Low volatility, complacent"] },
+        { id: "priceLevel", label: "Key Price Levels / Context", type: "textarea", required: false, rows: 2, placeholder: "e.g. S&P at 5,200, BTC at $95,000, Gold at $2,400/oz, 10Y yield at 4.5%" },
+        { id: "marketTrend", label: "Recent Market Trend (30 days)", type: "select", required: true, options: ["Strong uptrend (+10% or more)", "Moderate uptrend (+3–10%)", "Flat (-3% to +3%)", "Moderate downtrend (-3–10%)", "Strong downtrend (-10% or more)"] },
+      ],
+    },
+    {
+      title: "MACRO CONTEXT",
+      subtitle: "The economic backdrop",
+      fields: [
+        { id: "economicContext", label: "Economic Environment", type: "select", required: true, options: ["Strong growth, soft landing achieved", "Moderate growth, balanced", "Slowing growth, recession fears", "Active recession", "Stagflation (high inflation + slow growth)", "Recovery phase"] },
+        { id: "centralBankStance", label: "Central Bank Stance", type: "select", required: true, options: ["Actively hiking rates", "Pausing — rates on hold", "Actively cutting rates", "Emergency easing mode", "Quantitative tightening (QT)", "Quantitative easing (QE)"] },
+        { id: "inflationRate", label: "Current Inflation Rate", type: "select", required: true, options: ["Under 2% (below target)", "2–3% (on target)", "3–5% (above target)", "5–8% (high)", "8%+ (very high / crisis)"] },
+        { id: "geopoliticalFactors", label: "Active Geopolitical Risks", type: "textarea", required: false, rows: 2, placeholder: "e.g. Russia-Ukraine conflict, US-China trade war, Middle East tensions, election uncertainty" },
+      ],
+    },
+    {
+      title: "INVESTOR SENTIMENT",
+      subtitle: "Who is positioned how?",
+      fields: [
+        { id: "investorSentiment", label: "Current Investor Sentiment", type: "select", required: true, options: ["Extreme greed — FOMO driven", "Greed — risk-on", "Neutral", "Fear — risk-off", "Extreme fear — panic selling"] },
+        { id: "institutionalPositioning", label: "Institutional Positioning", type: "select", required: false, options: ["Heavily long / overweight", "Slightly long", "Neutral / balanced", "Slightly short / hedged", "Heavily short / defensive", "Unknown"] },
+        { id: "retailSentiment", label: "Retail / Crypto Community Sentiment", type: "select", required: false, options: ["Extremely bullish", "Bullish", "Neutral", "Bearish", "Panic / selling"] },
+        { id: "timeframe", label: "Simulation Timeframe", type: "select", required: true, options: ["Immediate reaction (minutes to hours)", "Short-term (1–7 days)", "Medium-term (1–4 weeks)", "Long-term (1–6 months)"] },
+        { id: "outcomeQuestion", label: "What Outcome Are You Predicting?", type: "select", required: true, options: ["Direction of price movement", "Magnitude of move (%)", "How quickly markets recover", "Which assets move most", "Whether a crash or rally occurs", "How different investor types react"] },
+      ],
+    },
+    {
+      title: "ADDITIONAL CONTEXT",
+      subtitle: "Help the AI simulate more accurately",
+      fields: [
+        { id: "historicalPrecedent", label: "Historical Comparisons", type: "textarea", required: false, rows: 3, placeholder: "e.g. 'Similar to the 2020 COVID crash' or 'Like the 2018 rate hike surprise that tanked markets 20%'" },
+        { id: "additionalNotes", label: "Other Key Details", type: "textarea", required: false, rows: 3, placeholder: "Upcoming earnings, expiry dates, regulatory decisions, or any market-specific factors" },
+      ],
+    },
+  ],
+};
+
+export const sportsSchema: FormSchema = {
+  type: "sports",
+  title: "Sports Match Simulation",
+  description: "Run probabilistic simulations of match outcomes accounting for form, injuries, tactics, and crowd dynamics.",
+  icon: "⚽",
+  sections: [
+    {
+      title: "THE EVENT",
+      subtitle: "Define the match or competition",
+      fields: [
+        { id: "eventName", label: "Match / Event Name", type: "text", required: true, placeholder: "e.g. Champions League Final 2025, NBA Game 7, Super Bowl LX, Wimbledon Men's Final" },
+        { id: "sport", label: "Sport", type: "select", required: true, options: ["Football (Soccer)", "American Football (NFL)", "Basketball (NBA)", "Cricket", "Tennis", "Rugby", "Boxing / MMA", "Formula 1", "Baseball (MLB)", "Hockey (NHL)", "Athletics / Track", "Other"] },
+        { id: "eventDate", label: "Match Date", type: "date", required: false },
+        { id: "venue", label: "Venue / Location", type: "text", required: false, placeholder: "e.g. Wembley Stadium, London / Madison Square Garden, NYC" },
+        { id: "competition", label: "Competition / Tournament Stage", type: "select", required: true, options: ["Final", "Semi-Final", "Quarter-Final", "Group Stage / Regular Season", "Play-off / Elimination game", "Derby / Rivalry match", "International / World Cup", "Friendly / Exhibition"] },
+      ],
+    },
+    {
+      title: "TEAM A / PLAYER A",
+      subtitle: "First competitor profile",
+      fields: [
+        { id: "teamA", label: "Team A / Player A Name", type: "text", required: true, placeholder: "e.g. Real Madrid, Kansas City Chiefs, Novak Djokovic" },
+        { id: "teamAForm", label: "Team A Recent Form", type: "select", required: true, options: ["Exceptional — winning streak, high confidence", "Good — mostly wins, solid momentum", "Average — inconsistent results", "Poor — recent losses, low morale", "Very poor — crisis mode"] },
+        { id: "teamARecord", label: "Team A Season Record / Ranking", type: "text", required: false, placeholder: "e.g. W22 D5 L3, #1 seed, World Rank 2" },
+        { id: "teamAKeyPlayers", label: "Team A Key Players / Stars", type: "textarea", required: false, rows: 2, placeholder: "List star players, their form, and any who are injury doubts" },
+        { id: "teamAStrengths", label: "Team A Tactical Strengths", type: "textarea", required: false, rows: 2, placeholder: "e.g. High press, counter-attack specialist, dominant in the air, fast break offense" },
+      ],
+    },
+    {
+      title: "TEAM B / PLAYER B",
+      subtitle: "Second competitor profile",
+      fields: [
+        { id: "teamB", label: "Team B / Player B Name", type: "text", required: true, placeholder: "e.g. Barcelona, San Francisco 49ers, Carlos Alcaraz" },
+        { id: "teamBForm", label: "Team B Recent Form", type: "select", required: true, options: ["Exceptional — winning streak, high confidence", "Good — mostly wins, solid momentum", "Average — inconsistent results", "Poor — recent losses, low morale", "Very poor — crisis mode"] },
+        { id: "teamBRecord", label: "Team B Season Record / Ranking", type: "text", required: false, placeholder: "e.g. W18 D7 L5, #3 seed, World Rank 1" },
+        { id: "teamBKeyPlayers", label: "Team B Key Players / Stars", type: "textarea", required: false, rows: 2, placeholder: "List star players, their form, and any injury doubts" },
+        { id: "teamBStrengths", label: "Team B Tactical Strengths", type: "textarea", required: false, rows: 2, placeholder: "e.g. Possession-based, set piece specialist, physical dominance, defensive solidity" },
+      ],
+    },
+    {
+      title: "MATCH INTELLIGENCE",
+      subtitle: "Everything that could determine the outcome",
+      fields: [
+        { id: "headToHead", label: "Head-to-Head History", type: "textarea", required: false, rows: 3, placeholder: "Recent meetings: who won, scores, patterns. e.g. 'Last 5: A won 3, B won 1, drew 1. A always wins on neutral ground.'" },
+        { id: "currentOdds", label: "Current Betting Odds / Probability", type: "text", required: false, placeholder: "e.g. Team A: 2.10, Draw: 3.40, Team B: 3.50 / Win probability A: 55%, B: 30%, Draw: 15%" },
+        { id: "homeAdvantage", label: "Home Advantage", type: "select", required: true, options: ["Team A is at home (strong home record)", "Team A is at home (neutral home record)", "Team B is at home (strong home record)", "Team B is at home (neutral home record)", "Neutral venue", "Neutral venue but Team A has more fans present"] },
+        { id: "injuries", label: "Injuries / Suspensions / Absences", type: "textarea", required: false, rows: 3, placeholder: "Any key players missing? Who is rated doubtful? Which positions are affected?" },
+        { id: "weather", label: "Weather / Playing Conditions", type: "select", required: false, options: ["Perfect conditions — dry, firm pitch", "Hot and humid", "Cold and windy", "Rain / wet pitch", "Extreme heat", "Indoor / controlled environment", "Unknown"] },
+      ],
+    },
+    {
+      title: "DEEPER FACTORS",
+      subtitle: "The intangibles that tip outcomes",
+      fields: [
+        { id: "pressureLevel", label: "Pressure Level for Each Team", type: "textarea", required: false, rows: 2, placeholder: "Who needs this win more? Which team has more at stake? Manager under pressure?" },
+        { id: "crowdFactor", label: "Crowd / Fan Factor", type: "select", required: false, options: ["Hostile crowd — heavily against visiting team", "Strongly favors Team A", "Strongly favors Team B", "Split crowd", "Neutral / empty stadium", "N/A (individual sport)"] },
+        { id: "additionalNotes", label: "Any Other Factors", type: "textarea", required: false, rows: 3, placeholder: "Derby rivalry history, managerial tactics, travel fatigue, fixture congestion, doping concerns, VAR patterns, etc." },
+      ],
+    },
+  ],
+};
+
+export const policySchema: FormSchema = {
+  type: "policy",
+  title: "Policy Impact Simulation",
+  description: "Measure public and political reaction to laws and regulations before implementation.",
+  icon: "📜",
+  sections: [
+    {
+      title: "THE POLICY",
+      subtitle: "What is being proposed or enacted?",
+      fields: [
+        { id: "policyName", label: "Policy / Law Name", type: "text", required: true, placeholder: "e.g. Universal Basic Income Act, Carbon Tax Bill, National ID Card Mandate, Crypto Regulation Framework" },
+        { id: "policyType", label: "Type of Policy", type: "select", required: true, options: ["Economic / Fiscal policy", "Social policy (healthcare, education, welfare)", "Environmental / Climate policy", "Security / Defense policy", "Immigration policy", "Tax policy", "Technology / AI regulation", "Criminal justice reform", "Trade / Economic sanctions", "Constitutional / Electoral reform", "Public health mandate", "Other"] },
+        { id: "issuingBody", label: "Who is Issuing This Policy?", type: "text", required: true, placeholder: "e.g. US Congress, UK Parliament, Nigerian Presidency, EU Commission, State Governor" },
+        { id: "effectiveDate", label: "Effective Date / Implementation Timeline", type: "date", required: false },
+        { id: "jurisdiction", label: "Jurisdiction / Scope", type: "select", required: true, options: ["National — affects entire country", "State / Regional", "Municipal / Local", "International / Multilateral", "Industry-specific", "Pilot / experimental program"] },
+      ],
+    },
+    {
+      title: "POLICY CONTENT",
+      subtitle: "What does it actually do?",
+      fields: [
+        { id: "policyDescription", label: "Full Policy Description", type: "textarea", required: true, rows: 5, placeholder: "Describe the policy in detail. What does it mandate? What does it change? Who is affected? What are the penalties or incentives? What is the stated goal?" },
+        { id: "keyProvisions", label: "Key Provisions / Main Points", type: "textarea", required: true, rows: 3, placeholder: "List the 3-5 most significant provisions. e.g. 'Citizens over 18 receive $1,000/month; funded by 5% wealth tax; replaces food stamps'" },
+        { id: "affectedSectors", label: "Sectors Most Affected", type: "multiselect", required: true, options: ["General public / citizens", "Low-income households", "Small businesses", "Large corporations", "Farmers / agriculture", "Tech industry", "Financial sector", "Healthcare workers", "Immigrants / foreign nationals", "Youth / students", "Elderly / retirees", "Military / veterans"] },
+        { id: "estimatedBudget", label: "Estimated Cost / Budget Impact", type: "text", required: false, placeholder: "e.g. $2.3 trillion over 10 years, $500M annual cost, revenue neutral" },
+      ],
+    },
+    {
+      title: "POLITICAL LANDSCAPE",
+      subtitle: "The battle lines around this policy",
+      fields: [
+        { id: "politicalContext", label: "Political Context", type: "textarea", required: true, rows: 3, placeholder: "What is the political environment? Is this government popular? Is this policy driven by election promises, crisis response, or ideology?" },
+        { id: "opposition", label: "Key Opposition Arguments", type: "textarea", required: true, rows: 3, placeholder: "What are the strongest arguments against this policy? Who leads the opposition?" },
+        { id: "support", label: "Key Support Arguments", type: "textarea", required: true, rows: 3, placeholder: "What are the strongest arguments for this policy? Who are the champions?" },
+        { id: "mediaFraming", label: "How is Media Framing This?", type: "select", required: true, options: ["Mostly positive / supportive", "Neutral / objective coverage", "Mixed — both sides represented", "Mostly negative / critical", "Highly polarized — split by outlet ideology", "Largely ignored so far"] },
+      ],
+    },
+    {
+      title: "SIMULATION PARAMETERS",
+      subtitle: "Define the simulation scope",
+      fields: [
+        { id: "targetRegions", label: "Target Regions", type: "multiselect", required: true, options: ["Urban centers", "Rural areas", "Suburban communities", "North America", "Europe", "Africa", "Asia", "Latin America", "Global"] },
+        { id: "targetDemographics", label: "Key Demographics to Simulate", type: "multiselect", required: true, options: ["Gen Z (18–25)", "Millennials (26–40)", "Gen X (41–55)", "Baby Boomers (56+)", "Working class", "Middle class", "Business owners", "Religious communities", "Political left", "Political right", "Political center"] },
+        { id: "timeframe", label: "Impact Timeframe", type: "select", required: true, options: ["Immediate public reaction (days)", "Short-term (1–3 months)", "Medium-term (6–12 months)", "Long-term (2–5 years)", "Generational impact"] },
+        { id: "primaryQuestion", label: "Primary Question", type: "select", required: true, options: ["Will the public support or oppose this?", "What will be the political fallout?", "Will this cause social unrest or protest?", "What is the economic impact?", "Will this policy survive legally?", "How will different demographics react?"] },
+      ],
+    },
+    {
+      title: "STAKEHOLDER MAP",
+      subtitle: "How key groups will respond",
+      fields: [
+        { id: "businessReaction", label: "Expected Business / Industry Reaction", type: "textarea", required: false, rows: 2, placeholder: "Will businesses comply, lobby against it, relocate, or adapt?" },
+        { id: "internationalResponse", label: "Expected International Response", type: "textarea", required: false, rows: 2, placeholder: "How will other countries or international bodies react?" },
+        { id: "implementationRisks", label: "Implementation / Compliance Risks", type: "textarea", required: false, rows: 2, placeholder: "What could go wrong in rolling this out? Enforcement challenges?" },
+        { id: "additionalNotes", label: "Additional Context", type: "textarea", required: false, rows: 2, placeholder: "Constitutional challenges, activist groups, historic precedents" },
+      ],
+    },
+  ],
+};
+
+export const productLaunchSchema: FormSchema = {
+  type: "product-launch",
+  title: "Product Launch Simulation",
+  description: "Simulate how your target market receives a new product, feature, or pricing change before you ship.",
+  icon: "🚀",
+  sections: [
+    {
+      title: "THE PRODUCT",
+      subtitle: "What are you launching?",
+      fields: [
+        { id: "productName", label: "Product Name", type: "text", required: true, placeholder: "e.g. iPhone 17 Pro, GPT-5, Nike Flyknit 2025, Stripe Capital for SMBs" },
+        { id: "companyName", label: "Company Name", type: "text", required: true, placeholder: "e.g. Apple, OpenAI, Nike, Stripe, YourStartupName" },
+        { id: "productCategory", label: "Product Category", type: "select", required: true, options: ["Consumer Hardware / Device", "Enterprise Software (B2B SaaS)", "Consumer App / Platform", "AI Product / Tool", "Physical Consumer Product", "Financial Product", "Healthcare / Biotech", "Fashion / Apparel", "Food & Beverage", "Gaming", "Media / Content", "Other"] },
+        { id: "launchDate", label: "Planned Launch Date", type: "date", required: false },
+        { id: "pricePoint", label: "Price Point / Pricing Model", type: "text", required: true, placeholder: "e.g. $999 one-time, $29/month, Freemium + $49/month Pro, Free with ads" },
+      ],
+    },
+    {
+      title: "THE PROPOSITION",
+      subtitle: "Why should anyone care?",
+      fields: [
+        { id: "productDescription", label: "Product Description", type: "textarea", required: true, rows: 4, placeholder: "Describe what the product does, what problem it solves, and what is genuinely new or different about it." },
+        { id: "uniqueValueProp", label: "Unique Value Proposition (UVP)", type: "textarea", required: true, rows: 3, placeholder: "In 1-2 sentences: why will customers choose this over alternatives? What is the killer feature?" },
+        { id: "differentiators", label: "Key Differentiators from Competition", type: "textarea", required: true, rows: 3, placeholder: "List 3-5 concrete ways this is better, different, or cheaper than what exists today" },
+        { id: "targetCustomer", label: "Ideal Target Customer", type: "textarea", required: true, rows: 2, placeholder: "Who is the exact person who will buy this? Age, job, pain point, location, spending habits" },
+      ],
+    },
+    {
+      title: "COMPETITIVE LANDSCAPE",
+      subtitle: "What are you walking into?",
+      fields: [
+        { id: "competition", label: "Main Competitors", type: "textarea", required: true, rows: 3, placeholder: "List direct and indirect competitors. Include their prices, strengths, and weaknesses." },
+        { id: "marketShare", label: "Current Market Share Landscape", type: "select", required: true, options: ["Monopoly / near-monopoly (one player dominates 70%+)", "Duopoly (two players split most of the market)", "Fragmented (many players, no dominant leader)", "Emerging category (no clear leader yet)", "Disrupting an analog / offline market"] },
+        { id: "incumbentAdvantage", label: "Incumbent Advantage Level", type: "select", required: true, options: ["Very high — established players with massive switching costs", "High — strong brand loyalty and distribution", "Medium — customers open to switching", "Low — customers are actively unhappy with incumbents", "None — new category"] },
+        { id: "firstMoverStatus", label: "First Mover Status", type: "select", required: true, options: ["First to market — creating a new category", "Fast follower — second but better", "Late entrant — entering established market", "Re-entering — pivoted from failed product"] },
+      ],
+    },
+    {
+      title: "GO-TO-MARKET STRATEGY",
+      subtitle: "How you plan to launch",
+      fields: [
+        { id: "launchMarkets", label: "Initial Launch Markets", type: "multiselect", required: true, options: ["United States", "United Kingdom", "European Union", "India", "Nigeria / West Africa", "Southeast Asia", "Latin America", "Japan / South Korea", "Middle East", "Global simultaneous launch"] },
+        { id: "channelStrategy", label: "Distribution Channels", type: "multiselect", required: true, options: ["Direct-to-consumer (D2C / website)", "App stores (iOS / Android)", "Retail partnerships", "Enterprise sales team", "Influencer / creator marketing", "SEO / content marketing", "Paid ads (Facebook, Google)", "Product Hunt / press launch", "Partnership / white-label"] },
+        { id: "marketingBudget", label: "Marketing Budget Range", type: "select", required: true, options: ["Bootstrapped — organic only (< $10K)", "Small budget ($10K – $100K)", "Medium budget ($100K – $1M)", "Large budget ($1M – $10M)", "Enterprise scale ($10M+)"] },
+        { id: "partnershipStrategy", label: "Key Partnerships / Endorsements", type: "textarea", required: false, rows: 2, placeholder: "Any celebrity endorsements, media partnerships, distribution deals, or platform integrations?" },
+      ],
+    },
+    {
+      title: "BRAND & MARKET CONTEXT",
+      subtitle: "The trust and perception environment",
+      fields: [
+        { id: "brandReputation", label: "Brand Reputation in This Category", type: "select", required: true, options: ["Iconic brand — trusted globally", "Strong brand — well-regarded", "Neutral brand — unknown in this space", "Mixed brand — some controversy", "Damaged brand — needs to rebuild trust", "Brand new — no existing perception"] },
+        { id: "targetDemographics", label: "Primary Buyer Demographics", type: "multiselect", required: true, options: ["Gen Z (18–25)", "Millennials (26–40)", "Gen X (41–55)", "Baby Boomers (56+)", "Enterprise buyers / CIOs", "Small business owners", "Developers / technical users", "Creatives / designers", "Health-conscious consumers", "Luxury buyers"] },
+        { id: "additionalNotes", label: "Other Context the AI Should Know", type: "textarea", required: false, rows: 3, placeholder: "Pre-launch hype, waitlist size, beta feedback, influencer seeding, past failed launches, regulatory concerns" },
+      ],
+    },
+  ],
+};
+
+export const geopoliticalSchema: FormSchema = {
+  type: "geopolitical",
+  title: "Geopolitical Event Simulation",
+  description: "Model the global ripple effects of conflicts, sanctions, treaties, or diplomatic crises across nations.",
+  icon: "🌍",
+  sections: [
+    {
+      title: "THE EVENT",
+      subtitle: "What geopolitical event is being simulated?",
+      fields: [
+        { id: "eventName", label: "Event Name / Title", type: "text", required: true, placeholder: "e.g. China Invades Taiwan, US Sanctions Iran, Russia-NATO Direct Confrontation, Sudan Civil War Escalation" },
+        { id: "eventType", label: "Event Type", type: "select", required: true, options: ["Military conflict / invasion", "Economic sanctions / trade war", "Diplomatic crisis / expulsion", "Treaty / Peace agreement", "Nuclear escalation", "Cyber attack / infrastructure hit", "Revolution / Coup d'etat", "Territorial dispute", "Refugee / humanitarian crisis", "Alliance formation / breakdown", "Assassination / Leadership change", "Other"] },
+        { id: "involvedParties", label: "Countries / Parties Directly Involved", type: "textarea", required: true, rows: 3, placeholder: "List all state and non-state actors directly involved. Include their roles: aggressor, defender, mediator, ally, etc." },
+        { id: "eventDate", label: "Date / When This Occurs", type: "date", required: false },
+        { id: "geographicScope", label: "Geographic Scope", type: "select", required: true, options: ["Bilateral (2 countries)", "Regional (multiple neighboring countries)", "Continental", "Global / multi-theater", "Cyber / non-physical"] },
+      ],
+    },
+    {
+      title: "THE TRIGGER",
+      subtitle: "What sparked this, and what happened immediately?",
+      fields: [
+        { id: "trigger", label: "The Trigger Event", type: "textarea", required: true, rows: 4, placeholder: "What specifically caused this? Was it a surprise attack, a political announcement, a military exercise gone wrong, an assassination? Describe the triggering moment in detail." },
+        { id: "immediateActions", label: "Immediate Actions Taken", type: "textarea", required: false, rows: 3, placeholder: "What has already happened? Military deployments, border closures, emergency sessions, sanctions announced?" },
+        { id: "officialStatements", label: "Official Statements / Justifications", type: "textarea", required: false, rows: 2, placeholder: "What have the key parties said publicly? What justification has been given?" },
+        { id: "internationalReaction", label: "Initial International Reaction", type: "textarea", required: false, rows: 2, placeholder: "How have the UN, US, EU, China, or regional bodies initially responded?" },
+      ],
+    },
+    {
+      title: "HISTORICAL CONTEXT",
+      subtitle: "The deep roots of this conflict or event",
+      fields: [
+        { id: "historicalContext", label: "Historical Background", type: "textarea", required: true, rows: 5, placeholder: "What is the history between these parties? Past wars, treaties, grievances, colonial history, territorial disputes, ethnic tensions. The deeper the context, the more accurate the simulation." },
+        { id: "currentTensions", label: "Current Tensions Before This Event", type: "textarea", required: true, rows: 3, placeholder: "What was the state of relations before this happened? Any recent provocations, diplomatic breakdowns, or military buildups?" },
+        { id: "alliances", label: "Key Alliances & Treaties", type: "textarea", required: false, rows: 2, placeholder: "Which major alliances are invoked? NATO Article 5? CSTO? BRICS solidarity? Belt & Road dependencies?" },
+      ],
+    },
+    {
+      title: "STAKES & INTERESTS",
+      subtitle: "What is really at stake here?",
+      fields: [
+        { id: "economicStakes", label: "Economic Stakes", type: "textarea", required: true, rows: 3, placeholder: "Oil supplies, trade routes, semiconductor production, grain exports, energy pipelines, financial markets. What economic systems are at risk?" },
+        { id: "resourcesInvolved", label: "Strategic Resources Involved", type: "multiselect", required: false, options: ["Oil & Gas", "Semiconductors / Technology", "Grain / Food supply", "Rare earth minerals", "Water rights", "Maritime routes", "Nuclear assets", "Cyber infrastructure", "Financial system"] },
+        { id: "escalationRisk", label: "Escalation Risk Assessment", type: "select", required: true, options: ["Extremely high — nuclear threshold could be crossed", "High — direct great power confrontation possible", "Medium — regional escalation likely", "Low — likely contained diplomatically", "Very low — symbolic / political theater"] },
+      ],
+    },
+    {
+      title: "SIMULATION PARAMETERS",
+      subtitle: "Define scope and outcomes to model",
+      fields: [
+        { id: "targetRegions", label: "Regions to Simulate Impact In", type: "multiselect", required: true, options: ["North America", "Europe", "Russia / Central Asia", "Middle East", "Africa", "South Asia", "East Asia", "Southeast Asia", "Latin America", "Global"] },
+        { id: "timeframe", label: "Simulation Timeframe", type: "select", required: true, options: ["Immediate (hours to days)", "Short-term (1–4 weeks)", "Medium-term (1–6 months)", "Long-term (6 months – 2 years)", "Decade-level structural shift"] },
+        { id: "primaryQuestion", label: "Primary Outcome Question", type: "select", required: true, options: ["Will this escalate to full-scale war?", "How will global markets react?", "What will the human cost be?", "How will alliances shift?", "What is the most likely resolution?", "Who gains and who loses geopolitically?"] },
+        { id: "additionalNotes", label: "Any Other Intelligence the AI Should Know", type: "textarea", required: false, rows: 3, placeholder: "Classified context, proxy actors, internal political pressures, leadership psychology, pending elections that affect decision-making" },
+      ],
+    },
+  ],
+};
+
+export const customSchema: FormSchema = {
+  type: "custom",
+  title: "Custom Scenario Simulation",
+  description: "Build any simulation scenario you can imagine. Climate events, social movements, technological disruptions — anything.",
+  icon: "⚡",
+  sections: [
+    {
+      title: "SCENARIO BASICS",
+      subtitle: "Define your custom simulation",
+      fields: [
+        { id: "scenarioTitle", label: "Scenario Title", type: "text", required: true, placeholder: "e.g. AGI is Announced Tomorrow, Pandemic Variant X Emerges, Global Internet Blackout, Mars Colony Established" },
+        { id: "scenarioCategory", label: "Scenario Category", type: "select", required: true, options: ["Technological Disruption", "Climate / Environmental Crisis", "Public Health / Pandemic", "Social Movement / Civil Unrest", "Economic Collapse / Boom", "Space / Scientific Discovery", "Media / Information Event", "Criminal / Justice Event", "Entertainment / Cultural Shift", "Religious / Ideological Event", "Infrastructure Failure", "Other"] },
+        { id: "scenarioDate", label: "When Does This Happen?", type: "date", required: false },
+        { id: "geographicScope", label: "Geographic Scope of Impact", type: "select", required: true, options: ["Local / City-level", "National", "Regional (multiple countries)", "Global", "Digital / Online space"] },
+      ],
+    },
+    {
+      title: "THE SCENARIO",
+      subtitle: "Tell the AI exactly what is happening",
+      fields: [
+        { id: "scenarioDescription", label: "Full Scenario Description", type: "textarea", required: true, rows: 6, placeholder: "Describe the scenario in as much detail as possible. What happened? Who was involved? How was it revealed? What is the immediate known impact? Think of this as briefing an intelligence analyst." },
+        { id: "keyEntities", label: "Key Entities Involved", type: "textarea", required: true, rows: 3, placeholder: "List all key people, organizations, governments, companies, or communities involved and their role in the scenario" },
+        { id: "stakeholders", label: "Key Stakeholders Affected", type: "textarea", required: false, rows: 2, placeholder: "Who are the winners, losers, and bystanders in this scenario?" },
+      ],
+    },
+    {
+      title: "CONTEXT & VARIABLES",
+      subtitle: "The world in which this happens",
+      fields: [
+        { id: "context", label: "World Context at Time of Event", type: "textarea", required: true, rows: 4, placeholder: "Describe the state of the world when this happens. Economic climate, political tensions, technological state, public mood, any relevant background events. Context is everything for accurate simulation." },
+        { id: "historicalPrecedent", label: "Historical Precedents", type: "textarea", required: false, rows: 3, placeholder: "Has anything similar happened before? What lessons does history offer? e.g. 'Similar to the 1918 Spanish flu' or 'Like when ChatGPT launched in Nov 2022'" },
+        { id: "variables", label: "Key Variables That Could Change the Outcome", type: "textarea", required: false, rows: 3, placeholder: "What are the 3-5 factors that most determine how this plays out? e.g. government response speed, media framing, economic resilience, international cooperation" },
+      ],
+    },
+    {
+      title: "SIMULATION GOALS",
+      subtitle: "What do you want to understand?",
+      fields: [
+        { id: "outcomeQuestion", label: "Primary Outcome Question", type: "textarea", required: true, rows: 3, placeholder: "What is the single most important question you want this simulation to answer? Be specific. e.g. 'Will the public accept AI replacing 30% of white collar jobs, and how will they respond?'" },
+        { id: "secondaryQuestions", label: "Secondary Questions (optional)", type: "textarea", required: false, rows: 2, placeholder: "Any additional angles or questions you want the simulation to explore?" },
+      ],
+    },
+    {
+      title: "PARAMETERS",
+      subtitle: "Simulation scope and demographic focus",
+      fields: [
+        { id: "targetRegions", label: "Target Regions", type: "multiselect", required: true, options: ["North America", "Europe", "Sub-Saharan Africa", "Middle East / North Africa", "South Asia", "East Asia", "Southeast Asia", "Latin America", "Oceania", "Global"] },
+        { id: "targetDemographics", label: "Key Demographics to Simulate", type: "multiselect", required: true, options: ["Gen Z (18–25)", "Millennials (26–40)", "Gen X (41–55)", "Baby Boomers (56+)", "Working class", "Middle class", "Upper class", "Business leaders", "Political class", "Scientific / academic community", "Religious communities", "Activist / civil society"] },
+        { id: "timeframe", label: "Simulation Timeframe", type: "select", required: true, options: ["Immediate (hours to 48 hours)", "Short-term (1–4 weeks)", "Medium-term (1–6 months)", "Long-term (1–5 years)", "Generational (5–25 years)"] },
+        { id: "complexityLevel", label: "Simulation Complexity", type: "select", required: true, options: ["Simple — focus on public reaction only", "Standard — reaction + key factors + recommendations", "Deep — full analysis with timeline, risks, opportunities", "Maximum — everything including dissenting views and edge cases"] },
+      ],
+    },
+  ],
+};
+
+export const formSchemas: Record<string, FormSchema> = {
+  "public-reaction": publicReactionSchema,
+  election: electionSchema,
+  markets: marketsSchema,
+  sports: sportsSchema,
+  policy: policySchema,
+  "product-launch": productLaunchSchema,
+  geopolitical: geopoliticalSchema,
+  custom: customSchema,
+};
