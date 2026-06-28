@@ -815,7 +815,9 @@ MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n${categoryDepthInstructi
       opportunities: Array.isArray(p.opportunities) ? p.opportunities : ["Strategic positioning available"],
       strategicActions: Array.isArray(p.strategicActions) ? p.strategicActions : [],
       recommendation: p.recommendation || "Review agent reactions for detailed insights.",
-      timeline: Array.isArray(p.timeline) ? p.timeline : [],\n      deepRead: p.deepRead,\n      relationshipDeepDive: p.relationshipDeepDive,
+      timeline: Array.isArray(p.timeline) ? p.timeline : [],
+      deepRead: p.deepRead,
+      relationshipDeepDive: p.relationshipDeepDive,
     };
   } catch {
     return {
