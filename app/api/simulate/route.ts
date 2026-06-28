@@ -70,6 +70,10 @@ export interface PhoneReachIntelligence {
 
 type FormValue = string | string[];
 
+
+function truthCalibrationText(data: Record<string, FormValue>): string {
+  return `\n\nTRUTH CALIBRATION\nKNOWN FACTS: ${fv(data.knownFacts)}\nUNKNOWNS / MISSING INFORMATION: ${fv(data.unknowns)}\nEVIDENCE QUALITY: ${fv(data.evidenceQuality)}\nREAL-WORLD CONSTRAINTS: ${fv(data.constraints)}\nIDEAL OUTCOME: ${fv(data.idealOutcome)}\nUNACCEPTABLE OUTCOME / BOUNDARY: ${fv(data.unacceptableOutcome)}\n\nINSTRUCTION: Treat measured facts and direct evidence as stronger than assumptions. When facts are missing, say what uncertainty remains. Respect constraints and boundaries. Do not overclaim certainty.`;
+}
 function fv(val: FormValue | undefined): string {
   if (!val) return "Not specified";
   return Array.isArray(val) ? val.join(", ") : val;
@@ -252,6 +256,8 @@ function buildScenarioText(type: string, data: Record<string, FormValue>): strin
       return `PROFIT PATH SIMULATION\n\nSTARTING CAPITAL: $${fv(data.startingCapital)}\nMONTHLY PROFIT GOAL: $${fv(data.monthlyNeed)}\nTIMEFRAME: ${fv(data.timeframe)}\nRISK TOLERANCE: ${fv(data.riskTolerance)}\n\nSKILLS: ${fv(data.skills)}\nTIME AVAILABLE: ${fv(data.availableTime)}\nTOOLS: ${fv(data.toolsAccess)}\n\nPREFERRED MODEL: ${fv(data.preferredModel)}\nTARGET BUYER: ${fv(data.targetBuyer)}\nOFFER IDEA: ${fv(data.offerIdea)}\n\nAUTOMATION TARGETS: ${fv(data.automationTargets)}\nSPEND PLAN: ${fv(data.spendPlan)}\nSTOP RULES: ${fv(data.stopRules)}\n\nMETRICS: ${fv(data.metrics)}\nREINVESTMENT RULE: ${fv(data.reinvestmentRule)}\nBIGGEST CONCERN: ${fv(data.biggestConcern)}\n\nIMPORTANT: This is educational simulation, not financial advice. Do not promise guaranteed or continuous profit. Emphasize capital protection, cash-flow experiments, tool verification, stop-loss rules, and reinvestment from actual profit only.`;
     case "relationship":
       return `RELATIONSHIP FUTURE SIMULATION\n\nTYPE: ${fv(data.relationshipType)}\nDURATION: ${fv(data.duration)}\nPRIMARY QUESTION: ${fv(data.primaryQuestion)}\n\nTRUST: ${fv(data.trustLevel)}\nCONFLICT PATTERN: ${fv(data.conflictPattern)}\nREPAIR ATTEMPTS: ${fv(data.repairAttempts)}\nAFFECTION / FRIENDSHIP: ${fv(data.affection)}\n\nPRESSURES: ${fv(data.pressureSources)}\nSHARED VALUES: ${fv(data.sharedValues)}\nWILLINGNESS TO CHANGE: ${fv(data.changeWillingness)}\n\nSAFETY CHECK: ${fv(data.safetyConcern)}\nSAFETY DETAILS: ${fv(data.safetyDetails)}\n\nDESIRED OUTCOME: ${fv(data.desiredOutcome)}\nNEXT CONVERSATION: ${fv(data.nextConversation)}\n\nIMPORTANT: This is not therapy, diagnosis, or a command to stay or leave. If safety concerns exist, prioritize safety, trusted outside support, and boundaries over normal relationship optimization.`;
+    case "health-signal":
+      return `HEALTH SIGNAL SIMULATION\n\nIMPORTANT SAFETY FRAME: This is educational health triage support, not diagnosis, prescription, or medical advice. Identify urgency, organize facts, suggest questions for a licensed clinician, and advise emergency care for red flags. Do not provide unsafe dosing or definitive diagnosis.\n\nPERSON: Age ${fv(data.age)} | Sex at birth: ${fv(data.sexAtBirth)} | Location: ${fv(data.currentLocation)} | Height/Weight: ${fv(data.heightWeight)}\nBLOOD TYPE: ${fv(data.bloodType)}\nGENOTYPE / SICKLE CELL STATUS: ${fv(data.genotype)}\nPREGNANCY / POSTPARTUM: ${fv(data.pregnancyStatus)}\n\nMAIN CONCERN: ${fv(data.mainConcern)}\nSYMPTOMS: ${fv(data.symptoms)}\nSTARTED: ${fv(data.startedWhen)}\nPROGRESSION: ${fv(data.progression)}\nPAIN / FEVER / BLEEDING: ${fv(data.painOrFever)}\n\nKNOWN CONDITIONS: ${fv(data.knownConditions)}\nMEDICATIONS / SUPPLEMENTS: ${fv(data.medications)}\nALLERGIES: ${fv(data.allergies)}\nEXPOSURES: ${fv(data.exposures)}\n\nVITALS: ${fv(data.vitals)}\nLABS / TESTS: ${fv(data.labs)}\nRED FLAGS: ${fv(data.redFlags)}\nCARE ACCESS: ${fv(data.careAccess)}\n\nOUTPUT STYLE: Start with urgency level and red-flag reasoning. Then list likely categories to discuss with a clinician, what facts matter most, what to monitor, and what questions/tests to ask for. If red flags are present, prioritize urgent care over simulation detail.`;
     case "legacy-view":
       return `LEGACY VIEW SIMULATION\n\nIMPORTANT SAFETY FRAME: This is a reflective exercise based on the user's memories and values. Do not claim to contact, channel, or speak literally for the deceased. Write as a grounded legacy mirror: "Based on what you remember of them, they may have wanted you to see..." Avoid manipulation, certainty, or supernatural claims.\n\nLOVED ONE: ${fv(data.lovedOneName)}\nRELATIONSHIP: ${fv(data.relationshipToYou)}\nPERSONALITY: ${fv(data.theirPersonality)}\nVALUES: ${fv(data.theirValues)}\n\nCURRENT SEASON: ${fv(data.currentSeason)}\nLIFE UPDATE: ${fv(data.lifeUpdate)}\nWHAT MIGHT MAKE THEM PROUD: ${fv(data.proudMoments)}\nPRIVATE STRUGGLE: ${fv(data.privateStruggle)}\n\nDESIRED TONE: ${fv(data.desiredTone)}\nMAIN QUESTION: ${fv(data.mainQuestion)}\nNEED MOST: ${fv(data.needMost)}\nAVOID TONE: ${fv(data.avoidTone)}\n\nRESILIENCE FOCUS: ${fv(data.resilienceFocus)}\nPOWER LESSON: ${fv(data.powerLesson)}\nNEXT STEP: ${fv(data.nextStep)}\n\nOUTPUT STYLE: Give sober hope, practical encouragement, and a clear next step. Integrate stoic principles: control what can be controlled, accept what cannot be changed, act with virtue, keep discipline under pressure. Integrate power-awareness without cruelty: reputation, timing, restraint, allies, leverage, and self-command. Use resilience laws such as self-mastery, disciplined action, honest grief, duty, boundaries, useful work, patience, and rebuilding identity after loss. If the user expresses self-harm intent, advise immediate trusted human support and emergency help.`;
     case "geopolitical":
@@ -522,7 +528,7 @@ WORLD POPULATION: 8.1 billion humans
 AGENT SAMPLE: ${agentResults.length} agents representing ~${totalRepresentedPop}M people
 RAW AGENT SENTIMENT: ${sentimentData.positive}% positive | ${sentimentData.neutral}% neutral | ${sentimentData.negative}% negative
 POPULATION-WEIGHTED GLOBAL SENTIMENT: ${populationWeightedSentiment.positive}% positive | ${populationWeightedSentiment.neutral}% neutral | ${populationWeightedSentiment.negative}% negative
-${type === "legacy-view" ? "PRIVATE REFLECTION REALITY: This is not an event-spread simulation. Treat it as a grief-safe legacy mirror. Do not claim supernatural contact or certainty. Focus on stoic encouragement, practical resilience, and grounded next steps." : "PHONE REACH REALITY: Every event must be analyzed through smartphone reach, basic/SMS phone reach, active-online-now spread, and delayed offline relay. Do not assume the whole world sees the event at once."}
+${type === "legacy-view" ? "PRIVATE REFLECTION REALITY: This is not an event-spread simulation. Treat it as a grief-safe legacy mirror. Do not claim supernatural contact or certainty. Focus on stoic encouragement, practical resilience, and grounded next steps." : type === "health-signal" ? "PRIVATE HEALTH REALITY: This is not an event-spread simulation. Treat it as educational triage support, not diagnosis. Prioritize red flags, clinician questions, measured facts, and uncertainty boundaries." : "PHONE REACH REALITY: Every event must be analyzed through smartphone reach, basic/SMS phone reach, active-online-now spread, and delayed offline relay. Do not assume the whole world sees the event at once."}
 
 SCENARIO:
 ${scenarioText.slice(0, 800)}
@@ -653,7 +659,7 @@ export async function POST(request: Request) {
       Promise.resolve(selectAgentsForSimulation(type, 20)),
     ]);
 
-    const scenarioText = buildScenarioText(type, data);
+    const scenarioText = `${buildScenarioText(type, data)}${truthCalibrationText(data)}`;
 
     // Parallel: run field agents + specialist panel simultaneously
     const [agentResults, specialistResults] = await Promise.all([
@@ -669,7 +675,7 @@ export async function POST(request: Request) {
     };
 
     const populationWeightedSentiment = calcPopulationWeightedSentiment(agentResults);
-    const phoneReachIntelligence = type === "legacy-view" ? undefined : calcPhoneReachIntelligence(type, agentResults, populationWeightedSentiment);
+    const phoneReachIntelligence = ["legacy-view", "health-signal"].includes(type) ? undefined : calcPhoneReachIntelligence(type, agentResults, populationWeightedSentiment);
 
     // Master synthesis (includes cascade effects)
     const prediction = await generateFinalPrediction(
