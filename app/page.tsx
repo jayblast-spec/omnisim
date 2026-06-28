@@ -3,7 +3,7 @@ import { simTypes } from "@/lib/siteConfig";
 
 const stats = [
   { value: "35+", label: "Global AI Agents" },
-  { value: "8", label: "Simulation Types" },
+  { value: "10", label: "Simulation Types" },
   { value: "20", label: "Agents Per Run" },
   { value: "∞", label: "Scenarios Possible" },
 ];
@@ -12,7 +12,7 @@ const howItWorks = [
   {
     step: "01",
     title: "Choose Your Simulation",
-    description: "Select from 8 categories: PR crisis, election, markets, sports, policy, product launch, geopolitical, or fully custom.",
+    description: "Select from 10 categories: PR crisis, election, markets, sports, policy, product launch, geopolitical, relationship futures, $1K profit paths, or fully custom.",
   },
   {
     step: "02",
@@ -120,10 +120,10 @@ export default function HomePage() {
           {[
             "PUBLIC REACTION", "◡", "ELECTION OUTCOME", "◡", "MARKET MOVEMENT", "◡",
             "SPORTS SIMULATION", "◡", "POLICY IMPACT", "◡", "PRODUCT LAUNCH", "◡",
-            "GEOPOLITICAL EVENT", "◡", "CUSTOM SCENARIO", "◡",
+            "GEOPOLITICAL EVENT", "◡", "RELATIONSHIP FUTURE", "◡", "$1K PROFIT PATH", "◡", "CUSTOM SCENARIO", "◡",
             "PUBLIC REACTION", "◡", "ELECTION OUTCOME", "◡", "MARKET MOVEMENT", "◡",
             "SPORTS SIMULATION", "◡", "POLICY IMPACT", "◡", "PRODUCT LAUNCH", "◡",
-            "GEOPOLITICAL EVENT", "◡", "CUSTOM SCENARIO", "◡",
+            "GEOPOLITICAL EVENT", "◡", "RELATIONSHIP FUTURE", "◡", "$1K PROFIT PATH", "◡", "CUSTOM SCENARIO", "◡",
           ].map((item, i) => (
             <span key={i} className="font-orbitron text-[9px] tracking-[0.4em] text-white/10 whitespace-nowrap">
               {item}&nbsp;&nbsp;&nbsp;
@@ -141,7 +141,7 @@ export default function HomePage() {
               What can OMNISIM simulate?
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-white/40">
-              Eight categories of world-class simulations. Each powered by 20 diverse global AI agents and a comprehensive intelligence intake form.
+              Ten categories of world-class simulations. Each powered by 20 diverse global AI agents and a comprehensive intelligence intake form.
             </p>
           </div>
 
