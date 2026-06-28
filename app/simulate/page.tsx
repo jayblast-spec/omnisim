@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "OMNISIM — Simulation Hub",
-  description: "Choose your simulation type. 11 categories powered by 35 global AI agents.",
+  description: "Choose your simulation type. 12 categories powered by 35 global AI agents.",
 };
 
 export default function SimulatePage() {
@@ -17,7 +17,7 @@ export default function SimulatePage() {
             Choose Your Simulation
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-sm leading-8 text-white/40">
-            Each simulation type has a tailored intelligence intake form. Fill it in, and 20 global AI agents react to your exact scenario, or reflect through a grief-safe legacy lens when the simulation is personal.
+            Each simulation type has a tailored intelligence intake form. Fill it in, and 20 global AI agents react to your exact scenario, with truth calibration fields that capture facts, unknowns, constraints, and boundaries.
           </p>
         </div>
 
