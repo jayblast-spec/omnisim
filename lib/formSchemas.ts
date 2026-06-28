@@ -605,6 +605,54 @@ export const relationshipSchema: FormSchema = {
     },
   ],
 };
+
+export const legacyViewSchema: FormSchema = {
+  type: "legacy-view",
+  title: "Loved One Legacy View",
+  description: "A reflective simulator for imagining how a passed father, mother, sister, brother, or loved one might view your life now, grounded in memory, stoic encouragement, power-awareness, and resilience.",
+  icon: "🕊️",
+  sections: [
+    {
+      title: "YOUR LOVED ONE",
+      subtitle: "Who are you reflecting with?",
+      fields: [
+        { id: "lovedOneName", label: "Loved One's Name", type: "text", required: true, placeholder: "e.g. Dad, Mum, Aisha, Michael" },
+        { id: "relationshipToYou", label: "Relationship To You", type: "select", required: true, options: ["Father", "Mother", "Sister", "Brother", "Grandparent", "Spouse / partner", "Child", "Friend", "Mentor", "Other loved one"] },
+        { id: "theirPersonality", label: "What Were They Like?", type: "textarea", required: true, rows: 4, placeholder: "Describe their voice, values, humor, discipline, faith, work ethic, kindness, standards, or the way they corrected you." },
+        { id: "theirValues", label: "Values They Lived By", type: "multiselect", required: true, options: ["Faith", "Family", "Hard work", "Education", "Discipline", "Kindness", "Truth", "Courage", "Respect", "Service", "Independence", "Humility", "Loyalty", "Wisdom", "Protection"] },
+      ],
+    },
+    {
+      title: "WHERE YOU ARE NOW",
+      subtitle: "Let the mirror see your current season clearly",
+      fields: [
+        { id: "currentSeason", label: "Current Life Season", type: "select", required: true, options: ["Trying to rebuild", "Growing but tired", "Successful but lonely", "Facing grief", "Starting over", "Carrying family responsibility", "Building a business", "Healing from failure", "Seeking direction", "Becoming stronger"] },
+        { id: "lifeUpdate", label: "What Would You Tell Them About Your Life Now?", type: "textarea", required: true, rows: 5, placeholder: "Tell them what has happened, what you are building, what hurts, what you survived, and what you wish they could see." },
+        { id: "proudMoments", label: "What Might Make Them Proud?", type: "textarea", required: false, rows: 3, placeholder: "What have you endured, achieved, protected, learned, or refused to give up on?" },
+        { id: "privateStruggle", label: "What Are You Quietly Struggling With?", type: "textarea", required: true, rows: 4, placeholder: "Be honest: fear, guilt, anger, money pressure, loneliness, family burden, confidence, discipline, regret, or direction." },
+      ],
+    },
+    {
+      title: "THE MESSAGE YOU NEED",
+      subtitle: "Set the emotional tone carefully",
+      fields: [
+        { id: "desiredTone", label: "Tone", type: "select", required: true, options: ["Stoic and steady", "Warm but honest", "Fatherly discipline", "Motherly comfort", "Big sibling truth", "Calm spiritual encouragement", "Direct no-excuses guidance"] },
+        { id: "mainQuestion", label: "What Do You Wish You Could Ask Them?", type: "textarea", required: true, rows: 3, placeholder: "Example: Would you be proud of me? Am I becoming strong? What would you tell me to stop doing?" },
+        { id: "needMost", label: "What Do You Need Most Right Now?", type: "select", required: true, options: ["Hope", "Forgiveness", "Courage", "Discipline", "Direction", "Closure", "Confidence", "Peace", "A reason to keep going", "A practical next step"] },
+        { id: "avoidTone", label: "Avoid This Tone", type: "multiselect", required: false, options: ["Too sentimental", "Too harsh", "Religious language", "Pretending to speak from the afterlife", "Toxic positivity", "Generic advice", "Shaming"] },
+      ],
+    },
+    {
+      title: "RESILIENCE AND POWER FILTER",
+      subtitle: "Stoic hope, strategic power, and practical strength",
+      fields: [
+        { id: "resilienceFocus", label: "Resilience Focus", type: "multiselect", required: true, options: ["Control what you can control", "Master your emotions", "Turn pain into duty", "Build quietly", "Protect your reputation", "Choose discipline over mood", "Keep your word to yourself", "Use loss as fuel", "Serve your family", "Do not beg for respect", "Be useful", "Keep moving after failure"] },
+        { id: "powerLesson", label: "Power Lesson Needed", type: "select", required: true, options: ["Guard your reputation", "Never appear desperate", "Use timing wisely", "Say less and observe more", "Choose allies carefully", "Turn weakness into leverage", "Avoid unnecessary enemies", "Make your actions speak", "Do not waste energy proving yourself"] },
+        { id: "nextStep", label: "One Real Step You Can Take This Week", type: "textarea", required: false, rows: 2, placeholder: "Optional: a call, apology, budget, workout, prayer, business task, boundary, study plan, or family responsibility." },
+      ],
+    },
+  ],
+};
 export const formSchemas: Record<string, FormSchema> = {
   "public-reaction": publicReactionSchema,
   election: electionSchema,
@@ -615,5 +663,6 @@ export const formSchemas: Record<string, FormSchema> = {
   geopolitical: geopoliticalSchema,
   "profit-path": profitPathSchema,
   relationship: relationshipSchema,
+  "legacy-view": legacyViewSchema,
   custom: customSchema,
 };
