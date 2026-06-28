@@ -389,7 +389,7 @@ function buildSwarmLabTrace(
     .replace(/[^a-zA-Z0-9\s$%.-]/g, " ")
     .split(/\s+/)
     .filter((word) => word.length > 4);
-  const uniqueWords = Array.from(new Set(words.map((word) => word.toLowerCase()))).slice(0, 8);
+  const uniqueWords = Array.from(new Set(words.map((word) => word.toLowerCase()))).slice(0, 10);
   const strongestAgents = [...agentResults]
     .sort((a, b) => b.intensity - a.intensity)
     .slice(0, 5)
@@ -404,32 +404,51 @@ function buildSwarmLabTrace(
       : "neutral";
 
   return {
-    engineVersion: "ArkNet SwarmLab Core v0.1",
+    engineVersion: "ArkNet SwarmLab Core v0.2",
     realitySeed: [
       `Scenario class: ${type}`,
       `Seed signals: ${uniqueWords.length ? uniqueWords.join(", ") : "truth calibration and user context"}`,
       `Population-weighted leaning: ${dominantSentiment}`,
       `Historical memory used: ${historicalCount} prior simulations`,
+      "Architecture: graph seed -> persona swarm -> environment model -> mutation tests -> report agent",
     ],
     personaSwarm: [...strongestAgents, ...strongestSpecialists].slice(0, 8),
     simulationRounds: [
       {
-        phase: "Reality Seed Extraction",
-        action: "Compressed the user's facts, unknowns, constraints, and desired outcome into a simulation seed.",
-        output: "Scenario boundaries and uncertainty map created.",
-        confidenceImpact: historicalCount > 0 ? 4 : 1,
+        phase: "Graph Seed Building",
+        action: "Converted facts, unknowns, constraints, people, timing, money, health, reputation, and evidence quality into a relationship graph.",
+        output: "Reality graph prepared for simulation instead of shallow prompt guessing.",
+        confidenceImpact: historicalCount > 0 ? 4 : 2,
+      },
+      {
+        phase: "Environment Setup",
+        action: "Built the sandbox conditions around region, culture, incentives, available tools, safety limits, and user boundaries.",
+        output: "Scenario world created with practical constraints and no-fantasy assumptions.",
+        confidenceImpact: 3,
       },
       {
         phase: "Persona Swarm Calibration",
-        action: `Selected ${agentResults.length} field agents and ${specialistResults.length} specialist lenses to test human response diversity.",
+        action: `Selected ${agentResults.length} field agents and ${specialistResults.length} specialist lenses to test human response diversity.`,
         output: "Human behavior spread, incentives, fears, and likely actions mapped.",
         confidenceImpact: agentResults.length >= 15 ? 5 : 2,
       },
       {
         phase: "Parallel Outcome Simulation",
-        action: "Compared best-case, likely-case, downside, and hidden-opportunity trajectories.",
-        output: `Dominant population-weighted sentiment resolved as ${dominantSentiment}.",
+        action: "Compared best-case, likely-case, downside, and hidden-opportunity trajectories across the swarm.",
+        output: `Dominant population-weighted sentiment resolved as ${dominantSentiment}.`,
         confidenceImpact: calibratedConfidence >= 75 ? 6 : calibratedConfidence >= 55 ? 3 : -2,
+      },
+      {
+        phase: "Dynamic Variable Injection",
+        action: "Pressure-tested what changes if timing, trust, money, health, reputation, or access constraints shift.",
+        output: "Fragile assumptions and leverage points separated from stable signals.",
+        confidenceImpact: 4,
+      },
+      {
+        phase: "ReportAgent Synthesis",
+        action: "Compressed swarm reactions, specialist analysis, counter-intelligence, and historical memory into a decision-grade brief.",
+        output: "Final answer shaped for action, not entertainment.",
+        confidenceImpact: 4,
       },
       {
         phase: "Resilience Filter",
