@@ -396,3 +396,48 @@ footer {
   background: rgba(236,242,249,0.86) !important;
   border-top: 1px solid rgba(15,23,42,0.12) !important;
 }
+/* Performance trust pass */
+body::before {
+  display: none !important;
+}
+
+.cyber-grid {
+  background-image: none !important;
+}
+
+.cyber-card,
+.glass-card,
+.btn-neon,
+.btn-glass,
+footer {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.cyber-card,
+.glass-card {
+  will-change: auto !important;
+  transform: translateZ(0);
+}
+
+.btn-neon,
+.btn-glass,
+.btn-solid,
+.btn-gold,
+.form-input {
+  transition: transform 140ms ease, opacity 140ms ease, border-color 140ms ease, box-shadow 140ms ease !important;
+}
+
+.ticker-track {
+  animation: none !important;
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
