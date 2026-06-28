@@ -14,50 +14,42 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed top-0 z-50 w-full border-b border-[rgba(0,245,255,0.1)] bg-[rgba(3,2,11,0.85)] backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="relative">
-            <span
-              className="font-orbitron text-xl font-black tracking-[0.18em] text-white"
-              style={{ textShadow: "0 0 12px rgba(0,245,255,0.6)" }}
-            >
-              OMNI
-            </span>
-            <span
-              className="font-orbitron text-xl font-black tracking-[0.18em]"
-              style={{ color: "#00F5FF", textShadow: "0 0 12px #00F5FF, 0 0 30px rgba(0,245,255,0.4)" }}
-            >
-              SIM
-            </span>
+    <nav className="fixed top-0 z-50 w-full px-3 pt-3 sm:px-5">
+      <div className="glass-card mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-6">
+        <Link href="/" className="flex items-center gap-3" aria-label="OmniSim home">
+          <div className="h-9 w-9 rounded-[14px] border border-white/80 bg-white/60 shadow-sm" />
+          <div className="leading-none">
+            <span className="hero-title block text-[22px] font-semibold italic text-[#0D1117]">OmniSim</span>
+            <span className="block text-[9px] font-semibold uppercase tracking-[0.16em] text-[#6B7894]">Future Intelligence</span>
           </div>
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="font-orbitron text-[10px] tracking-[0.35em] transition-colors"
-              style={{
-                color: pathname === link.href ? "#00F5FF" : "rgba(255,255,255,0.5)",
-                textShadow: pathname === link.href ? "0 0 8px #00F5FF" : "none",
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="hidden items-center gap-2 md:flex">
+          {navLinks.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-[14px] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.08em] transition"
+                style={{
+                  color: active ? "#0D1117" : "#2D3748",
+                  background: active ? "rgba(255,255,255,0.62)" : "transparent",
+                  boxShadow: active ? "0 0 0 0.5px rgba(255,255,255,0.9) inset" : "none",
+                }}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
-        <Link href="/simulate" className="btn-neon hidden text-[10px] md:inline-flex">
-          LAUNCH SIMULATION
+        <Link href="/simulate" className="btn-gold hidden text-[10px] md:inline-flex">
+          Launch Simulation
         </Link>
 
-        <Link
-          href="/simulate"
-          className="font-orbitron text-[10px] tracking-widest text-[#00F5FF] md:hidden"
-        >
-          SIMULATE
+        <Link href="/simulate" className="btn-glass text-[10px] md:hidden">
+          Simulate
         </Link>
       </div>
     </nav>
