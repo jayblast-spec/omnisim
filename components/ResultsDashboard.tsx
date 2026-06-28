@@ -7,6 +7,29 @@ const PINK = "#FF0077";
 const GREEN = "#00FF7F";
 const GOLD = "#FFD700";
 
+interface DeepReadTruth { signal: string; meaning: string; confidence: number; }
+interface DeepRead {
+  title?: string;
+  coreDiagnosis?: string;
+  truthMap?: DeepReadTruth[];
+  hiddenLevers?: string[];
+  failureMode?: string;
+  bestPath?: string;
+  decisionRules?: string[];
+  sevenDayActionPlan?: string[];
+  questionsToAnswerNext?: string[];
+  stoicResilienceNote?: string;
+}
+interface RelationshipDeepDive {
+  coreDiagnosis?: string;
+  whatEachPersonMayFeel?: Array<{ side: string; likelyFeeling: string; protectiveStrategy: string; hiddenNeed: string }>;
+  patternLoop?: string[];
+  repairPlan?: Array<{ step: string; whyItMatters: string; timeframe: string; successSignal: string }>;
+  breakdownPath?: string;
+  conversationScript?: string[];
+  sevenDayActionPlan?: string[];
+  stoicResilienceNote?: string;
+}
 interface TimelinePhase { phase: string; events: string; }
 interface ScenarioBranch { label: string; probability: number; description: string; trigger: string; }
 interface KeyFactor { factor: string; impact: number; probability: number; explanation: string; }
@@ -120,8 +143,31 @@ export interface SimulationResult {
   counterIntelligence?: CounterIntelligence;
   phoneReachIntelligence?: PhoneReachIntelligence;
   swarmLabTrace?: SwarmLabTrace;
+  deepRead?: DeepRead;
+  relationshipDeepDive?: RelationshipDeepDive;
 }
 
+function isPrivateResult(type: string) { return ["relationship", "legacy-view", "health-signal"].includes(type); }
+function textOf(item: string | { [key: string]: unknown }, primary: string) {
+  return typeof item === "string" ? item : String(item[primary] ?? item.explanation ?? item.mitigation ?? item.howToCapture ?? "");
+}
+function buildFallbackDeepRead(result: SimulationResult): DeepRead {
+  const factors = result.keyFactors.slice(0, 3).map((f) => textOf(f as string | { [key: string]: unknown }, "factor"));
+  const risks = result.risks.slice(0, 2).map((r) => textOf(r as string | { [key: string]: unknown }, "risk"));
+  const opportunities = result.opportunities.slice(0, 2).map((o) => textOf(o as string | { [key: string]: unknown }, "opportunity"));
+  return {
+    title: result.type === "relationship" ? "Relationship Pattern Deep Read" : "OmniSim Deep Read",
+    coreDiagnosis: `${result.prediction} ${result.recommendation}`,
+    truthMap: factors.map((factor, i) => ({ signal: factor || `Factor ${i + 1}`, meaning: "This is one of the strongest available signals in the current result. A better answer requires the missing facts from Truth Calibration.", confidence: Math.max(55, result.confidenceScore - i * 8) })),
+    hiddenLevers: [...factors, ...opportunities].filter(Boolean).slice(0, 4),
+    failureMode: risks.length ? `The most likely failure path is driven by ${risks.join(", ")}. If the user does not change behavior, gather missing facts, or set boundaries, the result will drift toward the highest-probability risk instead of the stated ideal outcome.` : "The failure path comes from acting without enough truth, ignoring constraints, or confusing hope with evidence.",
+    bestPath: opportunities.length ? `The best path is to focus on ${opportunities.join(", ")} while protecting against the highest risks. The next move should be small, observable, and measurable within seven days.` : "The best path is to turn the strongest signal into one measurable action, then update the simulation with what happens.",
+    decisionRules: ["If new evidence contradicts the current assumption, rerun the simulation.", "If risk rises faster than trust or upside, pause and protect downside.", "If the next action cannot be measured within seven days, make it smaller.", "If emotion and evidence disagree, obey evidence first."],
+    sevenDayActionPlan: ["Write the facts and unknowns without interpretation.", "Identify the one constraint that most limits success.", "Take one low-risk action that produces new evidence.", "Watch for the first confirmation or disconfirmation signal.", "Remove one behavior that increases risk.", "Ask one direct question that reduces uncertainty.", "Rerun OmniSim with the new evidence."],
+    questionsToAnswerNext: ["What fact would change this answer most?", "What is the highest-risk assumption?", "What action creates evidence fastest?", "What boundary protects the downside?"],
+    stoicResilienceNote: "Control the next honest action, not the whole outcome. Stop chasing certainty; build evidence, protect your standards, and update from reality."
+  };
+}
 function sCol(s: string) { return s === "positive" ? GREEN : s === "negative" ? PINK : NEON; }
 function sevCol(s: string) { return s === "critical" ? PINK : s === "high" ? "#FF6B35" : s === "medium" ? GOLD : NEON; }
 function potCol(p: string) { return p === "high" ? GREEN : p === "medium" ? NEON : GOLD; }
@@ -155,6 +201,8 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
   const counterIntel = result.counterIntelligence;
   const phoneReach = result.phoneReachIntelligence;
   const swarmLab = result.swarmLabTrace;
+  const deepRead = result.deepRead ?? buildFallbackDeepRead(result);
+  const relDeep = result.relationshipDeepDive;
 
   return (
     <div>
@@ -199,7 +247,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                   <div style={{ width: `${pwSent.neutral}%`, background: `${NEON}99` }} />
                   <div style={{ width: `${pwSent.negative}%`, background: `${PINK}99` }} />
                 </div>
-                <p className="text-[9px] mt-1 font-mono" style={{ color: "rgba(255,255,255,0.3)" }}>Population-weighted (8.1B humans)</p>
+                <p className="text-[9px] mt-1 font-mono" style={{ color: "rgba(255,255,255,0.3)" }}>{isPrivateResult(result.type) ? "Pattern-weighted private signal" : "Population-weighted (8.1B humans)"}</p>
               </div>
             )}
             <div className="flex items-center gap-3 flex-wrap">
