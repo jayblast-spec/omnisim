@@ -498,6 +498,113 @@ export const customSchema: FormSchema = {
   ],
 };
 
+export const profitPathSchema: FormSchema = {
+  type: "profit-path",
+  title: "$1K Profit Path Simulation",
+  description: "Turn limited starting capital into a practical cash-flow experiment using AI, automation, service income, and reinvestment discipline. Educational only; no guaranteed profit.",
+  icon: "💸",
+  sections: [
+    {
+      title: "CAPITAL BASE",
+      subtitle: "Define the money, time, and risk guardrails",
+      fields: [
+        { id: "startingCapital", label: "Starting Capital", type: "number", required: true, placeholder: "1000", hint: "The amount available to test. The simulator should protect the base before chasing upside." },
+        { id: "monthlyNeed", label: "Monthly Profit Goal", type: "number", required: true, placeholder: "300" },
+        { id: "timeframe", label: "Timeframe", type: "select", required: true, options: ["30 days", "60 days", "90 days", "6 months", "12 months"] },
+        { id: "riskTolerance", label: "Risk Tolerance", type: "select", required: true, options: ["Very low — protect capital first", "Low — small controlled tests", "Medium — balanced tests", "High — willing to lose capital for upside"] },
+      ],
+    },
+    {
+      title: "SKILLS AND ASSETS",
+      subtitle: "Small capital works best when paired with execution leverage",
+      fields: [
+        { id: "skills", label: "Current Skills", type: "multiselect", required: true, options: ["Writing / content", "Sales / outreach", "Design", "Coding / no-code", "Video editing", "Data research", "Customer support", "Local services", "E-commerce", "None yet"] },
+        { id: "availableTime", label: "Weekly Time Available", type: "select", required: true, options: ["Under 5 hours", "5-10 hours", "10-20 hours", "20-40 hours", "Full-time"] },
+        { id: "toolsAccess", label: "Tools Already Available", type: "multiselect", required: false, options: ["AI chat tools", "Canva / design tools", "Website builder", "CRM / spreadsheet", "Email outreach tool", "Social accounts", "Payment processor", "Marketplace profile"] },
+      ],
+    },
+    {
+      title: "PROFIT MODEL",
+      subtitle: "Pick the cash-flow lane to test first",
+      fields: [
+        { id: "preferredModel", label: "Preferred Model", type: "select", required: true, options: ["AI-assisted service business", "Digital product / templates", "Local lead generation", "Content + affiliate revenue", "Small e-commerce test", "Education / coaching", "Not sure — recommend one"] },
+        { id: "targetBuyer", label: "Target Buyer", type: "textarea", required: true, rows: 3, placeholder: "Who exactly would pay? Describe their problem, budget, and urgency." },
+        { id: "offerIdea", label: "Offer Idea", type: "textarea", required: true, rows: 3, placeholder: "What will you sell, what outcome does it create, and why would someone trust it?" },
+      ],
+    },
+    {
+      title: "AUTOMATION PLAN",
+      subtitle: "Use AI and tech to reduce manual work, not to gamble",
+      fields: [
+        { id: "automationTargets", label: "What Should AI Automate?", type: "multiselect", required: true, options: ["Market research", "Lead list building", "Cold email / DM drafts", "Landing page copy", "Proposal writing", "Customer onboarding", "Delivery templates", "Reporting / analytics", "Follow-up reminders"] },
+        { id: "spendPlan", label: "Planned Spend Allocation", type: "textarea", required: true, rows: 4, placeholder: "Example: $250 reserve, $350 website/tools, $200 lead generation test, $200 learning/templates. Include any platform fees." },
+        { id: "stopRules", label: "Stop-Loss Rules", type: "textarea", required: true, rows: 3, placeholder: "When do you stop spending? Example: no qualified leads after $100 test, no replies after 100 targeted messages." },
+      ],
+    },
+    {
+      title: "REINVESTMENT LOOP",
+      subtitle: "Continuous profit comes from measured compounding, not promises",
+      fields: [
+        { id: "metrics", label: "Metrics to Track", type: "multiselect", required: true, options: ["Revenue", "Profit margin", "Cash reserve", "Lead conversion", "Customer acquisition cost", "Repeat purchase", "Referral rate", "Hours spent", "Tool costs"] },
+        { id: "reinvestmentRule", label: "Reinvestment Rule", type: "select", required: true, options: ["Reinvest 10% of profit", "Reinvest 25% of profit", "Reinvest 50% of profit", "Only reinvest after 3 profitable weeks", "Do not reinvest until capital is recovered"] },
+        { id: "biggestConcern", label: "Biggest Concern", type: "textarea", required: false, rows: 2, placeholder: "What could make this fail: scams, weak offer, no time, no audience, low trust, platform risk?" },
+      ],
+    },
+  ],
+};
+
+export const relationshipSchema: FormSchema = {
+  type: "relationship",
+  title: "Relationship Future Simulation",
+  description: "Model relationship durability, repair paths, conflict recovery, trust, shared values, and safety signals. This is not therapy or a command to stay or leave.",
+  icon: "❤️",
+  sections: [
+    {
+      title: "RELATIONSHIP CONTEXT",
+      subtitle: "What kind of relationship is being simulated?",
+      fields: [
+        { id: "relationshipType", label: "Relationship Type", type: "select", required: true, options: ["Dating", "Marriage", "Long-distance", "Co-parenting", "Friendship", "Family", "Co-founder / business partner"] },
+        { id: "duration", label: "Relationship Duration", type: "select", required: true, options: ["Under 3 months", "3-12 months", "1-3 years", "3-7 years", "7+ years"] },
+        { id: "primaryQuestion", label: "Primary Question", type: "textarea", required: true, rows: 3, placeholder: "Example: Can this relationship recover if we rebuild trust and communicate better?" },
+      ],
+    },
+    {
+      title: "PATTERN SCAN",
+      subtitle: "The patterns matter more than one argument",
+      fields: [
+        { id: "trustLevel", label: "Trust Level", type: "select", required: true, options: ["Strong and consistent", "Mostly good with some damage", "Fragile", "Repeatedly broken", "Unknown"] },
+        { id: "conflictPattern", label: "Conflict Pattern", type: "select", required: true, options: ["Calm disagreement and repair", "Frequent arguments but some repair", "Criticism / defensiveness cycle", "Stonewalling / silent treatment", "Contempt or disrespect", "Avoidance — issues never discussed"] },
+        { id: "repairAttempts", label: "Repair Attempts", type: "select", required: true, options: ["Both people repair quickly", "One person usually repairs", "Repair happens but slowly", "Apologies without change", "No real repair"] },
+        { id: "affection", label: "Affection / Friendship", type: "select", required: true, options: ["Strong", "Present but declining", "Inconsistent", "Mostly gone", "Not sure"] },
+      ],
+    },
+    {
+      title: "FUTURE PRESSURES",
+      subtitle: "Stress reveals the real system",
+      fields: [
+        { id: "pressureSources", label: "Pressure Sources", type: "multiselect", required: true, options: ["Money", "Family", "Distance", "Career", "Children / parenting", "Trust breach", "Intimacy", "Different life goals", "Mental health stress", "Business pressure"] },
+        { id: "sharedValues", label: "Shared Values", type: "select", required: true, options: ["Highly aligned", "Mostly aligned", "Some major gaps", "Conflicting futures", "Unclear"] },
+        { id: "changeWillingness", label: "Willingness to Change", type: "select", required: true, options: ["Both actively willing", "One willing, one uncertain", "Both say yes but little action", "One refuses", "Neither is willing"] },
+      ],
+    },
+    {
+      title: "SAFETY CHECK",
+      subtitle: "Safety overrides normal relationship optimization",
+      fields: [
+        { id: "safetyConcern", label: "Any fear, threats, coercion, stalking, or violence?", type: "radio", required: true, options: ["No safety concern", "Yes — there is fear, threats, coercion, stalking, or violence"] },
+        { id: "safetyDetails", label: "Safety Details", type: "textarea", required: false, rows: 3, placeholder: "Optional. If there is danger, the simulator should prioritize safety planning and outside support, not relationship optimization." },
+      ],
+    },
+    {
+      title: "DESIRED OUTCOME",
+      subtitle: "Choose what the simulation should optimize for",
+      fields: [
+        { id: "desiredOutcome", label: "Desired Outcome", type: "select", required: true, options: ["Repair and stay together", "Understand if repair is realistic", "Set healthy boundaries", "Prepare a hard conversation", "Separate respectfully", "Rebuild trust after a breach"] },
+        { id: "nextConversation", label: "Next Conversation Needed", type: "textarea", required: true, rows: 3, placeholder: "What conversation needs to happen next, but keeps getting avoided?" },
+      ],
+    },
+  ],
+};
 export const formSchemas: Record<string, FormSchema> = {
   "public-reaction": publicReactionSchema,
   election: electionSchema,
@@ -506,5 +613,7 @@ export const formSchemas: Record<string, FormSchema> = {
   policy: policySchema,
   "product-launch": productLaunchSchema,
   geopolitical: geopoliticalSchema,
+  "profit-path": profitPathSchema,
+  relationship: relationshipSchema,
   custom: customSchema,
 };
