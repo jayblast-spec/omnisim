@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "OMNISIM",
   tagline: "Simulate Before It Happens",
   description:
-    "The world's most powerful AI simulation platform. Deploy 35+ intelligent agents to simulate real-world scenarios before they unfold — from PR crises and elections to market movements, relationship futures, and $1K profit paths, including private legacy reflection for grief and resilience.",
+    "The world's most powerful AI simulation platform. Deploy 35+ intelligent agents to simulate real-world scenarios before they unfold — from PR crises and elections to market movements, relationship futures, health signals, and $1K profit paths, including private legacy reflection for grief and resilience.",
   url: "https://omnisim.vercel.app",
 };
 
@@ -87,6 +87,14 @@ export const simTypes = [
       "Model trust, conflict recovery, repair attempts, shared values, safety signals, and likely relationship futures without pretending people are equations.",
     color: "#FF0077",
     usedBy: "Couples · Coaches · Founders · Families",
+  },  {
+    id: "health-signal",
+    icon: "🩺",
+    title: "Health Signal",
+    description:
+      "Organize symptoms, vitals, blood type, genotype, medications, allergies, red flags, and care access into an educational health triage brief.",
+    color: "#059669",
+    usedBy: "Families · Patients · Caregivers · Health Coaches",
   },  {
     id: "legacy-view",
     icon: "🕊️",
