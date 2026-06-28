@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "OMNISIM",
   tagline: "Simulate Before It Happens",
   description:
-    "The world's most powerful AI simulation platform. Deploy 35+ intelligent agents to simulate real-world scenarios before they unfold — from PR crises and elections to market movements, relationship futures, and $1K profit paths.",
+    "The world's most powerful AI simulation platform. Deploy 35+ intelligent agents to simulate real-world scenarios before they unfold — from PR crises and elections to market movements, relationship futures, and $1K profit paths, including private legacy reflection for grief and resilience.",
   url: "https://omnisim.vercel.app",
 };
 
