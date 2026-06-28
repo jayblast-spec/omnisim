@@ -40,6 +40,28 @@ export interface CounterIntelligence {
   flipScenario: string;
 }
 
+export interface PhoneReachIntelligence {
+  worldPopulation: number;
+  internetUsers: number;
+  offlinePopulation: number;
+  uniqueMobileSubscribers: number;
+  smartphoneReach: number;
+  basicPhoneReach: number;
+  estimatedActiveOnlineNow: number;
+  smartphoneActiveNow: number;
+  basicPhoneActiveNow: number;
+  offlineReachDelay: string;
+  firstHourReach: number;
+  firstDayReach: number;
+  smartphoneShareOfMobile: number;
+  digitalReachShare: number;
+  smsReachShare: number;
+  offlineShare: number;
+  likelyAmplification: "low" | "medium" | "high" | "explosive";
+  reachNarrative: string;
+  assumptions: string[];
+}
+
 export interface AgentResult {
   agentId: string;
   agentName: string;
@@ -79,6 +101,7 @@ export interface SimulationResult {
   historicalIntelligenceUsed?: number;
   specialistResults?: SpecialistResult[];
   counterIntelligence?: CounterIntelligence;
+  phoneReachIntelligence?: PhoneReachIntelligence;
 }
 
 function sCol(s: string) { return s === "positive" ? GREEN : s === "negative" ? PINK : NEON; }
@@ -112,6 +135,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
   const specialists = result.specialistResults ?? [];
   const cascades = (result.cascadeEffects ?? []) as CascadeEffect[];
   const counterIntel = result.counterIntelligence;
+  const phoneReach = result.phoneReachIntelligence;
 
   return (
     <div>
@@ -199,6 +223,77 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
             </div>
           )}
 
+
+          {/* Phone Reach Intelligence */}
+          {phoneReach && (
+            <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${GREEN}24`, boxShadow: `0 0 28px ${GREEN}08` }}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-6 rounded-full" style={{ background: GREEN }} />
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: GREEN }}>Phone Reach Intelligence</p>
+                    <p className="text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>Real-life spread model: smartphone feeds, basic phones, active online users, and offline delay.</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.18em] px-3 py-1 rounded-full" style={{ background: `${GREEN}12`, color: GREEN, border: `1px solid ${GREEN}33` }}>
+                  {phoneReach.likelyAmplification} amplification
+                </span>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-5">
+                {[
+                  ["Online Humans", `${phoneReach.internetUsers}M`, `${phoneReach.digitalReachShare}% of world`],
+                  ["Smartphone Reach", `${phoneReach.smartphoneReach}M`, `${phoneReach.smartphoneShareOfMobile}% of mobile`],
+                  ["Basic/SMS Phones", `${phoneReach.basicPhoneReach}M`, `${phoneReach.smsReachShare}% of world`],
+                  ["Offline Humans", `${phoneReach.offlinePopulation}M`, `${phoneReach.offlineShare}% delayed reach`],
+                ].map(([label, value, sub]) => (
+                  <div key={label} className="rounded-xl p-4" style={{ background: `${GREEN}07`, border: `1px solid ${GREEN}18` }}>
+                    <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: "rgba(255,255,255,0.38)" }}>{label}</p>
+                    <p className="text-2xl font-black font-mono" style={{ color: GREEN, textShadow: `0 0 10px ${GREEN}55` }}>{value}</p>
+                    <p className="text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.42)" }}>{sub}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3 mb-5">
+                {[
+                  ["Active Online Now", `${phoneReach.estimatedActiveOnlineNow}M`, NEON],
+                  ["Smartphone Active Now", `${phoneReach.smartphoneActiveNow}M`, GREEN],
+                  ["Basic Phone Active Now", `${phoneReach.basicPhoneActiveNow}M`, GOLD],
+                ].map(([label, value, color]) => (
+                  <div key={label} className="rounded-xl p-4" style={{ background: `${color}08`, border: `1px solid ${color}22` }}>
+                    <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color }}>{label}</p>
+                    <p className="text-xl font-black font-mono" style={{ color }}>{value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-xl p-4 mb-4" style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <p className="text-sm leading-7" style={{ color: "rgba(255,255,255,0.78)" }}>{phoneReach.reachNarrative}</p>
+                <p className="text-xs leading-6 mt-3" style={{ color: "rgba(255,255,255,0.5)" }}>{phoneReach.offlineReachDelay}</p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl p-4" style={{ background: `${NEON}08`, border: `1px solid ${NEON}22` }}>
+                  <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: NEON }}>Estimated First Hour Reach</p>
+                  <p className="text-3xl font-black font-mono" style={{ color: NEON }}>{phoneReach.firstHourReach}M</p>
+                </div>
+                <div className="rounded-xl p-4" style={{ background: `${PURPLE}08`, border: `1px solid ${PURPLE}22` }}>
+                  <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: PURPLE }}>Estimated First Day Reach</p>
+                  <p className="text-3xl font-black font-mono" style={{ color: PURPLE }}>{phoneReach.firstDayReach}M</p>
+                </div>
+              </div>
+
+              <details className="mt-4">
+                <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "rgba(255,255,255,0.38)" }}>Model assumptions</summary>
+                <ul className="mt-3 space-y-2">
+                  {phoneReach.assumptions.map((assumption, i) => (
+                    <li key={i} className="text-[11px] leading-5" style={{ color: "rgba(255,255,255,0.45)" }}>{assumption}</li>
+                  ))}
+                </ul>
+              </details>
+            </div>
+          )}
           {/* Expert Panel — 5 Specialists */}
           {specialists.length > 0 && (
             <div>
