@@ -88,6 +88,14 @@ export const simTypes = [
     color: "#FF0077",
     usedBy: "Couples · Coaches · Founders · Families",
   },  {
+    id: "legacy-view",
+    icon: "🕊️",
+    title: "Loved One Legacy View",
+    description:
+      "Reflect on how a passed father, mother, sister, brother, or loved one might view your life now with stoic hope, power-awareness, and resilience guidance.",
+    color: "#7C3AED",
+    usedBy: "Families · Grievers · Builders · Survivors",
+  },  {
     id: "custom",
     icon: "⚡",
     title: "Custom Scenario",
