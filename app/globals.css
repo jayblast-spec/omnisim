@@ -21,7 +21,7 @@
   --green: var(--iris-green);
   --panel: rgba(255,255,255,0.68);
   --border: rgba(255,255,255,0.78);
-  --shadow: 0 28px 80px rgba(45, 55, 72, 0.14), 0 12px 32px rgba(107, 143, 212, 0.12);
+  --shadow: 0 14px 34px rgba(45, 55, 72, 0.10);
 }
 
 * { box-sizing: border-box; }
@@ -39,7 +39,7 @@ body {
     radial-gradient(circle at 22% 84%, rgba(251, 191, 36, 0.24), transparent 28rem),
     radial-gradient(circle at 50% 44%, rgba(167, 139, 250, 0.20), transparent 34rem),
     linear-gradient(135deg, #F9FBFF 0%, #EEF4FA 46%, #FDF8F1 100%);
-  background-attachment: fixed;
+  background-attachment: scroll;
 }
 
 body::before {
@@ -52,7 +52,7 @@ body::before {
     linear-gradient(rgba(255,255,255,0.34) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.30) 1px, transparent 1px);
   background-size: 44px 44px;
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent 72%);
+  opacity: 0.28;
 }
 
 ::-webkit-scrollbar { width: 8px; }
@@ -98,26 +98,21 @@ h1, h2, .display, .hero-title {
 }
 
 .cyber-card,
-.glass-card,
-.rounded-2xl,
-.rounded-xl {
+.glass-card {
   position: relative;
-  background: rgba(255,255,255,0.66) !important;
+  background: rgba(255,255,255,0.78) !important;
   border: 1px solid rgba(255,255,255,0.82) !important;
   border-radius: 18px !important;
-  backdrop-filter: blur(30px) saturate(185%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(185%) !important;
+  backdrop-filter: blur(14px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
   box-shadow:
     0 0 0 0.5px rgba(255,255,255,0.92) inset,
-    0 24px 70px rgba(45,55,72,0.12),
-    0 10px 26px rgba(107,143,212,0.10) !important;
+    0 14px 34px rgba(45,55,72,0.10) !important;
   overflow: hidden;
 }
 
 .cyber-card::before,
-.glass-card::before,
-.rounded-2xl::before,
-.rounded-xl::before {
+.glass-card::before {
   content: "";
   position: absolute;
   inset: 0 auto auto 0;
@@ -173,8 +168,8 @@ h2 span,
   background: rgba(255,255,255,0.58) !important;
   border: 1px solid rgba(255,255,255,0.86) !important;
   border-radius: 14px !important;
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
   box-shadow: 0 0 0 0.5px rgba(255,255,255,0.9) inset, 0 14px 34px rgba(107,143,212,0.16) !important;
   text-decoration: none;
   white-space: nowrap;
@@ -263,7 +258,7 @@ h2 span,
 [style*="#03020B"],
 [style*="rgba(13, 11, 26"],
 [style*="rgba(0, 0, 0"] {
-  background: rgba(255,255,255,0.66) !important;
+  background: rgba(255,255,255,0.78) !important;
   color: var(--ink) !important;
 }
 
@@ -297,10 +292,55 @@ main > div {
 
 footer {
   background: rgba(255,255,255,0.48) !important;
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
 
 svg, img, .text-3xl, .text-4xl, .text-5xl {
   color: inherit;
+}
+/* Smoothness readability patch */
+.rounded-2xl,
+.rounded-xl {
+  background: rgba(255,255,255,0.82) !important;
+  border: 1px solid rgba(255,255,255,0.78) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 28px rgba(45,55,72,0.08) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.cyber-card,
+.glass-card {
+  will-change: transform;
+}
+
+p, span, label, button, a, li, summary, input, textarea, select {
+  text-rendering: geometricPrecision;
+}
+
+p, li, label, summary {
+  color: #2D3748 !important;
+}
+
+h1, h2, h3, h4, strong, b {
+  color: #0D1117 !important;
+}
+
+input, textarea, select {
+  color: #0D1117 !important;
+  background: rgba(255,255,255,0.88) !important;
+}
+
+.text-white, .text-white\/75, .text-white\/60, .text-white\/50, .text-white\/45, .text-white\/40, .text-white\/35, .text-white\/30, .text-white\/25, .text-white\/20, .text-white\/15, .text-white\/10 {
+  color: #2D3748 !important;
+}
+
+@media (max-width: 768px) {
+  .cyber-card,
+  .glass-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(255,255,255,0.90) !important;
+  }
 }
