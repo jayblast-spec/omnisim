@@ -506,7 +506,7 @@ footer {
 }
 /* Performance trust pass */
 body::before {
-  display: none !important;
+  display: block !important;
 }
 
 .cyber-grid {
