@@ -1022,3 +1022,80 @@ main [style*="rgba(255,255,255,0.08"] {
   color: #F4FFF8 !important;
   text-shadow: 0 2px 18px rgba(0,0,0,0.88), 0 0 18px rgba(244,255,248,0.18) !important;
 }
+/* 3D Matrix hero wordmark */
+.omnisim-wordmark {
+  position: relative;
+  display: inline-block;
+  color: transparent !important;
+  letter-spacing: 0 !important;
+  transform: perspective(900px) rotateX(8deg) rotateY(-4deg);
+  transform-style: preserve-3d;
+  -webkit-text-stroke: 1px rgba(190,255,223,0.62);
+  background: linear-gradient(180deg, #F4FFF8 0%, #7DFFC0 34%, #18B66A 58%, #062417 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 10px 0 rgba(0,0,0,0.36)) drop-shadow(0 0 24px rgba(38,255,135,0.34));
+  text-shadow:
+    0 1px 0 #DFFFF0,
+    0 2px 0 #8FFFC8,
+    0 4px 0 #109B58,
+    0 8px 0 #052115,
+    0 16px 28px rgba(0,0,0,0.74),
+    0 0 28px rgba(38,255,135,0.48),
+    0 0 70px rgba(0,245,255,0.22) !important;
+}
+
+.omnisim-wordmark span:first-child {
+  color: transparent !important;
+}
+
+.omnisim-wordmark span:last-child {
+  color: transparent !important;
+  background: linear-gradient(180deg, #EFFFF7 0%, #48FFC0 34%, #00D7FF 68%, #063042 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 1px rgba(197,255,244,0.68);
+}
+
+.omnisim-wordmark::before,
+.omnisim-wordmark::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  letter-spacing: inherit;
+}
+
+.omnisim-wordmark::before {
+  z-index: -1;
+  color: rgba(2,8,5,0.92);
+  transform: translate3d(10px, 12px, -18px);
+  text-shadow: 0 0 24px rgba(0,0,0,0.82);
+  -webkit-text-stroke: 0;
+}
+
+.omnisim-wordmark::after {
+  z-index: 2;
+  color: rgba(185,255,220,0.22);
+  transform: translate3d(-2px, -3px, 18px);
+  -webkit-text-stroke: 1px rgba(255,255,255,0.18);
+  text-shadow: 0 0 18px rgba(185,255,220,0.32);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 48%);
+}
+
+@media (max-width: 768px) {
+  .omnisim-wordmark {
+    transform: perspective(700px) rotateX(6deg) rotateY(-2deg);
+    -webkit-text-stroke-width: 0.7px;
+    filter: drop-shadow(0 7px 0 rgba(0,0,0,0.34)) drop-shadow(0 0 18px rgba(38,255,135,0.28));
+    text-shadow:
+      0 1px 0 #DFFFF0,
+      0 2px 0 #39D98A,
+      0 5px 0 #052115,
+      0 12px 22px rgba(0,0,0,0.70),
+      0 0 24px rgba(38,255,135,0.40) !important;
+  }
+
+  .omnisim-wordmark::before { transform: translate3d(6px, 8px, -14px); }
+  .omnisim-wordmark::after { transform: translate3d(-1px, -2px, 14px); }
+}
