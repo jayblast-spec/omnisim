@@ -24,7 +24,7 @@ export default function SimForm({ schema }: SimFormProps) {
   const loadingSteps = [
     {
       title: "Preparing OmniSim Intelligence",
-      detail: "Mounting the scenario engine and preparing the selected simulation model.",
+      detail: "Preparing the facts, constraints, and scenario boundaries before the final read.",
       signal: "INTELLIGENCE READY",
     },
     {
@@ -187,8 +187,8 @@ export default function SimForm({ schema }: SimFormProps) {
               <div className="absolute inset-7 rounded-full border" style={{ borderColor: "rgba(49,95,174,0.28)", background: "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(227,236,246,0.92))" }} />
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                 <span className="text-4xl font-black" style={{ color: "#315FAE" }}>{Math.round(progress)}%</span>
-                <span className="mt-1 text-[9px] font-black uppercase tracking-[0.18em]" style={{ color: "#40516D" }}>Core Draw</span>
-                <span className="text-[8px] font-bold uppercase tracking-[0.16em]" style={{ color: "#7C3AED" }}>Install Mode</span>
+                <span className="mt-1 text-[9px] font-black uppercase tracking-[0.18em]" style={{ color: "#40516D" }}>OmniSim</span>
+                <span className="text-[8px] font-bold uppercase tracking-[0.16em]" style={{ color: "#7C3AED" }}>Live Read</span>
               </div>
             </div>
 
