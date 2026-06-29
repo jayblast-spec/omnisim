@@ -803,3 +803,130 @@ footer {
   .sim-world__floor { height: 54vh; width: 230vw; bottom: -24%; background-size: 34px 34px; opacity: 0.82; }
   .cyber-card, .glass-card { background: rgba(248,255,252,0.84) !important; }
 }
+/* Global readability guard: no invisible text over Matrix world */
+main,
+nav,
+footer,
+.cyber-card,
+.glass-card,
+.rounded-2xl,
+.rounded-xl,
+.form-input,
+input,
+textarea,
+select,
+button,
+a {
+  color: #07120D !important;
+}
+
+p,
+li,
+label,
+summary,
+span,
+div,
+small {
+  color: inherit;
+}
+
+main p,
+main li,
+main label,
+main summary,
+main small,
+main span:not(.neon-text):not([class*="text-"]) {
+  color: #1B2A22 !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong,
+b {
+  color: #031008 !important;
+}
+
+.text-white,
+.text-white\/75,
+.text-white\/60,
+.text-white\/50,
+.text-white\/45,
+.text-white\/40,
+.text-white\/35,
+.text-white\/30,
+.text-white\/25,
+.text-white\/20,
+.text-white\/15,
+.text-white\/10 {
+  color: #1B2A22 !important;
+}
+
+.section-label,
+.text-\[\#00F5FF\],
+[style*="#00F5FF"],
+[style*="rgba(0,245,255"],
+[style*="rgba(255,255,255,0.4"],
+[style*="rgba(255,255,255,0.3"],
+[style*="rgba(255,255,255,0.2"] {
+  color: #0B6B3A !important;
+}
+
+.cyber-card,
+.glass-card,
+.form-input,
+input,
+textarea,
+select,
+[style*="background: rgba(255,255,255"],
+[style*="background:rgba(255,255,255"] {
+  background-color: rgba(248,255,252,0.88) !important;
+}
+
+button,
+a,
+[role="button"] {
+  text-shadow: none !important;
+}
+
+.btn-solid,
+.btn-gold {
+  color: #07120D !important;
+}
+
+.btn-neon,
+.btn-glass {
+  color: #072014 !important;
+  background: rgba(248,255,252,0.82) !important;
+  border-color: rgba(13,93,52,0.26) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(27,42,34,0.62) !important;
+}
+
+[style*="color: rgba(255,255,255"],
+[style*="color:rgba(255,255,255"] {
+  color: #1B2A22 !important;
+}
+
+[style*="color: #00FF7F"],
+[style*="color:#00FF7F"],
+.text-\[\#00FF7F\] {
+  color: #087A43 !important;
+}
+
+[style*="color: #FF0077"],
+[style*="color:#FF0077"],
+.text-\[\#FF0077\] {
+  color: #B01255 !important;
+}
+
+[style*="color: #FFD700"],
+[style*="color:#FFD700"] {
+  color: #8A6400 !important;
+}
