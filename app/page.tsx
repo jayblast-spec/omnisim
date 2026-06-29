@@ -45,15 +45,8 @@ export default function HomePage() {
     <div className="min-h-screen">
       {/* HERO */}
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-32 sm:px-8">
-        <div className="absolute inset-0 cyber-grid" style={{ opacity: 0.35 }} />
-        <div
-          className="absolute left-1/4 top-1/3 h-96 w-96 rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(191,0,255,0.08), transparent)", filter: "blur(40px)" }}
-        />
-        <div
-          className="absolute bottom-1/3 right-1/4 h-80 w-80 rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(0,245,255,0.06), transparent)", filter: "blur(40px)" }}
-        />
+        <div className="simulation-field" aria-hidden="true" />
+        <div className="sim-node-rail" aria-hidden="true" />
 
         <div className="relative z-10 mx-auto max-w-5xl text-center">
           <div className="mb-8 inline-flex items-center gap-3 rounded-sm border border-[rgba(0,245,255,0.15)] bg-[rgba(0,245,255,0.03)] px-5 py-2.5">
