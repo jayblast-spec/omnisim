@@ -2,30 +2,30 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/70 bg-white/50 backdrop-blur-3xl px-5 py-12 sm:px-8">
+    <footer className="matrix-footer border-t px-5 py-12 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 md:grid-cols-[1fr_1fr_1fr]">
           <div>
             <div className="mb-3">
-              <span className="hero-title text-2xl font-semibold italic text-[#0D1117]">OMNI</span>
+              <span className="hero-title text-2xl font-semibold italic" style={{ color: "#EFFFF7", textShadow: "0 0 12px rgba(43,255,143,0.28)" }}>OMNI</span>
               <span
                 className="hero-title text-2xl font-semibold italic"
-                style={{ color: "#00F5FF", textShadow: "0 0 10px #00F5FF" }}
+                style={{ color: "#7DFFC0", textShadow: "0 0 12px rgba(125,255,192,0.45)" }}
               >
                 SIM
               </span>
             </div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6B7894]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#B8EACF]">
               SIMULATE BEFORE IT HAPPENS
             </p>
-            <p className="mt-4 text-xs leading-7 text-[#6B7894]">
+            <p className="mt-4 text-xs leading-7 text-[#B8EACF]">
               The world&apos;s most powerful AI simulation platform.
               35+ global agents. Real predictions.
             </p>
           </div>
 
           <div>
-            <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#6B8FD4]">SIMULATIONS</p>
+            <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#7DFFC0]">SIMULATIONS</p>
             <div className="space-y-3">
               {[
                 ["Public Reaction", "/simulate/public-reaction"],
@@ -44,7 +44,7 @@ export default function Footer() {
                 <Link
                   key={href}
                   href={href}
-                  className="block text-xs font-medium text-[#2D3748] transition-colors hover:text-[#6B8FD4]"
+                  className="block text-xs font-medium text-[#2D3748] transition-colors hover:text-[#7DFFC0]"
                 >
                   {label}
                 </Link>
@@ -53,7 +53,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#6B8FD4]">PLATFORM</p>
+            <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#7DFFC0]">PLATFORM</p>
             <div className="space-y-3">
               {[
                 ["About OMNISIM", "/about"],
@@ -63,7 +63,7 @@ export default function Footer() {
                 <Link
                   key={href}
                   href={href}
-                  className="block text-xs font-medium text-[#2D3748] transition-colors hover:text-[#6B8FD4]"
+                  className="block text-xs font-medium text-[#2D3748] transition-colors hover:text-[#7DFFC0]"
                 >
                   {label}
                 </Link>
@@ -72,11 +72,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/70 pt-8 sm:flex-row">
-          <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#6B7894]">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[rgba(125,255,192,0.22)] pt-8 sm:flex-row">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#B8EACF]">
             &copy; 2026 OMNISIM. ALL RIGHTS RESERVED.
           </p>
-          <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#6B7894]">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#B8EACF]">
             POWERED BY ARKNET.DIGITAL
           </p>
         </div>
