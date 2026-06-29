@@ -293,28 +293,28 @@ export default function SimForm({ schema }: SimFormProps) {
       </div>
 
       {/* Section card */}
-      <div className="cyber-card p-6 md:p-10">
+      <div className="sim-form-board cyber-card p-6 md:p-10">
         <div className="mb-8 border-b border-white/8 pb-6">
-          <p className="font-orbitron text-[9px] tracking-[0.5em] text-white/25">
+          <p className="font-orbitron text-[9px] font-black tracking-[0.24em]" style={{ color: "#7DFFC0" }}>
             SECTION {currentSection + 1} OF {schema.sections.length}
           </p>
-          <h2 className="mt-2 font-orbitron text-lg font-bold text-white md:text-2xl">
+          <h2 className="mt-2 font-orbitron text-lg font-bold md:text-2xl" style={{ color: "#F4FFF8" }}>
             {section.title}
           </h2>
           {section.subtitle && (
-            <p className="mt-2 text-sm text-white/40">{section.subtitle}</p>
+            <p className="mt-2 text-sm font-medium" style={{ color: "#C8F5DC" }}>{section.subtitle}</p>
           )}
         </div>
 
         <div className="space-y-8">
           {section.fields.map((field) => (
             <div key={field.id}>
-              <label className="mb-1 block font-orbitron text-[10px] tracking-[0.25em] text-white/75">
+              <label className="mb-1 block font-orbitron text-[10px] font-black tracking-[0.16em]" style={{ color: "#E9FFF1" }}>
                 {field.label}
                 {field.required && <span className="ml-1 text-[#FF0077]">*</span>}
               </label>
               {field.hint && (
-                <p className="mb-3 text-[11px] leading-6 text-white/30">{field.hint}</p>
+                <p className="mb-3 text-[11px] font-medium leading-6" style={{ color: "#B8EACF" }}>{field.hint}</p>
               )}
 
               {field.type === "text" && (
@@ -446,7 +446,7 @@ export default function SimForm({ schema }: SimFormProps) {
             type="button"
             onClick={() => setCurrentSection((prev) => Math.max(0, prev - 1))}
             disabled={currentSection === 0}
-            className="font-orbitron text-[10px] tracking-widest text-white/30 transition-colors hover:text-white disabled:opacity-0"
+            className="font-orbitron text-[10px] font-black tracking-widest transition-colors disabled:opacity-0" style={{ color: "#B8EACF" }}
           >
             ← BACK
           </button>
