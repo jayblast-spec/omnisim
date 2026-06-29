@@ -315,7 +315,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                   ["Offline Humans", `${phoneReach.offlinePopulation}M`, `${phoneReach.offlineShare}% delayed reach`],
                 ].map(([label, value, sub]) => (
                   <div key={label} className="rounded-xl p-4" style={{ background: `${GREEN}07`, border: `1px solid ${GREEN}18` }}>
-                    <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: "rgba(255,255,255,0.38)" }}>{label}</p>
+                    <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: "#40516D" }}>{label}</p>
                     <p className="text-2xl font-black font-mono" style={{ color: GREEN, textShadow: `0 0 10px ${GREEN}55` }}>{value}</p>
                     <p className="text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.42)" }}>{sub}</p>
                   </div>
@@ -586,21 +586,21 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
             {([{ label: "Positive", count: pos, color: GREEN }, { label: "Neutral", count: neu, color: NEON }, { label: "Negative", count: neg, color: PINK }, { label: "Avg Intensity", count: avgInt, color: GOLD, suffix: "/10" }] as {label:string;count:string|number;color:string;suffix?:string}[]).map(({ label, count, color, suffix }) => (
               <div key={label} className="rounded-xl p-3 text-center" style={{ background: "#0D0B1A", border: `1px solid ${color}22` }}>
                 <p className="text-2xl font-black font-mono" style={{ color }}>{count}{suffix}</p>
-                <p className="text-[9px] uppercase tracking-[0.2em] mt-1" style={{ color: "rgba(255,255,255,0.38)" }}>{label}</p>
+                <p className="text-[9px] uppercase tracking-[0.2em] mt-1" style={{ color: "#40516D" }}>{label}</p>
               </div>
             ))}
           </div>
 
           <div className="flex gap-2 mb-5 flex-wrap">
             {(["all", "positive", "neutral", "negative"] as const).map((f) => {
-              const fc = f === "positive" ? GREEN : f === "negative" ? PINK : f === "neutral" ? NEON : "rgba(255,255,255,0.6)";
+              const fc = f === "positive" ? GREEN : f === "negative" ? PINK : f === "neutral" ? NEON : "#315FAE";
               const cnt = f === "all" ? result.agentResults.length : f === "positive" ? pos : f === "negative" ? neg : neu;
               return (
                 <button key={f} onClick={() => setAgentFilter(f)}
                   className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.15em] transition-all"
                   style={agentFilter === f
                     ? { background: `${fc}1E`, color: fc, border: `1px solid ${fc}55` }
-                    : { background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.38)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    : { background: "rgba(255,255,255,0.92)", color: "#1E293B", border: "1px solid rgba(15,23,42,0.22)" }}>
                   {f === "all" ? `All (${cnt})` : `${f} (${cnt})`}
                 </button>
               );
@@ -660,7 +660,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
               );
             })}
           </div>
-          {filtered.length === 0 && <p className="text-center py-10 text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>No agents with this sentiment in the simulation.</p>}
+          {filtered.length === 0 && <p className="text-center py-10 text-sm" style={{ color: "#40516D" }}>No agents with this sentiment in the simulation.</p>}
         </div>
       )}
 
