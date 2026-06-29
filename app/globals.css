@@ -1403,3 +1403,40 @@ button,
     background: linear-gradient(145deg, rgba(3,20,12,0.92), rgba(7,42,24,0.84), rgba(9,18,37,0.76)) !important;
   }
 }
+/* Homepage section contrast guard */
+.home-section {
+  position: relative;
+  z-index: 1;
+}
+
+.home-section > div:first-child,
+.home-section .mx-auto > div:first-child {
+  color: var(--matrix-ink) !important;
+}
+
+.home-heading,
+.home-section h2,
+.home-section h3 {
+  color: #F6FFF9 !important;
+  text-shadow: 0 2px 18px rgba(0,0,0,0.78), 0 0 22px rgba(0,215,255,0.18) !important;
+}
+
+.home-copy,
+.home-section > div > p:not(.section-label),
+.home-section .mx-auto > p:not(.section-label) {
+  color: #DDFEEB !important;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.72) !important;
+}
+
+.home-section .section-label {
+  color: #7DFFC0 !important;
+  text-shadow: 0 0 16px rgba(38,255,135,0.28) !important;
+}
+
+.matrix-navbar a:not(.matrix-launch) {
+  color: #F4FFF8 !important;
+}
+
+.matrix-navbar a:not(.matrix-launch):hover {
+  color: #7DFFC0 !important;
+}
