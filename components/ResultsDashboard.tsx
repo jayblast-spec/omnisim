@@ -254,7 +254,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                 <p className="text-[9px] font-mono" style={{ color: PURPLE }}>&#9670; {result.historicalIntelligenceUsed} prior simulations in memory</p>
               )}
               {specialists.length > 0 && (
-                <p className="text-[9px] font-mono" style={{ color: GOLD }}>&#9733; {specialists.length} specialist analysts</p>
+                <p className="text-[9px] font-mono" style={{ color: GOLD }}>&#9733; {specialists.length} expert analysts</p>
               )}
             </div>
           </div>
@@ -361,23 +361,23 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
               </details>
             </div>
           )}
-          {/* Expert Panel — 5 Specialists */}
+          {/* Expert Panel — 8 Specialists */}
           {specialists.length > 0 && (
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-1 h-5 rounded-full" style={{ background: GOLD }} />
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: GOLD }}>Expert Panel — Domain Specialists</p>
-                <span className="text-[8px] font-mono px-2 py-0.5 rounded-full" style={{ background: `${GOLD}18`, color: GOLD, border: `1px solid ${GOLD}33` }}>{specialists.length} analysts</span>
+                <div className="w-1 h-5 rounded-full" style={{ background: "#315FAE" }} />
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: "#315FAE" }}>Expert Panel — Domain Specialists</p>
+                <span className="text-[8px] font-mono px-2 py-0.5 rounded-full" style={{ background: "rgba(49,95,174,0.12)", color: "#070A12", border: "1px solid rgba(49,95,174,0.32)" }}>{specialists.length} analysts</span>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {specialists.map((s) => {
                   const sc = s.color;
                   const mod = s.confidenceModifier;
                   return (
-                    <div key={s.specialistId} className="rounded-xl p-4" style={{ background: "#0D0B1A", border: `1px solid ${sc}28`, boxShadow: `0 0 16px ${sc}08` }}>
+                    <div key={s.specialistId} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.92)", border: `1px solid ${sc}33`, boxShadow: "0 12px 30px rgba(15,23,42,0.12)" }}>
                       <div className="flex items-start justify-between gap-2 mb-3">
                         <div>
-                          <p className="font-black text-white text-sm">{s.name}</p>
+                          <p className="font-black text-sm" style={{ color: "#070A12" }}>{s.name}</p>
                           <p className="text-[9px] uppercase tracking-[0.18em] mt-0.5" style={{ color: sc }}>{s.domain}</p>
                         </div>
                         <span className="text-[10px] font-black font-mono px-2 py-1 rounded shrink-0" style={{ background: `${mod >= 0 ? GREEN : PINK}18`, color: mod >= 0 ? GREEN : PINK, border: `1px solid ${mod >= 0 ? GREEN : PINK}33` }}>
@@ -388,16 +388,16 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                       <div className="space-y-2">
                         <div className="rounded-lg px-3 py-2" style={{ background: `${sc}0A`, border: `1px solid ${sc}1E` }}>
                           <p className="text-[8px] uppercase tracking-[0.18em] mb-0.5 font-black" style={{ color: sc }}>Key Insight</p>
-                          <p className="text-[10px] leading-5" style={{ color: "rgba(255,255,255,0.78)" }}>{s.keyInsight}</p>
+                          <p className="text-[10px] leading-5" style={{ color: "#1E293B" }}>{s.keyInsight}</p>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div className="rounded-lg px-2 py-1.5" style={{ background: `${PINK}08`, border: `1px solid ${PINK}18` }}>
                             <p className="text-[7px] uppercase tracking-wider mb-0.5 font-black" style={{ color: PINK }}>Risk</p>
-                            <p className="text-[9px] leading-4" style={{ color: "rgba(255,255,255,0.6)" }}>{s.riskFlag}</p>
+                            <p className="text-[9px] leading-4" style={{ color: "#40516D" }}>{s.riskFlag}</p>
                           </div>
                           <div className="rounded-lg px-2 py-1.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}18` }}>
                             <p className="text-[7px] uppercase tracking-wider mb-0.5 font-black" style={{ color: GREEN }}>Opportunity</p>
-                            <p className="text-[9px] leading-4" style={{ color: "rgba(255,255,255,0.6)" }}>{s.opportunityFlag}</p>
+                            <p className="text-[9px] leading-4" style={{ color: "#40516D" }}>{s.opportunityFlag}</p>
                           </div>
                         </div>
                       </div>
@@ -464,7 +464,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
           {result.scenarioBranches && result.scenarioBranches.length > 0 && (
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-1 h-5 rounded-full" style={{ background: GOLD }} />
+                <div className="w-1 h-5 rounded-full" style={{ background: "#315FAE" }} />
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: GOLD }}>Scenario Probability Matrix</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
