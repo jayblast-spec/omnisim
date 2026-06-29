@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -12,15 +13,16 @@ const navLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
   return (
     <nav className="fixed top-0 z-50 w-full px-3 pt-3 sm:px-5">
-      <div className="glass-card mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-6">
-        <Link href="/" className="flex items-center gap-3" aria-label="OmniSim home">
-          <div className="h-9 w-9 rounded-[14px] border border-white/80 bg-white/60 shadow-sm" />
-          <div className="leading-none">
-            <span className="hero-title block text-[22px] font-semibold italic text-[#0D1117]">OmniSim</span>
-            <span className="block text-[9px] font-semibold uppercase tracking-[0.16em] text-[#6B7894]">Future Intelligence</span>
+      <div className="glass-card relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2.5 sm:px-6 sm:py-3">
+        <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="OmniSim home" onClick={() => setOpen(false)}>
+          <div className="h-8 w-8 shrink-0 rounded-[12px] border border-white/80 bg-white/60 shadow-sm sm:h-9 sm:w-9 sm:rounded-[14px]" />
+          <div className="min-w-0 leading-none">
+            <span className="hero-title block truncate text-[19px] font-semibold italic text-[#0D1117] sm:text-[22px]">OmniSim</span>
+            <span className="block truncate text-[7.5px] font-semibold uppercase tracking-[0.10em] text-[#4A5872] sm:text-[9px] sm:tracking-[0.16em]">Future Intelligence</span>
           </div>
         </Link>
 
@@ -48,9 +50,50 @@ export default function Navbar() {
           Launch Simulation
         </Link>
 
-        <Link href="/simulate" className="btn-glass text-[10px] md:hidden">
-          Simulate
-        </Link>
+        <button
+          type="button"
+          aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={open}
+          onClick={() => setOpen((value) => !value)}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border text-[#0D1117] md:hidden"
+          style={{ background: "rgba(255,255,255,0.86)", borderColor: "rgba(15,23,42,0.16)", boxShadow: "0 8px 18px rgba(15,23,42,0.10)" }}
+        >
+          <span className="sr-only">Menu</span>
+          <span className="flex flex-col gap-1.5" aria-hidden="true">
+            <span className="block h-0.5 w-4 rounded-full bg-current" />
+            <span className="block h-0.5 w-4 rounded-full bg-current" />
+            <span className="block h-0.5 w-4 rounded-full bg-current" />
+          </span>
+        </button>
+
+        {open && (
+          <div className="absolute left-0 right-0 top-[calc(100%+8px)] rounded-2xl border p-2 md:hidden" style={{ background: "rgba(255,255,255,0.96)", borderColor: "rgba(15,23,42,0.16)", boxShadow: "0 18px 42px rgba(15,23,42,0.18)" }}>
+            <div className="grid grid-cols-2 gap-2">
+              {navLinks.map((link) => {
+                const active = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className="min-h-[44px] rounded-xl px-3 py-3 text-center text-[11px] font-black uppercase tracking-[0.08em] transition"
+                    style={active ? { color: "#070A12", background: "rgba(49,95,174,0.16)", border: "1px solid rgba(49,95,174,0.32)" } : { color: "#1E293B", background: "rgba(255,255,255,0.88)", border: "1px solid rgba(15,23,42,0.10)" }}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+              <Link
+                href="/simulate"
+                onClick={() => setOpen(false)}
+                className="col-span-2 min-h-[44px] rounded-xl px-3 py-3 text-center text-[11px] font-black uppercase tracking-[0.08em] text-white"
+                style={{ background: "linear-gradient(135deg, #D4A843, #B8860B)", boxShadow: "0 10px 22px rgba(184,134,11,0.24)" }}
+              >
+                Launch Simulation
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
