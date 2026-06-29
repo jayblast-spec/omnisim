@@ -35,10 +35,10 @@ export default function AboutPage() {
       <section className="px-5 py-16 text-center sm:px-8">
         <div className="mx-auto max-w-3xl">
           <p className="section-label">ABOUT OMNISIM</p>
-          <h1 className="mt-4 font-orbitron text-4xl font-black text-white md:text-5xl">
+          <h1 className="page-heading mt-4 font-orbitron text-4xl font-black md:text-5xl">
             How the simulation engine works
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-sm leading-9 text-white/45">
+          <p className="page-copy mx-auto mt-6 max-w-2xl text-sm font-semibold leading-9">
             OMNISIM is not a chatbot. It is a multi-agent intelligence system that deploys 35 distinct
             global personas — each with a unique worldview, media diet, values, and disposition — and
             forces them to react authentically to your scenario.
@@ -54,15 +54,15 @@ export default function AboutPage() {
             {agentExamples.map((agent) => (
               <div key={agent.name} className="cyber-card p-4">
                 <div className="mb-2 text-2xl">{agent.flag}</div>
-                <p className="font-orbitron text-xs font-bold text-white">{agent.name}</p>
-                <p className="mt-1 text-[10px] text-white/35">{agent.role}</p>
+                <p className="font-orbitron text-xs font-bold" style={{ color: "#F6FFF9" }}>{agent.name}</p>
+                <p className="mt-1 text-[10px] font-medium" style={{ color: "#DDFEEB" }}>{agent.role}</p>
                 <p className="mt-2 font-orbitron text-[8px] tracking-widest" style={{ color: "#00F5FF" }}>
                   {agent.pol}
                 </p>
               </div>
             ))}
           </div>
-          <p className="mt-6 text-center font-orbitron text-[9px] tracking-widest text-white/20">
+          <p className="mt-6 text-center font-orbitron text-[9px] font-bold tracking-widest" style={{ color: "#BCEFD2" }}>
             + 23 MORE AGENTS ACROSS 30+ COUNTRIES
           </p>
         </div>
@@ -75,8 +75,8 @@ export default function AboutPage() {
           <div className="grid gap-6 md:grid-cols-2">
             {principles.map((p) => (
               <div key={p.title} className="cyber-card p-8">
-                <p className="font-orbitron text-base font-bold text-white">{p.title}</p>
-                <p className="mt-4 text-sm leading-8 text-white/45">{p.text}</p>
+                <p className="font-orbitron text-base font-bold" style={{ color: "#F6FFF9" }}>{p.title}</p>
+                <p className="mt-4 text-sm font-medium leading-8" style={{ color: "#DDFEEB" }}>{p.text}</p>
               </div>
             ))}
           </div>
@@ -86,7 +86,7 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="px-5 py-24 text-center sm:px-8">
         <p className="section-label">READY?</p>
-        <h2 className="mt-6 font-orbitron text-3xl font-black text-white">
+        <h2 className="page-heading mt-6 font-orbitron text-3xl font-black">
           See it in action.
         </h2>
         <div className="mt-10">
