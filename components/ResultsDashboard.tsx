@@ -262,14 +262,26 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
       </div>
 
       {/* ── TABS ── */}
-      <div className="flex gap-0 mb-6 border-b" style={{ borderColor: "rgba(15,23,42,0.14)" }}>
-        {(["overview", "agents", "factors"] as const).map((t) => (
-          <button key={t} onClick={() => setTab(t)}
-            className="px-5 py-3 text-[11px] font-bold uppercase tracking-[0.2em] border-b-2 -mb-px transition-all"
-            style={tab === t ? { color: "#070A12", borderColor: "#315FAE", background: "rgba(49,95,174,0.10)" } : { color: "#1E293B", borderColor: "transparent", background: "rgba(255,255,255,0.62)" }}>
-            {t === "overview" ? "Intelligence Brief" : t === "agents" ? `Field Agents (${result.agentResults.length})` : "Risk & Factor Matrix"}
-          </button>
-        ))}
+      <div className="mb-6 overflow-x-auto pb-2" style={{ WebkitOverflowScrolling: "touch" }}>
+        <div className="inline-flex min-w-full gap-2 rounded-2xl border p-1" style={{ borderColor: "rgba(15,23,42,0.14)", background: "rgba(255,255,255,0.70)" }}>
+          {(["overview", "agents", "factors"] as const).map((t) => {
+            const label = t === "overview" ? "Brief" : t === "agents" ? `Agents (${result.agentResults.length})` : "Risks";
+            const full = t === "overview" ? "Intelligence Brief" : t === "agents" ? `Field Agents (${result.agentResults.length})` : "Risk & Factor Matrix";
+            return (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                aria-label={full}
+                title={full}
+                className="min-w-[96px] flex-1 whitespace-nowrap rounded-xl px-3 py-3 text-[10px] font-black uppercase tracking-[0.12em] transition-all sm:min-w-[160px] sm:px-5 sm:text-[11px]"
+                style={tab === t ? { color: "#070A12", border: "1px solid rgba(49,95,174,0.44)", background: "rgba(49,95,174,0.14)", boxShadow: "0 8px 18px rgba(49,95,174,0.12)" } : { color: "#1E293B", border: "1px solid rgba(15,23,42,0.10)", background: "rgba(255,255,255,0.86)" }}
+              >
+                <span className="sm:hidden">{label}</span>
+                <span className="hidden sm:inline">{full}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* ══ OVERVIEW ══ */}
