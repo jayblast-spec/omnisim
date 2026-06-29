@@ -200,7 +200,6 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
   const cascades = (result.cascadeEffects ?? []) as CascadeEffect[];
   const counterIntel = result.counterIntelligence;
   const phoneReach = result.phoneReachIntelligence;
-  const swarmLab = result.swarmLabTrace;
   const deepRead = result.deepRead ?? buildFallbackDeepRead(result);
   const relDeep = result.relationshipDeepDive;
 
@@ -263,11 +262,11 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
       </div>
 
       {/* ── TABS ── */}
-      <div className="flex gap-0 mb-6 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+      <div className="flex gap-0 mb-6 border-b" style={{ borderColor: "rgba(15,23,42,0.14)" }}>
         {(["overview", "agents", "factors"] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)}
             className="px-5 py-3 text-[11px] font-bold uppercase tracking-[0.2em] border-b-2 -mb-px transition-all"
-            style={tab === t ? { color: NEON, borderColor: NEON } : { color: "rgba(255,255,255,0.38)", borderColor: "transparent" }}>
+            style={tab === t ? { color: "#070A12", borderColor: "#315FAE", background: "rgba(49,95,174,0.10)" } : { color: "#1E293B", borderColor: "transparent", background: "rgba(255,255,255,0.62)" }}>
             {t === "overview" ? "Intelligence Brief" : t === "agents" ? `Field Agents (${result.agentResults.length})` : "Risk & Factor Matrix"}
           </button>
         ))}
@@ -292,68 +291,6 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
 
 
 
-          {/* SwarmLab Intelligence Core */}
-          {swarmLab && (
-            <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${PURPLE}24`, boxShadow: `0 0 28px ${PURPLE}08` }}>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-1 h-6 rounded-full" style={{ background: PURPLE }} />
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: PURPLE }}>SwarmLab Intelligence Core</p>
-                    <p className="text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>{swarmLab.engineVersion} · native OmniSim swarm trace</p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-[0.18em] px-3 py-1 rounded-full" style={{ background: `${PURPLE}12`, color: PURPLE, border: `1px solid ${PURPLE}33` }}>
-                  self-loop learning active
-                </span>
-              </div>
-
-              <div className="grid gap-3 lg:grid-cols-3 mb-5">
-                <div className="rounded-xl p-4" style={{ background: `${NEON}07`, border: `1px solid ${NEON}18` }}>
-                  <p className="text-[8px] uppercase tracking-[0.2em] mb-3 font-black" style={{ color: NEON }}>Reality Seed</p>
-                  <ul className="space-y-2">
-                    {swarmLab.realitySeed.map((item, i) => <li key={i} className="text-[11px] leading-5" style={{ color: "rgba(255,255,255,0.72)" }}>{item}</li>)}
-                  </ul>
-                </div>
-                <div className="rounded-xl p-4" style={{ background: `${GREEN}07`, border: `1px solid ${GREEN}18` }}>
-                  <p className="text-[8px] uppercase tracking-[0.2em] mb-3 font-black" style={{ color: GREEN }}>Persona Swarm</p>
-                  <ul className="space-y-2">
-                    {swarmLab.personaSwarm.slice(0, 6).map((item, i) => <li key={i} className="text-[11px] leading-5" style={{ color: "rgba(255,255,255,0.72)" }}>{item}</li>)}
-                  </ul>
-                </div>
-                <div className="rounded-xl p-4" style={{ background: `${GOLD}07`, border: `1px solid ${GOLD}18` }}>
-                  <p className="text-[8px] uppercase tracking-[0.2em] mb-3 font-black" style={{ color: GOLD }}>Mutation Tests</p>
-                  <ul className="space-y-2">
-                    {swarmLab.mutationTests.map((item, i) => <li key={i} className="text-[11px] leading-5" style={{ color: "rgba(255,255,255,0.72)" }}>{item}</li>)}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="space-y-3 mb-5">
-                {swarmLab.simulationRounds.map((round, i) => (
-                  <div key={round.phase} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-xs font-black" style={{ color: PURPLE }}>{String(i + 1).padStart(2, "0")} · {round.phase}</p>
-                      <span className="text-[9px] font-black uppercase tracking-[0.16em]" style={{ color: round.confidenceImpact >= 0 ? GREEN : PINK }}>{round.confidenceImpact >= 0 ? "+" : ""}{round.confidenceImpact} confidence</span>
-                    </div>
-                    <p className="mt-2 text-xs leading-6" style={{ color: "rgba(255,255,255,0.72)" }}>{round.action}</p>
-                    <p className="mt-1 text-[11px] leading-5" style={{ color: "rgba(255,255,255,0.48)" }}>{round.output}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl p-4" style={{ background: `${NEON}08`, border: `1px solid ${NEON}22` }}>
-                  <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: NEON }}>Learning Loop</p>
-                  <p className="text-xs leading-6" style={{ color: "rgba(255,255,255,0.72)" }}>{swarmLab.learningLoop}</p>
-                </div>
-                <div className="rounded-xl p-4" style={{ background: `${PURPLE}08`, border: `1px solid ${PURPLE}22` }}>
-                  <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: PURPLE }}>Resilience Filter</p>
-                  <p className="text-xs leading-6" style={{ color: "rgba(255,255,255,0.72)" }}>{swarmLab.resilienceFilter}</p>
-                </div>
-              </div>
-            </div>
-          )}
           {/* Phone Reach Intelligence */}
           {phoneReach && (
             <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${GREEN}24`, boxShadow: `0 0 28px ${GREEN}08` }}>
