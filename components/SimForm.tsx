@@ -1,530 +1,844 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { FormSchema } from "@/lib/formSchemas";
+import type { FormSchema, FormField } from "@/lib/formSchemas";
 
 type TruthCheckValue = "true" | "unknown" | "skip";
+
+interface FlatQuestion {
+  field: FormField;
+  sectionTitle: string;
+  sectionIndex: number;
+  isFirstInSection: boolean;
+}
+
+type ChatEntry =
+  | { id: string; role: "section"; text: string }
+  | { id: string; role: "bot"; text: string }
+  | { id: string; role: "user"; text: string };
 
 interface SimFormProps {
   schema: FormSchema;
 }
 
+function flattenQuestions(schema: FormSchema): FlatQuestion[] {
+  const out: FlatQuestion[] = [];
+  schema.sections.forEach((section, si) => {
+    section.fields.forEach((field, fi) => {
+      out.push({
+        field,
+        sectionTitle: section.title,
+        sectionIndex: si,
+        isFirstInSection: fi === 0,
+      });
+    });
+  });
+  return out;
+}
+
+const LOADING_STEPS = [
+  { title: "Reading Your Scenario",          signal: "INTAKE LOCKED" },
+  { title: "Preparing 35 Global Agents",      signal: "AGENTS READY" },
+  { title: "Running Reaction Tests",          signal: "REACTIONS ACTIVE" },
+  { title: "Elite Specialist Analysis",       signal: "SPECIALISTS IN" },
+  { title: "Mathematical Calibration",        signal: "CONFIDENCE SET" },
+  { title: "Cascade Chain Modeling",          signal: "PATHS FORMED" },
+  { title: "Devil’s Advocate Check",    signal: "COUNTER CHECK" },
+  { title: "Writing Intel Report",            signal: "REPORT BUILD" },
+  { title: "Final Trust Pass",                signal: "READY" },
+];
+
 export default function SimForm({ schema }: SimFormProps) {
   const router = useRouter();
-  const [formData, setFormData] = useState<Record<string, string | string[]>>({});
-  const [currentSection, setCurrentSection] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loadingStep, setLoadingStep] = useState(0);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [truthChecks, setTruthChecks] = useState<Record<number, TruthCheckValue>>({});
-  const [pendingAction, setPendingAction] = useState<"next" | "submit" | null>(null);
+  const flatQ = useRef(flattenQuestions(schema)).current;
+  const total = flatQ.length;
 
-  const loadingSteps = [
-    {
-      title: "Preparing OmniSim Intelligence",
-      detail: "Preparing the facts, constraints, and scenario boundaries before the final read.",
-      signal: "INTELLIGENCE READY",
-    },
-    {
-      title: "Reading Every Blank You Filled",
-      detail: "Parsing names, motives, risks, context, emotional signals, timeframes, and hidden pressure points.",
-      signal: "INTAKE LOCKED",
-    },
-    {
-      title: "Testing Human Response Patterns",
-      detail: "Choosing the agent mix most likely to understand how real people would respond to this matter.",
-      signal: "AGENTS READY",
-    },
-    {
-      title: "Running Live Reaction Tests",
-      detail: "Testing how different personalities, cultures, incentives, and fears respond to this situation.",
-      signal: "REACTIONS ACTIVE",
-    },
-    {
-      title: "Applying Resilience Filters",
-      detail: "Checking reputation, timing, trust, leverage, safety, risk, upside, and probability of follow-through.",
-      signal: "SUCCESS FILTER",
-    },
-    {
-      title: "Generating Multiple Outcome Paths",
-      detail: "Building best-case, likely-case, downside, and hidden-opportunity branches before choosing the final signal.",
-      signal: "PATHS FORMED",
-    },
-    {
-      title: "Cross-Examining The Result",
-      detail: "Searching for weak assumptions, missed factors, emotional bias, and second-order consequences.",
-      signal: "COUNTER CHECK",
-    },
-    {
-      title: "Writing The Intelligence Report",
-      detail: "Compressing agent reactions, specialist insight, risks, opportunities, and next actions into one clear outcome.",
-      signal: "REPORT BUILD",
-    },
-    {
-      title: "Final Trust Pass",
-      detail: "Making the answer practical, sober, useful, and ready for a human decision.",
-      signal: "READY",
-    },
-  ];
+  const [qIdx,           setQIdx]           = useState(0);
+  const [answers,        setAnswers]        = useState<Record<string, string | string[]>>({});
+  const [history,        setHistory]        = useState<ChatEntry[]>([]);
+  const [typedText,      setTypedText]      = useState("");
+  const [isTyping,       setIsTyping]       = useState(false);
+  const [textInput,      setTextInput]      = useState("");
+  const [isSubmitting,   setIsSubmitting]   = useState(false);
+  const [loadingStep,    setLoadingStep]    = useState(0);
+  const [elapsed,        setElapsed]        = useState(0);
+  const [error,          setError]          = useState<string | null>(null);
+  const [truthPending,   setTruthPending]   = useState(false);
+  const [truthChecks,    setTruthChecks]    = useState<Record<number, TruthCheckValue>>({});
 
+  const chatEndRef  = useRef<HTMLDivElement>(null);
+  const typingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const currentQ = flatQ[qIdx];
+  const isDone   = qIdx >= total;
+
+  /* ── Auto-scroll ─────────────────────────────────────────────── */
   useEffect(() => {
-    if (!isSubmitting) {
-      setElapsedSeconds(0);
-      return;
-    }
-    const timer = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
-    return () => clearInterval(timer);
-  }, [isSubmitting]);
-  function handleChange(fieldId: string, value: string | string[]) {
-    setFormData((prev) => ({ ...prev, [fieldId]: value }));
-  }
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [history, typedText]);
 
-  function handleMultiSelect(fieldId: string, option: string) {
-    const current = (formData[fieldId] as string[]) || [];
-    if (current.includes(option)) {
-      handleChange(fieldId, current.filter((v) => v !== option));
-    } else {
-      handleChange(fieldId, [...current, option]);
-    }
-  }
-
-  function validateSection() {
-    const section = schema.sections[currentSection];
-    for (const field of section.fields) {
-      if (field.required) {
-        const val = formData[field.id];
-        if (!val || (Array.isArray(val) && val.length === 0) || val === "") {
-          return false;
-        }
+  /* ── Typewriter ──────────────────────────────────────────────── */
+  function typeOut(
+    text: string,
+    role: "section" | "bot",
+    onDone?: () => void
+  ) {
+    if (typingTimer.current) clearInterval(typingTimer.current);
+    setTypedText("");
+    setIsTyping(true);
+    let i = 0;
+    typingTimer.current = setInterval(() => {
+      i++;
+      setTypedText(text.slice(0, i));
+      if (i >= text.length) {
+        clearInterval(typingTimer.current!);
+        typingTimer.current = null;
+        setIsTyping(false);
+        setHistory((h) => [
+          ...h,
+          { id: `${role}-${Date.now()}-${Math.random()}`, role, text },
+        ]);
+        setTypedText("");
+        onDone?.();
       }
+    }, 16);
+  }
+
+  /* ── Advance to next question ────────────────────────────────── */
+  useEffect(() => {
+    if (qIdx >= total) return;
+    const q = flatQ[qIdx];
+    setTextInput("");
+
+    const questionText = q.field.hint
+      ? `${q.field.label}\n› ${q.field.hint}`
+      : q.field.label;
+
+    if (q.isFirstInSection) {
+      typeOut(`\/\/ ${q.sectionTitle}`, "section", () => {
+        setTimeout(() => typeOut(questionText, "bot"), 160);
+      });
+    } else {
+      typeOut(questionText, "bot");
     }
-    return true;
-  }
 
+    return () => {
+      if (typingTimer.current) clearInterval(typingTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qIdx]);
 
+  /* ── Submit an answer ────────────────────────────────────────── */
+  function submitAnswer(val: string | string[]) {
+    const display = Array.isArray(val) ? val.join(", ") : val;
+    if (!display.trim()) return;
 
-  function serializeTruthChecks(checks: Record<number, TruthCheckValue>) {
-    return JSON.stringify(
-      Object.entries(checks).map(([sectionIndex, answer]) => ({
-        sectionIndex: Number(sectionIndex),
-        sectionTitle: schema.sections[Number(sectionIndex)]?.title ?? `Section ${Number(sectionIndex) + 1}`,
-        answer,
-      }))
-    );
-  }
-  function openTruthCheck(action: "next" | "submit") {
-    if (!validateSection()) return;
-    if (truthChecks[currentSection]) {
-      if (action === "next") setCurrentSection((p) => p + 1);
-      else void handleSubmit();
-      return;
+    setAnswers((prev) => ({ ...prev, [currentQ!.field.id]: val }));
+    setHistory((h) => [
+      ...h,
+      { id: `user-${Date.now()}`, role: "user", text: display },
+    ]);
+
+    const next = qIdx + 1;
+    if (next >= total) {
+      setQIdx(next);
+      setTimeout(() => setTruthPending(true), 400);
+    } else {
+      setQIdx(next);
     }
-    setPendingAction(action);
   }
 
-  function answerTruthCheck(value: TruthCheckValue) {
-    const nextChecks = { ...truthChecks, [currentSection]: value };
-    setTruthChecks(nextChecks);
-    setFormData((prev) => ({
-      ...prev,
-      __truthStageChecks: serializeTruthChecks(nextChecks),
-    }));
-    const action = pendingAction;
-    setPendingAction(null);
-    if (action === "next") setCurrentSection((p) => p + 1);
-    if (action === "submit") void handleSubmit(nextChecks);
+  /* ── Truth check → submit ────────────────────────────────────── */
+  function answerTruth(val: TruthCheckValue) {
+    const checks = { ...truthChecks, 0: val };
+    setTruthChecks(checks);
+    setTruthPending(false);
+    void doSubmit(checks);
   }
-  async function handleSubmit(finalTruthChecks = truthChecks) {
+
+  /* ── Elapsed timer ───────────────────────────────────────────── */
+  useEffect(() => {
+    if (!isSubmitting) { setElapsed(0); return; }
+    const t = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [isSubmitting]);
+
+  /* ── API call ────────────────────────────────────────────────── */
+  async function doSubmit(checks: Record<number, TruthCheckValue> = truthChecks) {
     setIsSubmitting(true);
     setError(null);
 
     let step = 0;
     setLoadingStep(0);
-    const interval = setInterval(() => {
-      step = (step + 1) % loadingSteps.length;
+    const iv = setInterval(() => {
+      step = (step + 1) % LOADING_STEPS.length;
       setLoadingStep(step);
     }, 1350);
+
+    const truthPayload = JSON.stringify(
+      Object.entries(checks).map(([si, answer]) => ({
+        sectionIndex: Number(si),
+        sectionTitle: schema.sections[Number(si)]?.title ?? `Section ${Number(si) + 1}`,
+        answer,
+      }))
+    );
 
     try {
       const res = await fetch("/api/simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: schema.type, data: { ...formData, __truthStageChecks: serializeTruthChecks(finalTruthChecks) } }),
+        body: JSON.stringify({
+          type: schema.type,
+          data: { ...answers, __truthStageChecks: truthPayload },
+        }),
       });
-
-      clearInterval(interval);
-
+      clearInterval(iv);
       if (!res.ok) {
-        const errData = (await res.json()) as { error?: string };
-        throw new Error(errData.error || "Simulation failed");
+        const e = (await res.json()) as { error?: string };
+        throw new Error(e.error || "Simulation failed");
       }
-
       const result = (await res.json()) as { id: string };
       sessionStorage.setItem(`sim_${result.id}`, JSON.stringify(result));
       router.push(`/results/${result.id}`);
     } catch (err) {
-      clearInterval(interval);
+      clearInterval(iv);
       setIsSubmitting(false);
       setError(err instanceof Error ? err.message : "Simulation failed. Please try again.");
     }
   }
 
+  /* ═══════════════════════════ LOADING SCREEN ═════════════════════ */
   if (isSubmitting) {
-    const activeStep = loadingSteps[loadingStep];
-    const progress = ((loadingStep + 1) / loadingSteps.length) * 100;
-    const visibleChecks = loadingSteps.slice(0, loadingStep + 1).slice(-4);
-
+    const step     = LOADING_STEPS[loadingStep];
+    const progress = ((loadingStep + 1) / LOADING_STEPS.length) * 100;
     return (
-      <div className="mx-auto flex min-h-[72vh] max-w-5xl flex-col items-center justify-center px-4 pb-20 pt-28">
-        <div className="w-full overflow-hidden rounded-2xl border p-5 sm:p-8" style={{ background: "rgba(255,255,255,0.92)", borderColor: "rgba(15,23,42,0.16)", boxShadow: "0 18px 48px rgba(15,23,42,0.16)" }}>
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
-            <div className="relative mx-auto h-44 w-44 shrink-0 lg:mx-0">
-              <div className="absolute inset-0 rounded-full" style={{ background: "conic-gradient(from 120deg, #315FAE, #7C3AED, #DB2777, #C78616, #059669, #315FAE)", animation: "spinRing 6s linear infinite" }} />
-              <div className="absolute inset-3 rounded-full" style={{ background: "#EEF4FB" }} />
-              <div className="absolute inset-7 rounded-full border" style={{ borderColor: "rgba(49,95,174,0.28)", background: "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(227,236,246,0.92))" }} />
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-4xl font-black" style={{ color: "#315FAE" }}>{Math.round(progress)}%</span>
-                <span className="mt-1 text-[9px] font-black uppercase tracking-[0.18em]" style={{ color: "#40516D" }}>OmniSim</span>
-                <span className="text-[8px] font-bold uppercase tracking-[0.16em]" style={{ color: "#7C3AED" }}>Live Read</span>
-              </div>
-            </div>
+      <div
+        className="flex min-h-screen flex-col items-center justify-center px-4 py-24"
+        style={{ background: "var(--bg)" }}
+      >
+        <div
+          className="w-full max-w-2xl rounded border p-8"
+          style={{
+            background:  "rgba(12,22,10,0.97)",
+            border:      "1px solid rgba(0,255,65,0.25)",
+            boxShadow:   "0 0 60px rgba(0,255,65,0.10)",
+          }}
+        >
+          <p className="section-label">OMNISIM INTELLIGENCE ENGINE · LIVE</p>
 
-            <div className="min-w-0 flex-1">
-              <p className="section-label">OMNISIM BACKGROUND ENGINE</p>
-              <h2 className="mt-3 text-3xl font-black leading-tight md:text-5xl" style={{ color: "#070A12" }}>
-                {activeStep.title}
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-8" style={{ color: "#1E293B" }}>
-                {activeStep.detail}
-              </p>
+          <h2
+            className="mt-4 text-2xl font-bold md:text-3xl"
+            style={{ color: "#dae6d2", fontFamily: "var(--font-inter)" }}
+          >
+            {step.title}
+            <span style={{ color: "#00FF41" }} className="animate-pulse">\_</span>
+          </h2>
 
-              <div className="mt-6 overflow-hidden rounded-full border" style={{ background: "rgba(15,23,42,0.08)", borderColor: "rgba(15,23,42,0.12)" }}>
-                <div
-                  className="h-3 rounded-full transition-all duration-700"
-                  style={{ width: `${progress}%`, background: "linear-gradient(90deg, #315FAE, #7C3AED, #DB2777, #C78616)" }}
-                />
-              </div>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                {[
-                  ["Simulation", schema.title],
-                  ["Status", `${activeStep.signal} · ${elapsedSeconds}s`],
-                  ["Mode", schema.type === "legacy-view" ? "PRIVATE REFLECTION" : "MULTI-OUTCOME TEST"],
-                ].map(([label, value]) => (
-                  <div key={label} className="rounded-xl border px-4 py-3" style={{ background: "rgba(255,255,255,0.78)", borderColor: "rgba(15,23,42,0.14)" }}>
-                    <p className="text-[8px] font-black uppercase tracking-[0.18em]" style={{ color: "#40516D" }}>{label}</p>
-                    <p className="mt-1 truncate text-xs font-black uppercase tracking-[0.08em]" style={{ color: "#070A12" }}>{value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* Progress bar */}
+          <div
+            className="mt-5 h-1 overflow-hidden rounded-full"
+            style={{ background: "rgba(0,255,65,0.12)" }}
+          >
+            <div
+              className="h-full rounded-full transition-all duration-700"
+              style={{ width: `${progress}%`, background: "linear-gradient(90deg,#00FF41,#00e639)" }}
+            />
           </div>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="rounded-2xl border p-5" style={{ background: "rgba(255,255,255,0.72)", borderColor: "rgba(15,23,42,0.14)" }}>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "#315FAE" }}>Live System Log</p>
-              <div className="mt-4 space-y-3">
-                {visibleChecks.map((step, i) => (
-                  <div key={`${step.signal}-${i}`} className="flex gap-3 rounded-xl px-3 py-3" style={{ background: i === visibleChecks.length - 1 ? "rgba(49,95,174,0.10)" : "rgba(15,23,42,0.04)" }}>
-                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ background: i === visibleChecks.length - 1 ? "#315FAE" : "#059669", boxShadow: i === visibleChecks.length - 1 ? "0 0 14px rgba(49,95,174,0.45)" : "none" }} />
-                    <div>
-                      <p className="text-xs font-black" style={{ color: "#070A12" }}>{step.signal}</p>
-                      <p className="mt-1 text-xs leading-5" style={{ color: "#40516D" }}>{step.detail}</p>
-                    </div>
+          {/* Log */}
+          <div className="mt-6 space-y-2">
+            {LOADING_STEPS.slice(0, loadingStep + 1)
+              .slice(-5)
+              .map((s, i, arr) => {
+                const isActive = i === arr.length - 1;
+                return (
+                  <div
+                    key={s.signal}
+                    className="flex items-center gap-3 rounded px-3 py-2"
+                    style={{
+                      background: isActive
+                        ? "rgba(0,255,65,0.08)"
+                        : "rgba(0,255,65,0.02)",
+                    }}
+                  >
+                    <div
+                      className="h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{
+                        background: isActive ? "#00FF41" : "#00a833",
+                        boxShadow:  isActive ? "0 0 8px #00FF41" : "none",
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontFamily:     "var(--font-space-mono)",
+                        fontSize:       "10px",
+                        letterSpacing:  "0.10em",
+                        color:          isActive ? "#00FF41" : "#3b4b37",
+                        textTransform:  "uppercase",
+                      }}
+                    >
+                      {s.signal}
+                    </span>
+                    <span style={{ fontSize: "11px", color: isActive ? "#b9ccb2" : "#3b4b37" }}>
+                      {s.title}
+                    </span>
                   </div>
-                ))}
-              </div>
-            </div>
+                );
+              })}
+          </div>
 
-            <div className="rounded-2xl border p-5" style={{ background: "linear-gradient(135deg, rgba(49,95,174,0.10), rgba(124,58,237,0.10), rgba(199,134,22,0.10))", borderColor: "rgba(15,23,42,0.14)" }}>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "#7C3AED" }}>What is happening</p>
-              <div className="mt-4 space-y-4 text-sm leading-7" style={{ color: "#1E293B" }}>
-                <p>OmniSim is not just waiting. It is running agent reactions, testing assumptions, scanning risk and opportunity, then compressing the strongest signals into a readable intelligence brief.</p>
-                <p>{schema.type === "legacy-view" ? "For this private reflection, the system avoids pretending to contact the deceased. It uses your memory, their values, and your current season to create grounded encouragement and a practical next step." : "For this simulation, the system compares likely human responses, pressure points, second-order effects, and multiple possible outcomes before presenting the final path."}</p>
+          {/* Stats row */}
+          <div
+            className="mt-6 flex gap-6 border-t pt-5"
+            style={{ borderColor: "rgba(0,255,65,0.10)" }}
+          >
+            {[
+              ["Simulation", schema.title],
+              ["Signal",     step.signal],
+              ["Elapsed",    `${elapsed}s`],
+            ].map(([label, value]) => (
+              <div key={label} className="min-w-0 flex-1">
+                <p
+                  style={{
+                    fontFamily:    "var(--font-space-mono)",
+                    fontSize:      "8px",
+                    letterSpacing: "0.16em",
+                    color:         "#3b4b37",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {label}
+                </p>
+                <p
+                  className="mt-0.5 truncate"
+                  style={{
+                    fontFamily: "var(--font-space-mono)",
+                    fontSize:   "11px",
+                    color:      "#00FF41",
+                  }}
+                >
+                  {value}
+                </p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
     );
   }
 
-  const section = schema.sections[currentSection];
-
+  /* ═══════════════════════════ CHAT UI ════════════════════════════ */
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-20 pt-28">
-      {/* Header */}
-      <div className="mb-8 rounded-2xl border p-5 shadow-xl sm:p-6" style={{ background: "rgba(248,255,252,0.88)", borderColor: "rgba(174,255,211,0.36)", boxShadow: "0 18px 44px rgba(0,0,0,0.22), 0 0 34px rgba(43,255,143,0.08)" }}>
-        <p className="font-orbitron text-[10px] font-black uppercase tracking-[0.18em] sm:text-xs" style={{ color: "#0B6B3A" }}>
-          {schema.icon} {schema.type.toUpperCase().replace(/-/g, " ")} SIMULATION
-        </p>
-        <h1 className="mt-3 font-orbitron text-3xl font-black md:text-4xl" style={{ color: "#031008" }}>
-          {schema.title}
-        </h1>
-        <p className="mt-3 max-w-xl text-sm font-medium leading-7" style={{ color: "#1B2A22" }}>{schema.description}</p>
-
-        {/* Progress bar */}
-        <div className="mt-6 grid gap-2" style={{ gridTemplateColumns: `repeat(${schema.sections.length}, minmax(0, 1fr))` }}>
-          {schema.sections.map((s, i) => (
-            <div key={i} className="flex min-w-0 flex-col gap-2">
+    <div
+      className="flex flex-col"
+      style={{ height: "100svh", background: "var(--bg)", paddingTop: "72px" }}
+    >
+      {/* ── Top bar ── */}
+      <div
+        className="shrink-0 border-b px-4 py-2.5 sm:px-6"
+        style={{
+          background:  "rgba(7,17,6,0.96)",
+          borderColor: "rgba(0,255,65,0.12)",
+        }}
+      >
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-2">
+            <span style={{ fontSize: "15px" }}>{schema.icon}</span>
+            <span
+              className="truncate"
+              style={{
+                fontFamily:    "var(--font-space-mono)",
+                fontSize:      "10px",
+                color:         "#00FF41",
+                letterSpacing: "0.10em",
+                textTransform: "uppercase",
+              }}
+            >
+              {schema.type.replace(/-/g, " ")} SIMULATION
+            </span>
+          </div>
+          <div className="flex shrink-0 items-center gap-3">
+            <div
+              className="h-1 w-24 overflow-hidden rounded-full"
+              style={{ background: "rgba(0,255,65,0.12)" }}
+            >
               <div
-                className="h-1 rounded-full transition-all duration-500"
+                className="h-full rounded-full transition-all duration-500"
                 style={{
-                  background:
-                    i < currentSection
-                      ? "#0B6B3A"
-                      : i === currentSection
-                      ? "linear-gradient(90deg, #26FF87, #315FAE)"
-                      : "rgba(7,18,13,0.20)",
+                  width:      `${Math.min((qIdx / total) * 100, 100)}%`,
+                  background: "#00FF41",
                 }}
               />
-              <p
-                className="text-center font-orbitron text-[9px] font-black tracking-widest transition-colors"
-                style={{ color: i <= currentSection ? "#064E2E" : "#40516D" }}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </p>
             </div>
-          ))}
+            <span
+              style={{
+                fontFamily: "var(--font-space-mono)",
+                fontSize:   "9px",
+                color:      "#3b4b37",
+              }}
+            >
+              {Math.min(qIdx, total)}/{total}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Section card */}
-      <div className="sim-form-board cyber-card p-6 md:p-10">
-        <div className="mb-8 border-b border-white/8 pb-6">
-          <p className="font-orbitron text-[9px] font-black tracking-[0.24em]" style={{ color: "#7DFFC0" }}>
-            SECTION {currentSection + 1} OF {schema.sections.length}
-          </p>
-          <h2 className="mt-2 font-orbitron text-lg font-bold md:text-2xl" style={{ color: "#F4FFF8" }}>
-            {section.title}
-          </h2>
-          {section.subtitle && (
-            <p className="mt-2 text-sm font-medium" style={{ color: "#C8F5DC" }}>{section.subtitle}</p>
-          )}
-        </div>
+      {/* ── Chat scroll ── */}
+      <div
+        className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-6 sm:px-6"
+      >
+        <div className="mx-auto max-w-2xl space-y-3">
 
-        <div className="space-y-8">
-          {section.fields.map((field) => (
-            <div key={field.id}>
-              <label className="mb-1 block font-orbitron text-[10px] font-black tracking-[0.16em]" style={{ color: "#E9FFF1" }}>
-                {field.label}
-                {field.required && <span className="ml-1 text-[#FF0077]">*</span>}
-              </label>
-              {field.hint && (
-                <p className="mb-3 text-[11px] font-medium leading-6" style={{ color: "#B8EACF" }}>{field.hint}</p>
-              )}
+          {history.map((entry) => {
+            if (entry.role === "section") {
+              return (
+                <div key={entry.id} className="flex items-center gap-3 py-1">
+                  <div
+                    className="h-px flex-1"
+                    style={{ background: "rgba(0,255,65,0.12)" }}
+                  />
+                  <span
+                    style={{
+                      fontFamily:    "var(--font-space-mono)",
+                      fontSize:      "9px",
+                      color:         "rgba(0,255,65,0.45)",
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {entry.text}
+                  </span>
+                  <div
+                    className="h-px flex-1"
+                    style={{ background: "rgba(0,255,65,0.12)" }}
+                  />
+                </div>
+              );
+            }
 
-              {field.type === "text" && (
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder={field.placeholder}
-                  value={(formData[field.id] as string) || ""}
-                  onChange={(e) => handleChange(field.id, e.target.value)}
-                />
-              )}
+            if (entry.role === "user") {
+              return (
+                <div key={entry.id} className="flex justify-end">
+                  <div
+                    className="max-w-[78%] rounded px-4 py-2.5"
+                    style={{
+                      background:  "#00FF41",
+                      color:       "#003907",
+                      fontFamily:  "var(--font-space-mono)",
+                      fontSize:    "13px",
+                      lineHeight:  "1.6",
+                    }}
+                  >
+                    {entry.text}
+                  </div>
+                </div>
+              );
+            }
 
-              {field.type === "textarea" && (
-                <textarea
-                  className="form-input resize-none"
-                  rows={field.rows || 4}
-                  placeholder={field.placeholder}
-                  value={(formData[field.id] as string) || ""}
-                  onChange={(e) => handleChange(field.id, e.target.value)}
-                />
-              )}
-
-              {field.type === "select" && (
-                <select
-                  className="form-input"
-                  value={(formData[field.id] as string) || ""}
-                  onChange={(e) => handleChange(field.id, e.target.value)}
+            /* bot */
+            return (
+              <div key={entry.id} className="flex items-start gap-3">
+                <BotAvatar />
+                <div
+                  className="max-w-[84%] rounded px-4 py-2.5"
+                  style={{
+                    background:  "rgba(20,30,18,0.80)",
+                    border:      "1px solid rgba(0,255,65,0.12)",
+                    color:       "#dae6d2",
+                    fontFamily:  "var(--font-space-mono)",
+                    fontSize:    "13px",
+                    lineHeight:  "1.7",
+                    whiteSpace:  "pre-line",
+                  }}
                 >
-                  <option value="">— Select —</option>
-                  {field.options?.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              {field.type === "multiselect" && (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {field.options?.map((opt) => {
-                    const selected = ((formData[field.id] as string[]) || []).includes(opt);
-                    return (
-                      <label
-                        key={opt}
-                        className="flex min-h-[46px] cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2 text-[12px] font-bold leading-5 transition-all"
-                        style={{
-                          color: selected ? "#070A12" : "#1E293B",
-                          background: selected ? "linear-gradient(135deg, rgba(49,95,174,0.22), rgba(124,58,237,0.16))" : "rgba(255,255,255,0.92)",
-                          border: selected ? "1px solid rgba(49,95,174,0.55)" : "1px solid rgba(15,23,42,0.24)",
-                          boxShadow: selected ? "0 8px 18px rgba(49,95,174,0.14)" : "0 6px 14px rgba(15,23,42,0.06)",
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selected}
-                          onChange={() => handleMultiSelect(field.id, opt)}
-                          className="h-4 w-4 shrink-0 accent-[#315FAE]"
-                        />
-                        <span>{opt}</span>
-                      </label>
-                    );
-                  })}
+                  {entry.text}
                 </div>
-              )}
+              </div>
+            );
+          })}
 
-              {field.type === "date" && (
-                <input
-                  type="date"
-                  className="form-input"
-                  value={(formData[field.id] as string) || ""}
-                  onChange={(e) => handleChange(field.id, e.target.value)}
-                />
-              )}
-
-              {field.type === "number" && (
-                <input
-                  type="number"
-                  className="form-input"
-                  placeholder={field.placeholder}
-                  value={(formData[field.id] as string) || ""}
-                  onChange={(e) => handleChange(field.id, e.target.value)}
-                />
-              )}
-
-              {field.type === "radio" && (
-                <div className="space-y-3">
-                  {field.options?.map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 transition-all"
-                      onClick={() => handleChange(field.id, opt)}
-                      style={{
-                        background: formData[field.id] === opt ? "linear-gradient(135deg, rgba(49,95,174,0.18), rgba(124,58,237,0.12))" : "rgba(255,255,255,0.88)",
-                        border: formData[field.id] === opt ? "1px solid rgba(49,95,174,0.52)" : "1px solid rgba(15,23,42,0.20)",
-                      }}
-                    >
-                      <div
-                        className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border transition-all"
-                        style={{
-                          borderColor:
-                            formData[field.id] === opt
-                              ? "#315FAE"
-                              : "rgba(15,23,42,0.38)",
-                          background:
-                            formData[field.id] === opt
-                              ? "rgba(49,95,174,0.16)"
-                              : "rgba(255,255,255,0.92)",
-                        }}
-                      >
-                        {formData[field.id] === opt && (
-                          <div
-                            className="h-2.5 w-2.5 rounded-full"
-                            style={{ background: "#315FAE" }}
-                          />
-                        )}
-                      </div>
-                      <span className="text-sm font-semibold leading-6" style={{ color: "#1E293B" }}>{opt}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
+          {/* Typing indicator */}
+          {(isTyping || typedText) && (
+            <div className="flex items-start gap-3">
+              <BotAvatar pulsing />
+              <div
+                className="max-w-[84%] rounded px-4 py-2.5"
+                style={{
+                  background: "rgba(20,30,18,0.80)",
+                  border:     "1px solid rgba(0,255,65,0.12)",
+                  color:      "#dae6d2",
+                  fontFamily: "var(--font-space-mono)",
+                  fontSize:   "13px",
+                  lineHeight: "1.7",
+                  whiteSpace: "pre-line",
+                  minWidth:   "60px",
+                  minHeight:  "42px",
+                }}
+              >
+                {typedText || "​"}
+                <span style={{ color: "#00FF41" }} className="animate-pulse">▊</span>
+              </div>
             </div>
-          ))}
-        </div>
-
-        {/* Navigation */}
-        <div className="mt-10 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => setCurrentSection((prev) => Math.max(0, prev - 1))}
-            disabled={currentSection === 0}
-            className="font-orbitron text-[10px] font-black tracking-widest transition-colors disabled:opacity-0" style={{ color: "#B8EACF" }}
-          >
-            ← BACK
-          </button>
-
-          {error && (
-            <p className="max-w-xs text-center text-[11px] text-[#FF0077]">{error}</p>
           )}
 
-          {currentSection < schema.sections.length - 1 ? (
-            <button type="button" onClick={() => openTruthCheck("next")} className="btn-neon">
-              NEXT →
-            </button>
-          ) : (
-            <button type="button" onClick={() => openTruthCheck("submit")} className="btn-solid">
-              LAUNCH SIMULATION ⚡
+          <div ref={chatEndRef} />
+        </div>
+      </div>
+
+      {/* ── Input area ── */}
+      {!isDone && !isTyping && !truthPending && currentQ && (
+        <InputArea
+          key={qIdx}
+          field={currentQ.field}
+          textValue={textInput}
+          onTextChange={setTextInput}
+          onSubmit={submitAnswer}
+        />
+      )}
+
+      {/* ── Error ── */}
+      {error && (
+        <div
+          className="shrink-0 border-t px-4 py-2 text-center"
+          style={{
+            borderColor: "rgba(255,0,119,0.2)",
+            background:  "rgba(255,0,119,0.06)",
+          }}
+        >
+          <p
+            style={{
+              color:      "#FF0077",
+              fontSize:   "11px",
+              fontFamily: "var(--font-space-mono)",
+            }}
+          >
+            {error}
+          </p>
+        </div>
+      )}
+
+      {/* ── Truth check modal ── */}
+      {truthPending && <TruthModal onAnswer={answerTruth} />}
+    </div>
+  );
+}
+
+/* ════════════ SUB-COMPONENTS ════════════════════════════════════════ */
+
+function BotAvatar({ pulsing }: { pulsing?: boolean }) {
+  return (
+    <div
+      className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded"
+      style={{
+        background: "rgba(0,255,65,0.08)",
+        border:     "1px solid rgba(0,255,65,0.22)",
+        flexShrink: 0,
+      }}
+    >
+      <div
+        className={pulsing ? "animate-pulse" : ""}
+        style={{
+          width:     "8px",
+          height:    "8px",
+          borderRadius: "50%",
+          background: "#00FF41",
+          boxShadow: pulsing ? "0 0 8px #00FF41" : "0 0 4px #00FF41",
+        }}
+      />
+    </div>
+  );
+}
+
+function InputArea({
+  field,
+  textValue,
+  onTextChange,
+  onSubmit,
+}: {
+  field: FormField;
+  textValue: string;
+  onTextChange: (v: string) => void;
+  onSubmit: (val: string | string[]) => void;
+}) {
+  const [multi, setMulti] = useState<string[]>([]);
+
+  const base: React.CSSProperties = {
+    background:  "rgba(7,17,6,0.97)",
+    borderTop:   "1px solid rgba(0,255,65,0.12)",
+    padding:     "12px 16px",
+    flexShrink:  0,
+  };
+
+  const sendBtn: React.CSSProperties = {
+    background:    "#00FF41",
+    color:         "#003907",
+    border:        "none",
+    padding:       "8px 20px",
+    fontFamily:    "var(--font-space-mono)",
+    fontWeight:    700,
+    fontSize:      "11px",
+    letterSpacing: "0.08em",
+    cursor:        "pointer",
+    borderRadius:  "4px",
+    flexShrink:    0,
+  };
+
+  const skipBtn: React.CSSProperties = {
+    fontFamily:    "var(--font-space-mono)",
+    fontSize:      "9px",
+    color:         "#3b4b37",
+    background:    "none",
+    border:        "none",
+    cursor:        "pointer",
+    letterSpacing: "0.12em",
+  };
+
+  const inputStyle: React.CSSProperties = {
+    background:   "transparent",
+    border:       "none",
+    borderBottom: "1px solid rgba(0,255,65,0.30)",
+    padding:      "10px 4px",
+    color:        "#dae6d2",
+    fontFamily:   "var(--font-space-mono)",
+    fontSize:     "13px",
+    outline:      "none",
+    flex:         1,
+    minWidth:     0,
+  };
+
+  /* ── Text / number / date ── */
+  if (["text", "number", "date"].includes(field.type)) {
+    const handleSend = () => {
+      if (textValue.trim()) onSubmit(textValue.trim());
+    };
+    return (
+      <div style={base}>
+        <div className="mx-auto max-w-2xl">
+          <div className="flex items-end gap-3">
+            <input
+              autoFocus
+              type={field.type === "date" ? "date" : field.type === "number" ? "number" : "text"}
+              value={textValue}
+              onChange={(e) => onTextChange(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+              placeholder={field.placeholder || (field.required ? "Type your answer..." : "Type or skip →")}
+              style={inputStyle}
+            />
+            <button type="button" onClick={handleSend} style={sendBtn}>SEND →</button>
+          </div>
+          {!field.required && (
+            <button type="button" onClick={() => onSubmit("N/A")} style={{ ...skipBtn, marginTop: "6px", display: "block" }}>
+              SKIP →
             </button>
           )}
         </div>
       </div>
+    );
+  }
 
-
-      {pendingAction && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center px-3 pb-4 sm:items-center sm:pb-0" style={{ background: "rgba(7,10,18,0.24)" }}>
-          <div className="w-full max-w-sm rounded-2xl border p-4 shadow-2xl sm:max-w-md" style={{ background: "rgba(255,255,255,0.96)", borderColor: "rgba(15,23,42,0.18)" }}>
-            <div className="flex items-start gap-4">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: "linear-gradient(135deg, rgba(49,95,174,0.18), rgba(124,58,237,0.14))", color: "#315FAE" }}>
-                <span className="text-base font-black">i</span>
-              </div>
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.16em]" style={{ color: "#315FAE" }}>Truth Checkpoint</p>
-                <h3 className="mt-1 text-base font-black leading-tight" style={{ color: "#070A12" }}>{section.title}</h3>
-                <p className="mt-2 text-xs leading-6" style={{ color: "#1E293B" }}>
-                  Are these answers mostly facts, uncertain guesses, or emotion?
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4 grid gap-2">
-              <button type="button" onClick={() => answerTruthCheck("true")} className="rounded-xl px-3 py-2 text-left transition" style={{ background: "rgba(5,150,105,0.10)", border: "1px solid rgba(5,150,105,0.30)", color: "#064E3B" }}>
-                <span className="block text-sm font-black">True</span>
-                <span className="mt-1 block text-xs leading-5">Based on facts or evidence I trust.</span>
-              </button>
-              <button type="button" onClick={() => answerTruthCheck("unknown")} className="rounded-xl px-3 py-2 text-left transition" style={{ background: "rgba(199,134,22,0.12)", border: "1px solid rgba(199,134,22,0.32)", color: "#7A5208" }}>
-                <span className="block text-sm font-black">I don&apos;t know</span>
-                <span className="mt-1 block text-xs leading-5">Some parts are uncertain; lower confidence.</span>
-              </button>
-              <button type="button" onClick={() => answerTruthCheck("skip")} className="rounded-xl px-3 py-2 text-left transition" style={{ background: "rgba(15,23,42,0.06)", border: "1px solid rgba(15,23,42,0.18)", color: "#1E293B" }}>
-                <span className="block text-sm font-black">Don&apos;t ask me</span>
-                <span className="mt-1 block text-xs leading-5">Continue and mark this stage unverified.</span>
-              </button>
-            </div>
-
-            <button type="button" onClick={() => setPendingAction(null)} className="mt-3 text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: "#40516D" }}>
-              Back to edit
+  /* ── Textarea ── */
+  if (field.type === "textarea") {
+    return (
+      <div style={base}>
+        <div className="mx-auto max-w-2xl">
+          <textarea
+            autoFocus
+            rows={Math.min(field.rows || 3, 4)}
+            value={textValue}
+            onChange={(e) => onTextChange(e.target.value)}
+            placeholder={field.placeholder || "Type your answer..."}
+            style={{
+              ...inputStyle,
+              display: "block",
+              width:   "100%",
+              resize:  "none",
+              flex:    "unset",
+            }}
+          />
+          <div className="mt-2 flex items-center justify-between">
+            {!field.required
+              ? <button type="button" onClick={() => onSubmit("N/A")} style={skipBtn}>SKIP →</button>
+              : <span />}
+            <button
+              type="button"
+              onClick={() => { if (textValue.trim()) onSubmit(textValue.trim()); }}
+              style={sendBtn}
+            >
+              SEND →
             </button>
           </div>
         </div>
-      )}
-      {/* Section jump pills */}
-      <div className="mt-6 flex flex-wrap justify-center gap-2">
-        {schema.sections.map((s, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => setCurrentSection(i)}
-            className="rounded-sm px-3 py-1 font-orbitron text-[8px] tracking-widest transition-all"
-            style={{
-              color: i === currentSection ? "#315FAE" : i < currentSection ? "rgba(0,245,255,0.4)" : "rgba(255,255,255,0.15)",
-              border:
-                i === currentSection
-                  ? "1px solid rgba(0,245,255,0.4)"
-                  : "1px solid rgba(255,255,255,0.06)",
-              background: i === currentSection ? "rgba(0,245,255,0.06)" : "rgba(255,255,255,0.92)",
-            }}
-          >
-            {s.title}
-          </button>
-        ))}
+      </div>
+    );
+  }
+
+  /* ── Select / radio — tap to instantly answer ── */
+  if (field.type === "select" || field.type === "radio") {
+    return (
+      <div style={{ ...base, padding: "12px 16px 14px" }}>
+        <div className="mx-auto max-w-2xl">
+          <div className="flex flex-wrap gap-2">
+            {field.options?.map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => onSubmit(opt)}
+                style={{
+                  background:    "rgba(20,30,18,0.90)",
+                  border:        "1px solid rgba(0,255,65,0.22)",
+                  color:         "#dae6d2",
+                  padding:       "8px 16px",
+                  fontFamily:    "var(--font-space-mono)",
+                  fontSize:      "12px",
+                  cursor:        "pointer",
+                  borderRadius:  "4px",
+                  transition:    "all 0.12s ease",
+                }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget;
+                  el.style.background    = "#00FF41";
+                  el.style.color         = "#003907";
+                  el.style.borderColor   = "#00FF41";
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget;
+                  el.style.background    = "rgba(20,30,18,0.90)";
+                  el.style.color         = "#dae6d2";
+                  el.style.borderColor   = "rgba(0,255,65,0.22)";
+                }}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+          {!field.required && (
+            <button type="button" onClick={() => onSubmit("N/A")} style={{ ...skipBtn, marginTop: "8px", display: "block" }}>
+              SKIP →
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Multiselect — toggle chips, then confirm ── */
+  if (field.type === "multiselect") {
+    const toggle = (opt: string) =>
+      setMulti((prev) =>
+        prev.includes(opt) ? prev.filter((v) => v !== opt) : [...prev, opt]
+      );
+    return (
+      <div style={{ ...base, padding: "12px 16px 14px" }}>
+        <div className="mx-auto max-w-2xl">
+          <div className="mb-3 flex flex-wrap gap-2">
+            {field.options?.map((opt) => {
+              const sel = multi.includes(opt);
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => toggle(opt)}
+                  style={{
+                    background:   sel ? "#00FF41" : "rgba(20,30,18,0.90)",
+                    border:       sel ? "1px solid #00FF41" : "1px solid rgba(0,255,65,0.22)",
+                    color:        sel ? "#003907" : "#dae6d2",
+                    padding:      "7px 14px",
+                    fontFamily:   "var(--font-space-mono)",
+                    fontSize:     "11px",
+                    cursor:       "pointer",
+                    borderRadius: "4px",
+                    transition:   "all 0.10s ease",
+                  }}
+                >
+                  {sel ? "✓ " : ""}{opt}
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex items-center justify-between">
+            {!field.required
+              ? <button type="button" onClick={() => onSubmit(["N/A"])} style={skipBtn}>SKIP →</button>
+              : <span />}
+            <button
+              type="button"
+              disabled={multi.length === 0}
+              onClick={() => { if (multi.length > 0) { onSubmit(multi); setMulti([]); } }}
+              style={{
+                ...sendBtn,
+                background: multi.length > 0 ? "#00FF41" : "rgba(0,255,65,0.15)",
+                color:      multi.length > 0 ? "#003907" : "#3b4b37",
+                cursor:     multi.length > 0 ? "pointer" : "default",
+              }}
+            >
+              CONFIRM{multi.length > 0 ? ` (${multi.length})` : ""} →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+function TruthModal({ onAnswer }: { onAnswer: (v: TruthCheckValue) => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-5 sm:items-center sm:pb-0"
+      style={{ background: "rgba(4,8,4,0.72)" }}
+    >
+      <div
+        className="w-full max-w-sm rounded border p-5"
+        style={{
+          background: "rgba(12,22,10,0.99)",
+          border:     "1px solid rgba(0,255,65,0.28)",
+          boxShadow:  "0 0 40px rgba(0,255,65,0.12)",
+        }}
+      >
+        <p className="section-label">Truth Checkpoint</p>
+        <h3
+          className="mt-2 text-base font-semibold"
+          style={{ color: "#dae6d2", fontFamily: "var(--font-inter)" }}
+        >
+          Are these answers based on facts or estimates?
+        </h3>
+        <p
+          className="mt-1 text-xs"
+          style={{ color: "#84967e", fontFamily: "var(--font-space-mono)" }}
+        >
+          This calibrates simulation confidence.
+        </p>
+        <div className="mt-4 space-y-2">
+          {([
+            ["true",    "Based on facts I trust",           "rgba(0,255,65,0.08)",  "rgba(0,255,65,0.28)", "#dae6d2"],
+            ["unknown", "Some parts are uncertain",          "rgba(255,184,0,0.06)", "rgba(255,184,0,0.22)", "#dae6d2"],
+            ["skip",    "Mark unverified and continue",      "rgba(0,0,0,0.20)",     "rgba(255,255,255,0.06)", "#84967e"],
+          ] as [TruthCheckValue, string, string, string, string][]).map(
+            ([val, label, bg, border, color]) => (
+              <button
+                key={val}
+                type="button"
+                onClick={() => onAnswer(val)}
+                style={{
+                  width:         "100%",
+                  background:    bg,
+                  border:        `1px solid ${border}`,
+                  color,
+                  padding:       "10px 14px",
+                  textAlign:     "left",
+                  fontFamily:    "var(--font-space-mono)",
+                  fontSize:      "12px",
+                  cursor:        "pointer",
+                  borderRadius:  "4px",
+                  display:       "block",
+                }}
+              >
+                {label}
+              </button>
+            )
+          )}
+        </div>
       </div>
     </div>
   );
