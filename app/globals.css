@@ -1482,3 +1482,28 @@ button,
 .page-shell .cyber-card strong {
   color: #F6FFF9 !important;
 }
+/* Mobile nav must be visible and tappable, not decorative */
+.matrix-navbar {
+  overflow: visible !important;
+}
+
+.matrix-navbar a {
+  position: relative;
+  z-index: 5;
+  pointer-events: auto !important;
+  text-decoration: none !important;
+}
+
+@media (max-width: 767px) {
+  .matrix-navbar {
+    gap: 0.55rem !important;
+  }
+
+  .matrix-navbar a {
+    touch-action: manipulation;
+  }
+
+  body main {
+    padding-top: 1.5rem;
+  }
+}
