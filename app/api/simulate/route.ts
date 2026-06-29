@@ -968,10 +968,17 @@ function buildGuaranteedDeepRead(
 // ─── POST Handler ─────────────────────────────────────────────────────────────
 export async function POST(request: Request) {
   try {
+    const contentLength = Number(request.headers.get("content-length") || 0);
+    if (contentLength > 60000) return NextResponse.json({ error: "Request too large" }, { status: 413 });
+
     const body = (await request.json()) as { type?: string; data?: Record<string, FormValue> };
     const { type, data } = body;
     if (!type || !data) return NextResponse.json({ error: "Missing type or data" }, { status: 400 });
-    if (!process.env.GROQ_API_KEY) return NextResponse.json({ error: "GROQ_API_KEY not configured" }, { status: 500 });
+
+    const allowedTypes = new Set(["public-reaction", "election", "markets", "sports", "policy", "product-launch", "geopolitical", "profit-path", "relationship", "health-signal", "legacy-view", "custom"]);
+    if (!allowedTypes.has(type)) return NextResponse.json({ error: "Unknown simulation type" }, { status: 400 });
+
+    if (!process.env.GROQ_API_KEY) return NextResponse.json({ error: "Simulation engine unavailable" }, { status: 503 });
 
     // Parallel: fetch history + select agents
     const [historicalIntel, agents] = await Promise.all([
@@ -1035,6 +1042,6 @@ export async function POST(request: Request) {
     return NextResponse.json(simulationResult);
   } catch (err) {
     console.error("Simulation error:", err);
-    return NextResponse.json({ error: err instanceof Error ? err.message : "Simulation failed" }, { status: 500 });
+    return NextResponse.json({ error: "Simulation failed" }, { status: 500 });
   }
 }
