@@ -6,7 +6,7 @@ export async function GET() {
     const supabase = createServiceClient();
     const { data, error } = await supabase
       .from("simulations")
-      .select("id, type, status, created_at, result")
+      .select("id, type, status, created_at")
       .order("created_at", { ascending: false })
       .limit(50);
 
