@@ -257,39 +257,39 @@ export default function SimForm({ schema }: SimFormProps) {
   return (
     <div className="mx-auto max-w-3xl px-4 pb-20 pt-28">
       {/* Header */}
-      <div className="mb-10">
-        <p className="font-orbitron text-xs tracking-[0.4em] text-[#00F5FF]">
+      <div className="mb-8 rounded-2xl border p-5 shadow-xl sm:p-6" style={{ background: "rgba(248,255,252,0.88)", borderColor: "rgba(174,255,211,0.36)", boxShadow: "0 18px 44px rgba(0,0,0,0.22), 0 0 34px rgba(43,255,143,0.08)" }}>
+        <p className="font-orbitron text-[10px] font-black uppercase tracking-[0.18em] sm:text-xs" style={{ color: "#0B6B3A" }}>
           {schema.icon} {schema.type.toUpperCase().replace(/-/g, " ")} SIMULATION
         </p>
-        <h1 className="mt-3 font-orbitron text-3xl font-black text-white md:text-4xl">
+        <h1 className="mt-3 font-orbitron text-3xl font-black md:text-4xl" style={{ color: "#031008" }}>
           {schema.title}
         </h1>
-        <p className="mt-3 max-w-xl text-sm leading-7 text-white/40">{schema.description}</p>
-      </div>
+        <p className="mt-3 max-w-xl text-sm font-medium leading-7" style={{ color: "#1B2A22" }}>{schema.description}</p>
 
-      {/* Progress bar */}
-      <div className="mb-8 flex gap-2">
-        {schema.sections.map((s, i) => (
-          <div key={i} className="flex flex-1 flex-col gap-2">
-            <div
-              className="h-0.5 rounded-full transition-all duration-500"
-              style={{
-                background:
-                  i < currentSection
-                    ? "#315FAE"
-                    : i === currentSection
-                    ? "linear-gradient(90deg, #00F5FF, #BF00FF)"
-                    : "rgba(255,255,255,0.08)",
-              }}
-            />
-            <p
-              className="text-center font-orbitron text-[8px] tracking-widest transition-colors"
-              style={{ color: i <= currentSection ? "#315FAE" : "rgba(255,255,255,0.2)" }}
-            >
-              {String(i + 1).padStart(2, "0")}
-            </p>
-          </div>
-        ))}
+        {/* Progress bar */}
+        <div className="mt-6 grid gap-2" style={{ gridTemplateColumns: `repeat(${schema.sections.length}, minmax(0, 1fr))` }}>
+          {schema.sections.map((s, i) => (
+            <div key={i} className="flex min-w-0 flex-col gap-2">
+              <div
+                className="h-1 rounded-full transition-all duration-500"
+                style={{
+                  background:
+                    i < currentSection
+                      ? "#0B6B3A"
+                      : i === currentSection
+                      ? "linear-gradient(90deg, #26FF87, #315FAE)"
+                      : "rgba(7,18,13,0.20)",
+                }}
+              />
+              <p
+                className="text-center font-orbitron text-[9px] font-black tracking-widest transition-colors"
+                style={{ color: i <= currentSection ? "#064E2E" : "#40516D" }}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Section card */}
