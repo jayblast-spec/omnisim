@@ -55,7 +55,7 @@ export default function Navbar() {
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border text-[#0D1117] md:hidden"
+          className="relative z-20 flex h-10 shrink-0 items-center justify-center gap-2 rounded-[14px] border px-3 text-[#0D1117] md:hidden"
           style={{ background: "rgba(255,255,255,0.86)", borderColor: "rgba(15,23,42,0.16)", boxShadow: "0 8px 18px rgba(15,23,42,0.10)" }}
         >
           <span className="sr-only">Menu</span>
@@ -67,7 +67,7 @@ export default function Navbar() {
         </button>
 
         {open && (
-          <div className="absolute left-0 right-0 top-[calc(100%+8px)] rounded-2xl border p-2 md:hidden" style={{ background: "rgba(255,255,255,0.96)", borderColor: "rgba(15,23,42,0.16)", boxShadow: "0 18px 42px rgba(15,23,42,0.18)" }}>
+          <div className="fixed left-3 right-3 top-[74px] z-[80] rounded-2xl border p-2 md:hidden" style={{ background: "rgba(255,255,255,0.98)", borderColor: "rgba(15,23,42,0.16)", boxShadow: "0 18px 42px rgba(15,23,42,0.22)" }}>
             <div className="grid grid-cols-2 gap-2">
               {navLinks.map((link) => {
                 const active = pathname === link.href;
