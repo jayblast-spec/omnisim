@@ -1440,3 +1440,45 @@ button,
 .matrix-navbar a:not(.matrix-launch):hover {
   color: #7DFFC0 !important;
 }
+/* Shared top-level page readability guard */
+.page-shell > div > div:first-child,
+.page-shell .mb-12,
+.page-shell .text-center:first-child {
+  position: relative;
+  border: 1px solid rgba(125,255,192,0.26);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(3,20,12,0.82), rgba(9,18,37,0.74), rgba(34,10,28,0.52));
+  box-shadow: 0 22px 54px rgba(0,0,0,0.30), 0 0 36px rgba(0,215,255,0.08);
+  padding: 1.5rem;
+}
+
+.page-heading,
+.page-shell h1,
+.page-shell h2 {
+  color: #F6FFF9 !important;
+  text-shadow: 0 2px 18px rgba(0,0,0,0.78), 0 0 22px rgba(0,215,255,0.18) !important;
+}
+
+.page-copy,
+.page-shell > div > div:first-child p:not(.section-label),
+.page-shell .mb-12 p:not(.section-label) {
+  color: #DDFEEB !important;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.72) !important;
+}
+
+.page-shell .section-label {
+  color: #7DFFC0 !important;
+  text-shadow: 0 0 16px rgba(38,255,135,0.28) !important;
+}
+
+.page-shell .cyber-card p,
+.page-shell .cyber-card span,
+.page-shell .cyber-card a {
+  color: #DDFEEB !important;
+}
+
+.page-shell .cyber-card h2,
+.page-shell .cyber-card h3,
+.page-shell .cyber-card strong {
+  color: #F6FFF9 !important;
+}
