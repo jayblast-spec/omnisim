@@ -353,25 +353,28 @@ export default function SimForm({ schema }: SimFormProps) {
               )}
 
               {field.type === "multiselect" && (
-                <div className="flex flex-wrap gap-2">
+                <div className="grid gap-2 sm:grid-cols-2">
                   {field.options?.map((opt) => {
                     const selected = ((formData[field.id] as string[]) || []).includes(opt);
                     return (
-                      <button
+                      <label
                         key={opt}
-                        type="button"
-                        onClick={() => handleMultiSelect(field.id, opt)}
-                        className="rounded-xl px-3 py-2 text-[11px] font-bold tracking-wide transition-all"
+                        className="flex min-h-[46px] cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2 text-[12px] font-bold leading-5 transition-all"
                         style={{
                           color: selected ? "#070A12" : "#1E293B",
-                          background: selected ? "linear-gradient(135deg, rgba(49,95,174,0.22), rgba(124,58,237,0.16))" : "rgba(255,255,255,0.88)",
-                          border: selected
-                            ? "1px solid rgba(49,95,174,0.50)"
-                            : "1px solid rgba(15,23,42,0.22)",
+                          background: selected ? "linear-gradient(135deg, rgba(49,95,174,0.22), rgba(124,58,237,0.16))" : "rgba(255,255,255,0.92)",
+                          border: selected ? "1px solid rgba(49,95,174,0.55)" : "1px solid rgba(15,23,42,0.24)",
+                          boxShadow: selected ? "0 8px 18px rgba(49,95,174,0.14)" : "0 6px 14px rgba(15,23,42,0.06)",
                         }}
                       >
-                        {opt}
-                      </button>
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => handleMultiSelect(field.id, opt)}
+                          className="h-4 w-4 shrink-0 accent-[#315FAE]"
+                        />
+                        <span>{opt}</span>
+                      </label>
                     );
                   })}
                 </div>
