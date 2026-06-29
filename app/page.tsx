@@ -61,7 +61,7 @@ export default function HomePage() {
           ))}
         </div>        <div className="sim-node-rail" aria-hidden="true" />
 
-        <div className="relative z-10 mx-auto max-w-5xl text-center">
+        <div className="hero-copy relative z-10 mx-auto max-w-5xl text-center">
           <div className="mb-8 inline-flex items-center gap-3 rounded-sm border border-[rgba(0,245,255,0.15)] bg-[rgba(0,245,255,0.03)] px-5 py-2.5">
             <span
               className="inline-block h-1.5 w-1.5 rounded-full"
@@ -84,11 +84,11 @@ export default function HomePage() {
             </span>
           </h1>
 
-          <p className="mt-6 font-orbitron text-xs tracking-[0.6em] text-white/30">
+          <p className="mt-6 font-orbitron text-xs font-black tracking-[0.18em] sm:tracking-[0.32em]" style={{ color: "#B8FFD8", textShadow: "0 0 18px rgba(43,255,143,0.45), 0 2px 12px rgba(0,0,0,0.75)" }}>
             SIMULATE BEFORE IT HAPPENS
           </p>
 
-          <p className="mx-auto mt-8 max-w-2xl text-sm leading-9 text-white/45">
+          <p className="mx-auto mt-8 max-w-2xl rounded-2xl border px-5 py-4 text-sm font-semibold leading-8 sm:leading-9" style={{ color: "#F4FFF8", background: "rgba(2,8,5,0.58)", borderColor: "rgba(125,255,192,0.22)", textShadow: "0 2px 12px rgba(0,0,0,0.78)", boxShadow: "0 18px 44px rgba(0,0,0,0.22), 0 0 30px rgba(43,255,143,0.08)" }}>
             The world&apos;s most powerful AI simulation platform. Deploy 35+ intelligent global agents to
             predict public reactions, election outcomes, market movements, sports results, and geopolitical
             events — before they happen.
