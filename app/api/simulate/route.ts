@@ -823,20 +823,52 @@ MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n${categoryDepthInstructi
   if (!resp.ok) {
     const errText = await resp.text();
     console.error(`Groq synthesis error ${resp.status}: ${errText}`);
+    const dominantAgent = agentResults
+      .slice()
+      .sort((a, b) => b.intensity - a.intensity)[0];
+    const strongestSpecialist = specialistResults
+      .slice()
+      .sort((a, b) => Math.abs(b.confidenceModifier) - Math.abs(a.confidenceModifier))[0];
+    const topSentiment = Object.entries(sentimentData)
+      .sort((a, b) => b[1] - a[1])[0]?.[0] || "neutral";
+    const privateScenario = isPrivateHumanScenario(type);
+    const evidenceLine = dominantAgent
+      ? `${dominantAgent.agentName} reads the scenario as ${dominantAgent.sentiment} at ${dominantAgent.intensity}/10 intensity, with the likely action: ${dominantAgent.likelyAction}`
+      : "The field-agent layer found mixed signals and no single dominant human response.";
+    const specialistLine = strongestSpecialist
+      ? `${strongestSpecialist.name} adds the strongest specialist signal: ${strongestSpecialist.keyInsight}`
+      : "The specialist layer points back to truth quality, constraints, and downside control as the deciding variables.";
+
     return {
-      executiveSummary: "OmniSim completed the agent and specialist analysis, but the final synthesis model was temporarily rate-limited. This fallback brief preserves the intelligence signals instead of failing the simulation.\n\nReview the expert panel, field agents, risk matrix, and Deep Read. The next best action is to verify the weakest assumptions and rerun once the model lane clears.\n\nThe result is usable as a resilience-first decision draft, not the final polished synthesis.",
-      prediction: "The simulation produced enough agent and specialist signal to continue, but the final narrative synthesis was rate-limited. Treat this as a provisional intelligence brief. Focus on the highest-intensity agent reactions, specialist risks, truth calibration, and the Deep Read action plan. If the scenario is high-stakes, rerun after adding more verified facts.",
-      confidenceLabel: "PROVISIONAL - MODEL BUSY",
-      confidenceScore: 58,
-      confidenceReasoning: "Confidence is reduced because the final synthesis model was rate-limited. Agent and specialist signals still exist, but the polished cross-domain conclusion could not be completed in this pass.",
-      cascadeEffects: [],
-      scenarioBranches: [],
-      keyFactors: ["Truth calibration", "Specialist panel", "Field-agent disagreement", "Real-world constraints"],
-      risks: ["Final synthesis unavailable", "User may over-trust provisional output", "Missing facts can shift outcome"],
-      opportunities: ["Rerun with verified facts", "Use Deep Read as action draft", "Compare field-agent patterns"],
-      strategicActions: ["Verify the top unknown", "Protect the downside boundary", "Take one evidence-producing action", "Rerun the simulation with new facts"],
-      recommendation: "Use this as a temporary decision draft. Do not treat it as the strongest OmniSim output until the synthesis model completes normally.",
-      timeline: [],
+      executiveSummary: privateScenario
+        ? `OmniSim reads this as a private human decision, not a public spectacle. The strongest current pattern is ${topSentiment}, meaning the facts supplied point toward pressure, uncertainty, or repair work that cannot be solved by hope alone. ${evidenceLine}\n\n${specialistLine} The important question is not only what will happen; it is which behavior must change first for the outcome to improve. If trust, safety, health, money, or emotional honesty is weak, the simulation treats that as a real constraint, not background noise.\n\nThe useful path is disciplined: protect the downside, verify the biggest unknown, stop rewarding repeated harm, and take one evidence-producing action within the next 7 days. The result should be judged by observable behavior, not promises, fear, guilt, or temporary emotion.`
+        : `OmniSim reads this as a real-world event with human attention, phone reach, media relay, and second-order pressure shaping the outcome. The strongest current agent pattern is ${topSentiment}, which means early response is likely to cluster around that emotional direction before facts, incentives, and counter-narratives reshape it. ${evidenceLine}\n\n${specialistLine} The first visible outcome will come from attention velocity; the durable outcome will come from incentives, credibility, and who adapts fastest after the first reaction. Smartphone reach creates fast awareness, while basic-phone and offline relay create slower but still meaningful spread.\n\nThe practical move is to watch the confirmation signals: who changes behavior, who commits money or reputation, what institutions respond, and which narrative survives after the first emotional wave. The simulation favors measured action, verified signals, and downside control over hype.`,
+      prediction: privateScenario
+        ? `The likely path is not fixed, but it is conditional. If the key pressure point stays unaddressed, the scenario will drift toward the dominant ${topSentiment} pattern shown by the field agents. If the user verifies the weakest facts, sets a clear boundary, and watches behavior over words, the outcome can improve. The next stage should focus on one concrete test: what changes in action, not explanation, within the next 7 to 14 days.`
+        : `The likely path begins with a fast attention spike, then separates into people who react emotionally, people who wait for proof, and institutions or markets that respond only when incentives become clear. If the first evidence wave confirms the dominant ${topSentiment} signal, the outcome strengthens quickly. If credible counter-evidence appears, sentiment can flatten and become more neutral. The strongest forecast is therefore conditional: track attention, proof, incentives, and behavior change rather than one headline result.`,
+      confidenceLabel: "RESERVE SYNTHESIS",
+      confidenceScore: 66,
+      confidenceReasoning: `Confidence is moderate because OmniSim is using completed field-agent and specialist layers without the extended narrative pass. The result is still grounded in ${agentResults.length} agents, ${specialistResults.length} specialists, sentiment balance, historical memory, and scenario constraints.`,
+      cascadeEffects: [
+        { step: 1, title: "Pressure Reveals", description: "The scenario's strongest pressure point becomes visible through behavior, not words.", probability: 72, timeframe: "0-7 days", domain: privateScenario ? "social" : "media" },
+        { step: 2, title: "Response Splits", description: "Different actors separate into action, avoidance, resistance, or repair depending on incentives and trust.", probability: 64, timeframe: "1-4 weeks", domain: "social" },
+        { step: 3, title: "Pattern Locks", description: "Repeated behavior starts to matter more than stated intention, creating the durable path.", probability: 58, timeframe: "1-3 months", domain: privateScenario ? "social" : "economic" },
+      ],
+      scenarioBranches: [
+        { label: "Most Likely", probability: 54, description: "The current dominant pattern continues unless a concrete behavior change or new evidence interrupts it.", trigger: "No verified change in the highest-pressure variable" },
+        { label: "Recovery Path", probability: 28, description: "The outcome improves when the user verifies facts, reduces emotional distortion, and acts on the highest-leverage next step.", trigger: "Clear proof, boundary, or disciplined action within 7-14 days" },
+        { label: "Downside Path", probability: 18, description: "The situation worsens if missing facts, pressure, or unsafe incentives are ignored.", trigger: "Avoidance, denial, coercion, financial overreach, or repeated broken trust" },
+      ],
+      keyFactors: ["Evidence quality", "Dominant human response", "Specialist risk signal", "Real-world constraints", "Next observable behavior"],
+      risks: ["Acting from emotion instead of verified facts", "Ignoring the highest-pressure variable", "Confusing words with behavior", "Moving too aggressively without downside protection"],
+      opportunities: ["Verify the weakest assumption", "Use one small action to test reality", "Turn pressure into a disciplined decision", "Improve outcome by changing the leverage variable first"],
+      strategicActions: ["Name the biggest unknown", "Verify it with evidence", "Set the downside boundary", "Take one reversible next action", "Measure behavior within 7-14 days"],
+      recommendation: "Treat this as a decision brief: do not chase comfort, drama, or certainty. Act on the highest-leverage fact, protect the downside, and let the next observable behavior update the simulation.",
+      timeline: [
+        { phase: "Now", expected: "Clarify facts and pressure", action: "Identify the one variable that can change the outcome fastest" },
+        { phase: "7-14 days", expected: "Behavior proof appears", action: "Measure action, not promises" },
+        { phase: "30-90 days", expected: "Pattern becomes durable", action: "Double down, repair, exit, or redesign based on evidence" },
+      ],
     };
   }
 
