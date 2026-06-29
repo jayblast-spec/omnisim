@@ -13,10 +13,10 @@ export default function SimulatePage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
           <p className="section-label">SIMULATION HUB</p>
-          <h1 className="mt-4 font-orbitron text-4xl font-black text-white md:text-5xl">
+          <h1 className="page-heading mt-4 font-orbitron text-4xl font-black md:text-5xl">
             Choose Your Simulation
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-sm leading-8 text-white/40">
+          <p className="page-copy mx-auto mt-5 max-w-xl text-sm font-semibold leading-8">
             Each simulation type has a tailored intelligence intake form. Fill it in, and 20 global AI agents react to your exact scenario, with truth calibration fields that capture facts, unknowns, constraints, and boundaries.
           </p>
         </div>
@@ -30,13 +30,13 @@ export default function SimulatePage() {
             >
               <div className="text-5xl">{sim.icon}</div>
               <div className="flex-1">
-                <p className="font-orbitron text-base font-bold text-white group-hover:text-[#00F5FF] transition-colors">
+                <p className="font-orbitron text-base font-bold transition-colors" style={{ color: "#F6FFF9" }}>
                   {sim.title}
                 </p>
-                <p className="mt-3 text-xs leading-7 text-white/35">{sim.description}</p>
+                <p className="mt-3 text-xs font-medium leading-7" style={{ color: "#DDFEEB" }}>{sim.description}</p>
               </div>
               <div className="border-t border-white/5 pt-4">
-                <p className="font-orbitron text-[8px] tracking-widest text-white/20">
+                <p className="font-orbitron text-[8px] font-bold tracking-widest" style={{ color: "#BCEFD2" }}>
                   {sim.usedBy}
                 </p>
                 <p className="mt-2 font-orbitron text-[9px] tracking-widest text-[#00F5FF]">
