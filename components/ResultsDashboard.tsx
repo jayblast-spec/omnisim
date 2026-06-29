@@ -262,10 +262,11 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
       </div>
 
       {/* ── TABS ── */}
-      <div className="mb-6 overflow-x-auto pb-2" style={{ WebkitOverflowScrolling: "touch" }}>
-        <div className="inline-flex min-w-full gap-2 rounded-2xl border p-1" style={{ borderColor: "rgba(15,23,42,0.14)", background: "rgba(255,255,255,0.70)" }}>
+      <div className="mb-6 w-full">
+        <div className="grid w-full grid-cols-3 gap-1 rounded-2xl border p-1 sm:gap-2" style={{ borderColor: "rgba(15,23,42,0.14)", background: "rgba(255,255,255,0.78)" }}>
           {(["overview", "agents", "factors"] as const).map((t) => {
-            const label = t === "overview" ? "Brief" : t === "agents" ? `Agents (${result.agentResults.length})` : "Risks";
+            const label = t === "overview" ? "Brief" : t === "agents" ? `Agents` : "Risks";
+            const count = t === "agents" ? result.agentResults.length : null;
             const full = t === "overview" ? "Intelligence Brief" : t === "agents" ? `Field Agents (${result.agentResults.length})` : "Risk & Factor Matrix";
             return (
               <button
@@ -273,10 +274,10 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                 onClick={() => setTab(t)}
                 aria-label={full}
                 title={full}
-                className="min-w-[96px] flex-1 whitespace-nowrap rounded-xl px-3 py-3 text-[10px] font-black uppercase tracking-[0.12em] transition-all sm:min-w-[160px] sm:px-5 sm:text-[11px]"
-                style={tab === t ? { color: "#070A12", border: "1px solid rgba(49,95,174,0.44)", background: "rgba(49,95,174,0.14)", boxShadow: "0 8px 18px rgba(49,95,174,0.12)" } : { color: "#1E293B", border: "1px solid rgba(15,23,42,0.10)", background: "rgba(255,255,255,0.86)" }}
+                className="min-h-[42px] min-w-0 rounded-xl px-1.5 py-2 text-center text-[9px] font-black uppercase leading-tight tracking-[0.04em] transition-all sm:min-h-[48px] sm:px-4 sm:text-[11px] sm:tracking-[0.10em]"
+                style={tab === t ? { color: "#070A12", border: "1px solid rgba(49,95,174,0.44)", background: "rgba(49,95,174,0.16)", boxShadow: "0 8px 18px rgba(49,95,174,0.12)" } : { color: "#1E293B", border: "1px solid rgba(15,23,42,0.10)", background: "rgba(255,255,255,0.90)" }}
               >
-                <span className="sm:hidden">{label}</span>
+                <span className="block truncate sm:hidden">{label}{count ? ` ${count}` : ""}</span>
                 <span className="hidden sm:inline">{full}</span>
               </button>
             );
