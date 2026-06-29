@@ -43,7 +43,9 @@ html, body { isolation: isolate; }
 body {
   min-height: 100svh;
   color: var(--text);
-  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+  font-family: var(--font-inter), Inter, system-ui, -apple-system,
+               "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+               sans-serif;
   overflow-x: hidden;
   background-color: var(--bg);
   background-image:
@@ -195,6 +197,17 @@ select:focus {
 select option {
   background: var(--surface-hi);
   color: var(--text);
+}
+
+/* ── CAUSE-EFFECT TEXTAREA override (uses Inter, not Space Mono) ─── */
+.ce-scenario-textarea {
+  font-family: var(--font-inter), Inter, system-ui, sans-serif !important;
+  font-size: 0.95rem !important;
+  line-height: 1.8 !important;
+  padding: 0.75rem 0.5rem !important;
+  resize: vertical !important;
+  border-bottom: 1px solid rgba(0,255,65,0.22) !important;
+  background: rgba(20,30,18,0.60) !important;
 }
 
 /* ── HEADINGS ────────────────────────────────────────────────────────────── */
@@ -404,6 +417,17 @@ footer a:hover,
 
 .page-heading { color: var(--text) !important; }
 .page-copy    { color: var(--text-muted) !important; }
+
+/* ── CE TWO-COL (responsive for hidden forces / tipping point) ─────────── */
+.ce-two-col {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 600px) {
+  .ce-two-col { grid-template-columns: 1fr; }
+}
 
 /* ── MOBILE ──────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
