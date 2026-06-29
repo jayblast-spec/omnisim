@@ -215,7 +215,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
               <div>
                 <p className="font-bold text-base text-white tracking-wide">{result.confidenceLabel}</p>
                 {result.confidenceReasoning && (
-                  <p className="text-xs mt-1 leading-5 max-w-md" style={{ color: "#40516D" }}>{result.confidenceReasoning}</p>
+                  <p className="text-xs mt-1 leading-5 max-w-md" style={{ color: "#84967e" }}>{result.confidenceReasoning}</p>
                 )}
               </div>
             </div>
@@ -232,7 +232,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                 <div style={{ width: `${result.sentimentData.neutral}%`, background: NEON }} />
                 <div style={{ width: `${result.sentimentData.negative}%`, background: PINK }} />
               </div>
-              <p className="text-[9px] mt-1 font-mono" style={{ color: "#40516D" }}>Agent sentiment · {result.agentResults.length} agents · avg {avgInt}/10</p>
+              <p className="text-[9px] mt-1 font-mono" style={{ color: "#84967e" }}>Agent sentiment · {result.agentResults.length} agents · avg {avgInt}/10</p>
             </div>
             {pwSent && (
               <div>
@@ -246,7 +246,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                   <div style={{ width: `${pwSent.neutral}%`, background: `${NEON}99` }} />
                   <div style={{ width: `${pwSent.negative}%`, background: `${PINK}99` }} />
                 </div>
-                <p className="text-[9px] mt-1 font-mono" style={{ color: "#40516D" }}>{isPrivateResult(result.type) ? "Pattern-weighted private signal" : "Population-weighted (8.1B humans)"}</p>
+                <p className="text-[9px] mt-1 font-mono" style={{ color: "#84967e" }}>{isPrivateResult(result.type) ? "Pattern-weighted private signal" : "Population-weighted (8.1B humans)"}</p>
               </div>
             )}
             <div className="flex items-center gap-3 flex-wrap">
@@ -275,7 +275,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                 aria-label={full}
                 title={full}
                 className="min-h-[42px] min-w-0 rounded-xl px-1.5 py-2 text-center text-[9px] font-black uppercase leading-tight tracking-[0.04em] transition-all sm:min-h-[48px] sm:px-4 sm:text-[11px] sm:tracking-[0.10em]"
-                style={tab === t ? { color: "#070A12", border: "1px solid rgba(49,95,174,0.44)", background: "rgba(49,95,174,0.16)", boxShadow: "0 8px 18px rgba(49,95,174,0.12)" } : { color: "#1E293B", border: "1px solid rgba(15,23,42,0.10)", background: "rgba(255,255,255,0.90)" }}
+                style={tab === t ? { color: "#dae6d2", border: "1px solid rgba(49,95,174,0.44)", background: "rgba(49,95,174,0.16)", boxShadow: "0 8px 18px rgba(49,95,174,0.12)" } : { color: "#b9ccb2", border: "1px solid rgba(15,23,42,0.10)", background: "rgba(255,255,255,0.90)" }}
               >
                 <span className="block truncate sm:hidden">{label}{count ? ` ${count}` : ""}</span>
                 <span className="hidden sm:inline">{full}</span>
@@ -297,7 +297,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: NEON }}>Executive Intelligence Summary</p>
               </div>
               {result.executiveSummary.split("\n\n").map((para, i) => (
-                <p key={i} className={`text-sm leading-8 ${i > 0 ? "mt-5" : ""}`} style={{ color: "#1E293B" }}>{para}</p>
+                <p key={i} className={`text-sm leading-8 ${i > 0 ? "mt-5" : ""}`} style={{ color: "#b9ccb2" }}>{para}</p>
               ))}
             </div>
           )}
@@ -312,7 +312,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                   <div className="w-1 h-6 rounded-full" style={{ background: GREEN }} />
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: GREEN }}>Phone Reach Intelligence</p>
-                    <p className="text-[10px] mt-1" style={{ color: "#40516D" }}>Real-life spread model: smartphone feeds, basic phones, active online users, and offline delay.</p>
+                    <p className="text-[10px] mt-1" style={{ color: "#84967e" }}>Real-life spread model: smartphone feeds, basic phones, active online users, and offline delay.</p>
                   </div>
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-[0.18em] px-3 py-1 rounded-full" style={{ background: `${GREEN}12`, color: GREEN, border: `1px solid ${GREEN}33` }}>
@@ -328,9 +328,9 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                   ["Offline Humans", `${phoneReach.offlinePopulation}M`, `${phoneReach.offlineShare}% delayed reach`],
                 ].map(([label, value, sub]) => (
                   <div key={label} className="rounded-xl p-4" style={{ background: `${GREEN}07`, border: `1px solid ${GREEN}18` }}>
-                    <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: "#40516D" }}>{label}</p>
+                    <p className="text-[8px] uppercase tracking-[0.2em] mb-2 font-black" style={{ color: "#84967e" }}>{label}</p>
                     <p className="text-2xl font-black font-mono" style={{ color: GREEN, textShadow: `0 0 10px ${GREEN}55` }}>{value}</p>
-                    <p className="text-[10px] mt-1" style={{ color: "#40516D" }}>{sub}</p>
+                    <p className="text-[10px] mt-1" style={{ color: "#84967e" }}>{sub}</p>
                   </div>
                 ))}
               </div>
@@ -368,7 +368,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                 <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "rgba(255,255,255,0.38)" }}>Model assumptions</summary>
                 <ul className="mt-3 space-y-2">
                   {phoneReach.assumptions.map((assumption, i) => (
-                    <li key={i} className="text-[11px] leading-5" style={{ color: "#40516D" }}>{assumption}</li>
+                    <li key={i} className="text-[11px] leading-5" style={{ color: "#84967e" }}>{assumption}</li>
                   ))}
                 </ul>
               </details>
@@ -379,8 +379,8 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-1 h-5 rounded-full" style={{ background: "#315FAE" }} />
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: "#315FAE" }}>Expert Panel — Domain Specialists</p>
-                <span className="text-[8px] font-mono px-2 py-0.5 rounded-full" style={{ background: "rgba(49,95,174,0.12)", color: "#070A12", border: "1px solid rgba(49,95,174,0.32)" }}>{specialists.length} analysts</span>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: "#00FF41" }}>Expert Panel — Domain Specialists</p>
+                <span className="text-[8px] font-mono px-2 py-0.5 rounded-full" style={{ background: "rgba(49,95,174,0.12)", color: "#dae6d2", border: "1px solid rgba(49,95,174,0.32)" }}>{specialists.length} analysts</span>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {specialists.map((s) => {
@@ -390,27 +390,27 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                     <div key={s.specialistId} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.92)", border: `1px solid ${sc}33`, boxShadow: "0 12px 30px rgba(15,23,42,0.12)" }}>
                       <div className="flex items-start justify-between gap-2 mb-3">
                         <div>
-                          <p className="font-black text-sm" style={{ color: "#070A12" }}>{s.name}</p>
+                          <p className="font-black text-sm" style={{ color: "#dae6d2" }}>{s.name}</p>
                           <p className="text-[9px] uppercase tracking-[0.18em] mt-0.5" style={{ color: sc }}>{s.domain}</p>
                         </div>
                         <span className="text-[10px] font-black font-mono px-2 py-1 rounded shrink-0" style={{ background: `${mod >= 0 ? GREEN : PINK}18`, color: mod >= 0 ? GREEN : PINK, border: `1px solid ${mod >= 0 ? GREEN : PINK}33` }}>
                           {mod >= 0 ? "+" : ""}{mod}
                         </span>
                       </div>
-                      <p className="text-xs leading-6 mb-3" style={{ color: "#1E293B" }}>{s.analysis}</p>
+                      <p className="text-xs leading-6 mb-3" style={{ color: "#b9ccb2" }}>{s.analysis}</p>
                       <div className="space-y-2">
                         <div className="rounded-lg px-3 py-2" style={{ background: `${sc}0A`, border: `1px solid ${sc}1E` }}>
                           <p className="text-[8px] uppercase tracking-[0.18em] mb-0.5 font-black" style={{ color: sc }}>Key Insight</p>
-                          <p className="text-[10px] leading-5" style={{ color: "#1E293B" }}>{s.keyInsight}</p>
+                          <p className="text-[10px] leading-5" style={{ color: "#b9ccb2" }}>{s.keyInsight}</p>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div className="rounded-lg px-2 py-1.5" style={{ background: `${PINK}08`, border: `1px solid ${PINK}18` }}>
                             <p className="text-[7px] uppercase tracking-wider mb-0.5 font-black" style={{ color: PINK }}>Risk</p>
-                            <p className="text-[9px] leading-4" style={{ color: "#40516D" }}>{s.riskFlag}</p>
+                            <p className="text-[9px] leading-4" style={{ color: "#84967e" }}>{s.riskFlag}</p>
                           </div>
                           <div className="rounded-lg px-2 py-1.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}18` }}>
                             <p className="text-[7px] uppercase tracking-wider mb-0.5 font-black" style={{ color: GREEN }}>Opportunity</p>
-                            <p className="text-[9px] leading-4" style={{ color: "#40516D" }}>{s.opportunityFlag}</p>
+                            <p className="text-[9px] leading-4" style={{ color: "#84967e" }}>{s.opportunityFlag}</p>
                           </div>
                         </div>
                       </div>
@@ -456,9 +456,9 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                         <div className="flex items-center gap-3 mb-1.5">
                           <h4 className="font-black text-white text-sm">{ce.title}</h4>
                           <span className="text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold" style={{ background: `${dc}12`, color: dc, border: `1px solid ${dc}28` }}>{ce.domain}</span>
-                          <span className="text-[8px] font-mono ml-auto" style={{ color: "#40516D" }}>{ce.timeframe}</span>
+                          <span className="text-[8px] font-mono ml-auto" style={{ color: "#84967e" }}>{ce.timeframe}</span>
                         </div>
-                        <p className="text-sm leading-7 mb-2" style={{ color: "#1E293B" }}>{ce.description}</p>
+                        <p className="text-sm leading-7 mb-2" style={{ color: "#b9ccb2" }}>{ce.description}</p>
                         <div className="flex items-center gap-2">
                           <div className="h-1 flex-1 rounded-full overflow-hidden" style={{ background: "rgba(15,23,42,0.10)" }}>
                             <div className="h-full rounded-full" style={{ width: `${ce.probability}%`, background: dc, boxShadow: `0 0 6px ${dc}` }} />
@@ -495,7 +495,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                       <p className="text-xs leading-6 mb-3" style={{ color: "rgba(255,255,255,0.78)" }}>{b.description}</p>
                       <div className="rounded-lg px-3 py-2" style={{ background: `${bc}0C`, border: `1px solid ${bc}22` }}>
                         <p className="text-[8px] uppercase tracking-[0.2em] mb-1 font-black" style={{ color: bc }}>Trigger Condition</p>
-                        <p className="text-[10px] leading-5" style={{ color: "#40516D" }}>{b.trigger}</p>
+                        <p className="text-[10px] leading-5" style={{ color: "#84967e" }}>{b.trigger}</p>
                       </div>
                     </div>
                   );
@@ -520,7 +520,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                     </div>
                     <div className="pb-6">
                       <p className="text-[10px] font-black uppercase tracking-[0.22em] mb-1" style={{ color: NEON }}>{ph.phase}</p>
-                      <p className="text-sm leading-7" style={{ color: "#1E293B" }}>{ph.events}</p>
+                      <p className="text-sm leading-7" style={{ color: "#b9ccb2" }}>{ph.events}</p>
                     </div>
                   </div>
                 ))}
@@ -530,7 +530,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
           {timelineStr && (
             <div className="rounded-2xl p-6" style={{ background: "#0D0B1A", border: `1px solid ${NEON}14` }}>
               <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-3" style={{ color: NEON }}>Timeline</p>
-              <p className="text-sm leading-7" style={{ color: "#1E293B" }}>{timelineStr}</p>
+              <p className="text-sm leading-7" style={{ color: "#b9ccb2" }}>{timelineStr}</p>
             </div>
           )}
 
@@ -564,7 +564,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                 {counterIntel.challenges.map((c, i) => (
                   <div key={i} className="flex gap-3 items-start rounded-xl px-4 py-3" style={{ background: `${PINK}0A`, border: `1px solid ${PINK}22` }}>
                     <span className="text-xs font-black font-mono shrink-0 mt-0.5" style={{ color: PINK }}>C{String(i + 1).padStart(2, "0")}</span>
-                    <p className="text-sm leading-6" style={{ color: "#1E293B" }}>{c}</p>
+                    <p className="text-sm leading-6" style={{ color: "#b9ccb2" }}>{c}</p>
                   </div>
                 ))}
               </div>
@@ -599,7 +599,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
             {([{ label: "Positive", count: pos, color: GREEN }, { label: "Neutral", count: neu, color: NEON }, { label: "Negative", count: neg, color: PINK }, { label: "Avg Intensity", count: avgInt, color: GOLD, suffix: "/10" }] as {label:string;count:string|number;color:string;suffix?:string}[]).map(({ label, count, color, suffix }) => (
               <div key={label} className="rounded-xl p-3 text-center" style={{ background: "#0D0B1A", border: `1px solid ${color}22` }}>
                 <p className="text-2xl font-black font-mono" style={{ color }}>{count}{suffix}</p>
-                <p className="text-[9px] uppercase tracking-[0.2em] mt-1" style={{ color: "#40516D" }}>{label}</p>
+                <p className="text-[9px] uppercase tracking-[0.2em] mt-1" style={{ color: "#84967e" }}>{label}</p>
               </div>
             ))}
           </div>
@@ -613,7 +613,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                   className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.15em] transition-all"
                   style={agentFilter === f
                     ? { background: `${fc}1E`, color: fc, border: `1px solid ${fc}55` }
-                    : { background: "rgba(255,255,255,0.92)", color: "#1E293B", border: "1px solid rgba(15,23,42,0.22)" }}>
+                    : { background: "rgba(255,255,255,0.92)", color: "#b9ccb2", border: "1px solid rgba(15,23,42,0.22)" }}>
                   {f === "all" ? `All (${cnt})` : `${f} (${cnt})`}
                 </button>
               );
@@ -629,41 +629,41 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0" style={{ background: `${col}1A`, color: col, border: `1px solid ${col}44` }}>{i + 1}</span>
-                        <h4 className="font-bold text-sm" style={{ color: "#070A12" }}>{agent.agentName}</h4>
+                        <h4 className="font-bold text-sm" style={{ color: "#dae6d2" }}>{agent.agentName}</h4>
                       </div>
-                      <p className="text-[11px] pl-8" style={{ color: "#40516D" }}>
+                      <p className="text-[11px] pl-8" style={{ color: "#84967e" }}>
                         {agent.location}{agent.age ? ` · ${agent.age}yr` : ""}{agent.occupation ? ` · ${agent.occupation}` : ""}
                       </p>
                     </div>
                     <div className="text-right shrink-0">
                       <span className="block text-[8px] font-black uppercase px-2 py-0.5 rounded mb-1" style={{ background: `${col}1A`, color: col, border: `1px solid ${col}33` }}>{agent.sentiment}</span>
-                      <span className="text-[10px] font-mono font-bold" style={{ color: "#40516D" }}>{agent.intensity}/10</span>
+                      <span className="text-[10px] font-mono font-bold" style={{ color: "#84967e" }}>{agent.intensity}/10</span>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-1 mb-3">
                     {agent.politicalLeaning && <span className="text-[8px] px-2 py-0.5 rounded-full font-semibold" style={{ background: `${PURPLE}12`, color: PURPLE, border: `1px solid ${PURPLE}28` }}>{agent.politicalLeaning}</span>}
-                    {agent.economicStatus && <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: "rgba(15,23,42,0.06)", color: "#40516D", border: "1px solid rgba(15,23,42,0.12)" }}>{agent.economicStatus}</span>}
+                    {agent.economicStatus && <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: "rgba(15,23,42,0.06)", color: "#84967e", border: "1px solid rgba(15,23,42,0.12)" }}>{agent.economicStatus}</span>}
                     {agent.mediaDiet && <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: `${NEON}0A`, color: `${NEON}BB` }}>{agent.mediaDiet}</span>}
                   </div>
 
                   {agent.values && agent.values.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-4">
                       {agent.values.slice(0, 5).map((v) => (
-                        <span key={v} className="text-[8px] px-1.5 py-0.5 rounded font-mono" style={{ background: "rgba(15,23,42,0.06)", color: "#40516D", border: "1px solid rgba(15,23,42,0.12)" }}>{v}</span>
+                        <span key={v} className="text-[8px] px-1.5 py-0.5 rounded font-mono" style={{ background: "rgba(15,23,42,0.06)", color: "#84967e", border: "1px solid rgba(15,23,42,0.12)" }}>{v}</span>
                       ))}
                     </div>
                   )}
 
                   <div className="h-px mb-4" style={{ background: `linear-gradient(to right,${col}28,transparent)` }} />
 
-                  <blockquote className="text-sm leading-7 italic mb-4" style={{ color: "#1E293B" }}>
+                  <blockquote className="text-sm leading-7 italic mb-4" style={{ color: "#b9ccb2" }}>
                     &ldquo;{agent.reaction}&rdquo;
                   </blockquote>
 
                   <div className="rounded-lg px-3 py-2 mb-4" style={{ background: `${col}0A`, border: `1px solid ${col}1E` }}>
                     <p className="text-[8px] uppercase tracking-[0.2em] mb-1 font-black" style={{ color: col }}>Likely Action</p>
-                    <p className="text-[11px] leading-5" style={{ color: "#1E293B" }}>{agent.likelyAction}</p>
+                    <p className="text-[11px] leading-5" style={{ color: "#b9ccb2" }}>{agent.likelyAction}</p>
                   </div>
 
                   <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(15,23,42,0.10)" }}>
@@ -673,7 +673,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
               );
             })}
           </div>
-          {filtered.length === 0 && <p className="text-center py-10 text-sm" style={{ color: "#40516D" }}>No agents with this sentiment in the simulation.</p>}
+          {filtered.length === 0 && <p className="text-center py-10 text-sm" style={{ color: "#84967e" }}>No agents with this sentiment in the simulation.</p>}
         </div>
       )}
 
@@ -704,8 +704,8 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                         <h4 className="font-bold text-white">{kf.factor}</h4>
                       </div>
                       <div className="flex gap-5 shrink-0">
-                        <div className="text-right"><p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "#40516D" }}>Impact</p><p className="font-mono font-black text-lg leading-none" style={{ color: NEON }}>{kf.impact}<span className="text-xs">/10</span></p></div>
-                        <div className="text-right"><p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "#40516D" }}>Prob.</p><p className="font-mono font-black text-lg leading-none" style={{ color: PURPLE }}>{kf.probability}<span className="text-xs">%</span></p></div>
+                        <div className="text-right"><p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "#84967e" }}>Impact</p><p className="font-mono font-black text-lg leading-none" style={{ color: NEON }}>{kf.impact}<span className="text-xs">/10</span></p></div>
+                        <div className="text-right"><p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "#84967e" }}>Prob.</p><p className="font-mono font-black text-lg leading-none" style={{ color: PURPLE }}>{kf.probability}<span className="text-xs">%</span></p></div>
                       </div>
                     </div>
                     <div className="h-1 rounded-full mb-4 overflow-hidden" style={{ background: "rgba(15,23,42,0.10)" }}>
@@ -742,7 +742,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                         <h4 className="font-bold text-white">{ri.risk}</h4>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "#40516D" }}>Probability</p>
+                        <p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "#84967e" }}>Probability</p>
                         <p className="font-mono font-black text-lg leading-none" style={{ color: rc }}>{ri.probability}<span className="text-xs">%</span></p>
                       </div>
                     </div>
@@ -783,7 +783,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                         <h4 className="font-bold text-white">{oi.opportunity}</h4>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "#40516D" }}>Window</p>
+                        <p className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: "#84967e" }}>Window</p>
                         <p className="text-xs font-mono font-bold" style={{ color: oc }}>{oi.window}</p>
                       </div>
                     </div>
