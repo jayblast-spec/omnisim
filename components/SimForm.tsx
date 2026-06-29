@@ -44,7 +44,7 @@ const LOADING_STEPS = [
   { title: "Elite Specialist Analysis",  signal: "SPECIALISTS IN" },
   { title: "Mathematical Calibration",   signal: "CONFIDENCE SET" },
   { title: "Cascade Chain Modeling",     signal: "PATHS FORMED" },
-  { title: "Devil’s Advocate Check", signal: "COUNTER CHECK" },
+  { title: "Devil’s Advocate Check",    signal: "COUNTER CHECK" },
   { title: "Writing Intel Report",       signal: "REPORT BUILD" },
   { title: "Final Trust Pass",           signal: "READY" },
 ];
@@ -72,21 +72,18 @@ export default function SimForm({ schema }: SimFormProps) {
 
   const currentQ  = flatQ[qIdx];
   const isDone    = qIdx >= total;
+  // showInput controls visibility only — the zone stays in DOM at all times
   const showInput = !isDone && !isTyping && !truthPending && !!currentQ;
 
-  /* ── Scroll to bottom ─────────────────────────────────────────── */
-  function scrollToBottom() {
+  /* ── Scroll to bottom ────────────────────────────────────── */
+  useEffect(() => {
     requestAnimationFrame(() => {
       const el = chatScrollRef.current;
       if (el) el.scrollTop = el.scrollHeight;
     });
-  }
-
-  useEffect(() => {
-    scrollToBottom();
   }, [history, typedText]);
 
-  /* ── Typewriter ──────────────────────────────────────────────── */
+  /* ── Typewriter ────────────────────────────────────────── */
   function typeOut(
     text: string,
     role: "section" | "bot",
@@ -113,7 +110,7 @@ export default function SimForm({ schema }: SimFormProps) {
     }, 16);
   }
 
-  /* ── Advance to next question ────────────────────────────────── */
+  /* ── Advance to next question ────────────────────────────── */
   useEffect(() => {
     if (qIdx >= total) return;
     const q = flatQ[qIdx];
@@ -137,7 +134,7 @@ export default function SimForm({ schema }: SimFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [qIdx]);
 
-  /* ── Submit an answer ────────────────────────────────────────── */
+  /* ── Submit an answer ───────────────────────────────────── */
   function submitAnswer(val: string | string[]) {
     const display = Array.isArray(val) ? val.join(", ") : val;
     if (!display.trim()) return;
@@ -157,7 +154,7 @@ export default function SimForm({ schema }: SimFormProps) {
     }
   }
 
-  /* ── Truth check → submit ────────────────────────────────────── */
+  /* ── Truth check ───────────────────────────────────────── */
   function answerTruth(val: TruthCheckValue) {
     const checks = { ...truthChecks, 0: val };
     setTruthChecks(checks);
@@ -165,14 +162,14 @@ export default function SimForm({ schema }: SimFormProps) {
     void doSubmit(checks);
   }
 
-  /* ── Elapsed timer ───────────────────────────────────────────── */
+  /* ── Elapsed timer ──────────────────────────────────────── */
   useEffect(() => {
     if (!isSubmitting) { setElapsed(0); return; }
     const t = setInterval(() => setElapsed((s) => s + 1), 1000);
     return () => clearInterval(t);
   }, [isSubmitting]);
 
-  /* ── API call ────────────────────────────────────────────────── */
+  /* ── API call ──────────────────────────────────────────── */
   async function doSubmit(checks: Record<number, TruthCheckValue> = truthChecks) {
     setIsSubmitting(true);
     setError(null);
@@ -234,7 +231,6 @@ export default function SimForm({ schema }: SimFormProps) {
           }}
         >
           <p className="section-label">OMNISIM INTELLIGENCE ENGINE · LIVE</p>
-
           <h2
             className="mt-4 text-2xl font-bold md:text-3xl"
             style={{ color: "#dae6d2", fontFamily: "var(--font-inter)" }}
@@ -242,7 +238,6 @@ export default function SimForm({ schema }: SimFormProps) {
             {step.title}
             <span style={{ color: "#00FF41" }} className="animate-pulse">\_</span>
           </h2>
-
           <div
             className="mt-5 h-1 overflow-hidden rounded-full"
             style={{ background: "rgba(0,255,65,0.12)" }}
@@ -252,77 +247,32 @@ export default function SimForm({ schema }: SimFormProps) {
               style={{ width: `${progress}%`, background: "linear-gradient(90deg,#00FF41,#00e639)" }}
             />
           </div>
-
           <div className="mt-6 space-y-2">
-            {LOADING_STEPS.slice(0, loadingStep + 1)
-              .slice(-5)
-              .map((s, i, arr) => {
-                const isActive = i === arr.length - 1;
-                return (
+            {LOADING_STEPS.slice(0, loadingStep + 1).slice(-5).map((s, i, arr) => {
+              const isActive = i === arr.length - 1;
+              return (
+                <div
+                  key={s.signal}
+                  className="flex items-center gap-3 rounded px-3 py-2"
+                  style={{ background: isActive ? "rgba(0,255,65,0.08)" : "rgba(0,255,65,0.02)" }}
+                >
                   <div
-                    key={s.signal}
-                    className="flex items-center gap-3 rounded px-3 py-2"
-                    style={{
-                      background: isActive ? "rgba(0,255,65,0.08)" : "rgba(0,255,65,0.02)",
-                    }}
-                  >
-                    <div
-                      className="h-1.5 w-1.5 shrink-0 rounded-full"
-                      style={{
-                        background: isActive ? "#00FF41" : "#00a833",
-                        boxShadow:  isActive ? "0 0 8px #00FF41" : "none",
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontFamily:    "var(--font-space-mono)",
-                        fontSize:      "10px",
-                        letterSpacing: "0.10em",
-                        color:         isActive ? "#00FF41" : "#3b4b37",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {s.signal}
-                    </span>
-                    <span style={{ fontSize: "11px", color: isActive ? "#b9ccb2" : "#3b4b37" }}>
-                      {s.title}
-                    </span>
-                  </div>
-                );
-              })}
+                    className="h-1.5 w-1.5 shrink-0 rounded-full"
+                    style={{ background: isActive ? "#00FF41" : "#00a833", boxShadow: isActive ? "0 0 8px #00FF41" : "none" }}
+                  />
+                  <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "10px", letterSpacing: "0.10em", color: isActive ? "#00FF41" : "#3b4b37", textTransform: "uppercase" }}>
+                    {s.signal}
+                  </span>
+                  <span style={{ fontSize: "11px", color: isActive ? "#b9ccb2" : "#3b4b37" }}>{s.title}</span>
+                </div>
+              );
+            })}
           </div>
-
-          <div
-            className="mt-6 flex gap-6 border-t pt-5"
-            style={{ borderColor: "rgba(0,255,65,0.10)" }}
-          >
-            {[
-              ["Simulation", schema.title],
-              ["Signal",     step.signal],
-              ["Elapsed",    `${elapsed}s`],
-            ].map(([label, value]) => (
+          <div className="mt-6 flex gap-6 border-t pt-5" style={{ borderColor: "rgba(0,255,65,0.10)" }}>
+            {[["Simulation", schema.title], ["Signal", step.signal], ["Elapsed", `${elapsed}s`]].map(([label, value]) => (
               <div key={label} className="min-w-0 flex-1">
-                <p
-                  style={{
-                    fontFamily:    "var(--font-space-mono)",
-                    fontSize:      "8px",
-                    letterSpacing: "0.16em",
-                    color:         "#3b4b37",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {label}
-                </p>
-                <p
-                  className="mt-0.5 truncate"
-                  style={{
-                    fontFamily: "var(--font-space-mono)",
-                    fontSize:   "11px",
-                    color:      "#00FF41",
-                  }}
-                >
-                  {value}
-                </p>
+                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "8px", letterSpacing: "0.16em", color: "#3b4b37", textTransform: "uppercase" }}>{label}</p>
+                <p className="mt-0.5 truncate" style={{ fontFamily: "var(--font-space-mono)", fontSize: "11px", color: "#00FF41" }}>{value}</p>
               </div>
             ))}
           </div>
@@ -334,70 +284,40 @@ export default function SimForm({ schema }: SimFormProps) {
   /* ═══════════════════════════ CHAT UI ══════════════════════════ */
   return (
     <div
+      className="flex flex-col"
       style={{
-        position:        "fixed",
-        inset:           0,
-        paddingTop:      "72px",
-        display:         "flex",
-        flexDirection:   "column",
-        background:      "var(--bg)",
-        overflow:        "hidden",
+        // 100dvh = dynamic viewport height: shrinks correctly when
+        // the mobile keyboard opens, preventing hard layout reflow.
+        // 100svh had this right in theory but combined with paddingTop
+        // it could overshoot and cause a scroll at the document level.
+        height:     "100dvh",
+        paddingTop: "72px",
+        background: "var(--bg)",
       }}
     >
       {/* ── Top bar ── */}
       <div
-        style={{
-          flexShrink:  0,
-          background:  "rgba(7,17,6,0.96)",
-          borderBottom: "1px solid rgba(0,255,65,0.12)",
-          padding:     "10px 16px",
-        }}
+        className="shrink-0 border-b px-4 py-2.5 sm:px-6"
+        style={{ background: "rgba(7,17,6,0.96)", borderColor: "rgba(0,255,65,0.12)" }}
       >
-        <div style={{ margin: "0 auto", maxWidth: "672px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
-            <span style={{ fontSize: "15px", flexShrink: 0 }}>{schema.icon}</span>
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-2">
+            <span style={{ fontSize: "15px" }}>{schema.icon}</span>
             <span
-              style={{
-                fontFamily:    "var(--font-space-mono)",
-                fontSize:      "10px",
-                color:         "#00FF41",
-                letterSpacing: "0.10em",
-                textTransform: "uppercase",
-                overflow:      "hidden",
-                textOverflow:  "ellipsis",
-                whiteSpace:    "nowrap",
-              }}
+              className="truncate"
+              style={{ fontFamily: "var(--font-space-mono)", fontSize: "10px", color: "#00FF41", letterSpacing: "0.10em", textTransform: "uppercase" }}
             >
               {schema.type.replace(/-/g, " ")} SIMULATION
             </span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
-            <div
-              style={{
-                height:   "4px",
-                width:    "80px",
-                background: "rgba(0,255,65,0.12)",
-                borderRadius: "2px",
-                overflow: "hidden",
-              }}
-            >
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="h-1 w-24 overflow-hidden rounded-full" style={{ background: "rgba(0,255,65,0.12)" }}>
               <div
-                style={{
-                  height:     "100%",
-                  borderRadius: "2px",
-                  transition:   "width 500ms ease",
-                  width:        `${Math.min((qIdx / total) * 100, 100)}%`,
-                  background:   "#00FF41",
-                }}
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.min((qIdx / total) * 100, 100)}%`, background: "#00FF41" }}
               />
             </div>
-            <span
-              style={{
-                fontFamily: "var(--font-space-mono)",
-                fontSize:   "9px",
-                color:      "#3b4b37",
-              }}
-            >
+            <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "9px", color: "#3b4b37" }}>
               {Math.min(qIdx, total)}/{total}
             </span>
           </div>
@@ -405,79 +325,46 @@ export default function SimForm({ schema }: SimFormProps) {
       </div>
 
       {/* ── Chat scroll ──
-           flex:1 + minHeight:0 is the correct flex pattern to allow
-           this div to shrink and scroll without overflowing the parent */}
+           min-h-0 is essential: without it the flex child won't shrink
+           below its content height, breaking the flex layout. */}
       <div
         ref={chatScrollRef}
+        className="min-h-0 flex-1 overflow-y-auto px-4 pt-6 pb-4 sm:px-6"
         style={{
-          flex:                    1,
-          minHeight:               0,
-          overflowY:               "auto",
-          overscrollBehavior:      "contain",
-          WebkitOverflowScrolling: "touch",
-          padding:                 "24px 16px 16px",
+          overscrollBehavior: "contain",
         }}
       >
-        <div style={{ margin: "0 auto", maxWidth: "672px", display: "flex", flexDirection: "column", gap: "12px" }}>
-
+        <div className="mx-auto max-w-2xl space-y-3">
           {history.map((entry) => {
             if (entry.role === "section") {
               return (
-                <div key={entry.id} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "4px 0" }}>
-                  <div style={{ flex: 1, height: "1px", background: "rgba(0,255,65,0.12)" }} />
-                  <span
-                    style={{
-                      fontFamily:    "var(--font-space-mono)",
-                      fontSize:      "9px",
-                      color:         "rgba(0,255,65,0.45)",
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
-                    }}
-                  >
+                <div key={entry.id} className="flex items-center gap-3 py-1">
+                  <div className="h-px flex-1" style={{ background: "rgba(0,255,65,0.12)" }} />
+                  <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "9px", color: "rgba(0,255,65,0.45)", letterSpacing: "0.14em", textTransform: "uppercase" }}>
                     {entry.text}
                   </span>
-                  <div style={{ flex: 1, height: "1px", background: "rgba(0,255,65,0.12)" }} />
+                  <div className="h-px flex-1" style={{ background: "rgba(0,255,65,0.12)" }} />
                 </div>
               );
             }
-
             if (entry.role === "user") {
               return (
-                <div key={entry.id} style={{ display: "flex", justifyContent: "flex-end" }}>
+                <div key={entry.id} className="flex justify-end">
                   <div
-                    style={{
-                      maxWidth:   "78%",
-                      borderRadius: "4px",
-                      padding:    "10px 16px",
-                      background: "#00FF41",
-                      color:      "#003907",
-                      fontFamily: "var(--font-space-mono)",
-                      fontSize:   "13px",
-                      lineHeight: "1.6",
-                    }}
+                    className="max-w-[78%] rounded px-4 py-2.5"
+                    style={{ background: "#00FF41", color: "#003907", fontFamily: "var(--font-space-mono)", fontSize: "13px", lineHeight: "1.6" }}
                   >
                     {entry.text}
                   </div>
                 </div>
               );
             }
-
             return (
-              <div key={entry.id} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+              <div key={entry.id} className="flex items-start gap-3">
                 <BotAvatar />
                 <div
-                  style={{
-                    maxWidth:   "84%",
-                    borderRadius: "4px",
-                    padding:    "10px 16px",
-                    background: "rgba(20,30,18,0.80)",
-                    border:     "1px solid rgba(0,255,65,0.12)",
-                    color:      "#dae6d2",
-                    fontFamily: "var(--font-space-mono)",
-                    fontSize:   "13px",
-                    lineHeight: "1.7",
-                    whiteSpace: "pre-line",
-                  }}
+                  className="max-w-[84%] rounded px-4 py-2.5"
+                  style={{ background: "rgba(20,30,18,0.80)", border: "1px solid rgba(0,255,65,0.12)", color: "#dae6d2", fontFamily: "var(--font-space-mono)", fontSize: "13px", lineHeight: "1.7", whiteSpace: "pre-line" }}
                 >
                   {entry.text}
                 </div>
@@ -485,25 +372,13 @@ export default function SimForm({ schema }: SimFormProps) {
             );
           })}
 
-          {/* Typing indicator */}
+          {/* Typing bubble */}
           {(isTyping || typedText) && (
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+            <div className="flex items-start gap-3">
               <BotAvatar pulsing />
               <div
-                style={{
-                  maxWidth:   "84%",
-                  borderRadius: "4px",
-                  padding:    "10px 16px",
-                  background: "rgba(20,30,18,0.80)",
-                  border:     "1px solid rgba(0,255,65,0.12)",
-                  color:      "#dae6d2",
-                  fontFamily: "var(--font-space-mono)",
-                  fontSize:   "13px",
-                  lineHeight: "1.7",
-                  whiteSpace: "pre-line",
-                  minWidth:   "60px",
-                  minHeight:  "42px",
-                }}
+                className="max-w-[84%] rounded px-4 py-2.5"
+                style={{ background: "rgba(20,30,18,0.80)", border: "1px solid rgba(0,255,65,0.12)", color: "#dae6d2", fontFamily: "var(--font-space-mono)", fontSize: "13px", lineHeight: "1.7", whiteSpace: "pre-line", minWidth: "60px", minHeight: "42px" }}
               >
                 {typedText || "​"}
                 <span style={{ color: "#00FF41" }} className="animate-pulse">▊</span>
@@ -511,24 +386,23 @@ export default function SimForm({ schema }: SimFormProps) {
             </div>
           )}
 
-          {/* Anchor — scrolled into view after each message */}
-          <div style={{ height: "1px" }} />
+          <div style={{ height: "4px" }} />
         </div>
       </div>
 
       {/* ── Input zone ──
-           ALWAYS in the DOM with a stable minimum height.
-           Only opacity and pointer-events change so the chat area
-           never reflows when a question transitions. */}
+           Always in DOM with a fixed minHeight so the chat area
+           never reflows when the bot is typing vs awaiting input.
+           Only opacity + pointerEvents change — zero layout shift. */}
       <div
+        className="shrink-0"
         style={{
-          flexShrink:    0,
-          background:    showInput ? "rgba(7,17,6,0.97)" : "rgba(7,17,6,0.60)",
+          background:    "rgba(7,17,6,0.97)",
           borderTop:     "1px solid rgba(0,255,65,0.10)",
           minHeight:     "72px",
           opacity:       showInput ? 1 : 0,
           pointerEvents: showInput ? "auto" : "none",
-          transition:    "opacity 180ms ease",
+          transition:    "opacity 160ms ease",
         }}
       >
         {currentQ && (
@@ -542,63 +416,33 @@ export default function SimForm({ schema }: SimFormProps) {
         )}
       </div>
 
-      {/* ── Error bar ── */}
+      {/* Error */}
       {error && (
         <div
-          style={{
-            flexShrink:  0,
-            borderTop:   "1px solid rgba(255,0,119,0.2)",
-            background:  "rgba(255,0,119,0.06)",
-            padding:     "8px 16px",
-            textAlign:   "center",
-          }}
+          className="shrink-0 border-t px-4 py-2 text-center"
+          style={{ borderColor: "rgba(255,0,119,0.2)", background: "rgba(255,0,119,0.06)" }}
         >
-          <p
-            style={{
-              color:      "#FF0077",
-              fontSize:   "11px",
-              fontFamily: "var(--font-space-mono)",
-              margin:     0,
-            }}
-          >
-            {error}
-          </p>
+          <p style={{ color: "#FF0077", fontSize: "11px", fontFamily: "var(--font-space-mono)" }}>{error}</p>
         </div>
       )}
 
-      {/* ── Truth check modal ── */}
+      {/* Truth modal */}
       {truthPending && <TruthModal onAnswer={answerTruth} />}
     </div>
   );
 }
 
-/* ════════════ SUB-COMPONENTS ════════════════════════════════ */
+/* ════════════ SUB-COMPONENTS ═══════════════════════════════ */
 
 function BotAvatar({ pulsing }: { pulsing?: boolean }) {
   return (
     <div
-      style={{
-        marginTop:    "4px",
-        width:        "28px",
-        height:       "28px",
-        flexShrink:   0,
-        borderRadius: "4px",
-        background:   "rgba(0,255,65,0.08)",
-        border:       "1px solid rgba(0,255,65,0.22)",
-        display:      "flex",
-        alignItems:   "center",
-        justifyContent: "center",
-      }}
+      className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded"
+      style={{ background: "rgba(0,255,65,0.08)", border: "1px solid rgba(0,255,65,0.22)", flexShrink: 0 }}
     >
       <div
         className={pulsing ? "animate-pulse" : ""}
-        style={{
-          width:        "8px",
-          height:       "8px",
-          borderRadius: "50%",
-          background:   "#00FF41",
-          boxShadow:    pulsing ? "0 0 8px #00FF41" : "0 0 4px #00FF41",
-        }}
+        style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#00FF41", boxShadow: pulsing ? "0 0 8px #00FF41" : "0 0 4px #00FF41" }}
       />
     </div>
   );
@@ -618,7 +462,10 @@ function InputArea({
   const [multi, setMulti] = useState<string[]>([]);
 
   const base: React.CSSProperties = {
-    padding:    "12px 16px 14px",
+    background:  "transparent",
+    borderTop:   "none",
+    padding:     "12px 16px",
+    flexShrink:  0,
   };
 
   const sendBtn: React.CSSProperties = {
@@ -633,7 +480,6 @@ function InputArea({
     cursor:        "pointer",
     borderRadius:  "4px",
     flexShrink:    0,
-    minHeight:     "38px",
   };
 
   const skipBtn: React.CSSProperties = {
@@ -659,45 +505,28 @@ function InputArea({
     flex:         1,
     minWidth:     0,
     boxShadow:    "none",
-    width:        "100%",
     borderRadius: 0,
   };
 
-  const inner: React.CSSProperties = {
-    margin:    "0 auto",
-    maxWidth:  "672px",
-  };
-
-  /* ── Text / number / date ── */
   if (["text", "number", "date"].includes(field.type)) {
-    const handleSend = () => {
-      if (textValue.trim()) onSubmit(textValue.trim());
-    };
+    const handleSend = () => { if (textValue.trim()) onSubmit(textValue.trim()); };
     return (
       <div style={base}>
-        <div style={inner}>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: "10px" }}>
+        <div className="mx-auto max-w-2xl">
+          <div className="flex items-end gap-3">
             <input
+              autoFocus
               type={field.type === "date" ? "date" : field.type === "number" ? "number" : "text"}
               value={textValue}
               onChange={(e) => onTextChange(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
               placeholder={field.placeholder || (field.required ? "Type your answer..." : "Type or skip →")}
               style={inputStyle}
             />
             <button type="button" onClick={handleSend} style={sendBtn}>SEND →</button>
           </div>
           {!field.required && (
-            <button
-              type="button"
-              onClick={() => onSubmit("N/A")}
-              style={{ ...skipBtn, marginTop: "6px", display: "block" }}
-            >
+            <button type="button" onClick={() => onSubmit("N/A")} style={{ ...skipBtn, marginTop: "6px", display: "block" }}>
               SKIP →
             </button>
           )}
@@ -706,110 +535,60 @@ function InputArea({
     );
   }
 
-  /* ── Textarea ── */
   if (field.type === "textarea") {
     return (
       <div style={base}>
-        <div style={inner}>
+        <div className="mx-auto max-w-2xl">
           <textarea
-            rows={Math.min(field.rows || 3, 3)}
+            autoFocus
+            rows={Math.min(field.rows || 3, 4)}
             value={textValue}
             onChange={(e) => onTextChange(e.target.value)}
             placeholder={field.placeholder || "Type your answer..."}
-            style={{
-              ...inputStyle,
-              display: "block",
-              resize:  "none",
-              flex:    "unset",
-            }}
+            style={{ ...inputStyle, display: "block", resize: "none", flex: "unset", width: "100%" }}
           />
-          <div style={{ marginTop: "8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            {!field.required
-              ? <button type="button" onClick={() => onSubmit("N/A")} style={skipBtn}>SKIP →</button>
-              : <span />}
-            <button
-              type="button"
-              onClick={() => { if (textValue.trim()) onSubmit(textValue.trim()); }}
-              style={sendBtn}
-            >
-              SEND →
-            </button>
+          <div className="mt-2 flex items-center justify-between">
+            {!field.required ? <button type="button" onClick={() => onSubmit("N/A")} style={skipBtn}>SKIP →</button> : <span />}
+            <button type="button" onClick={() => { if (textValue.trim()) onSubmit(textValue.trim()); }} style={sendBtn}>SEND →</button>
           </div>
         </div>
       </div>
     );
   }
 
-  /* ── Select / radio — tap option to instantly answer ── */
   if (field.type === "select" || field.type === "radio") {
     return (
-      <div style={base}>
-        <div style={inner}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+      <div style={{ ...base, padding: "12px 16px 14px" }}>
+        <div className="mx-auto max-w-2xl">
+          <div className="flex flex-wrap gap-2">
             {field.options?.map((opt) => (
               <button
                 key={opt}
                 type="button"
                 onClick={() => onSubmit(opt)}
-                style={{
-                  background:   "rgba(20,30,18,0.90)",
-                  border:       "1px solid rgba(0,255,65,0.22)",
-                  color:        "#dae6d2",
-                  padding:      "8px 14px",
-                  fontFamily:   "var(--font-space-mono)",
-                  fontSize:     "11px",
-                  cursor:       "pointer",
-                  borderRadius: "4px",
-                  transition:   "background 100ms ease, color 100ms ease",
-                  touchAction:  "manipulation",
-                }}
-                onTouchStart={(e) => {
-                  const el = e.currentTarget;
-                  el.style.background  = "#00FF41";
-                  el.style.color       = "#003907";
-                  el.style.borderColor = "#00FF41";
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget;
-                  el.style.background  = "#00FF41";
-                  el.style.color       = "#003907";
-                  el.style.borderColor = "#00FF41";
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget;
-                  el.style.background  = "rgba(20,30,18,0.90)";
-                  el.style.color       = "#dae6d2";
-                  el.style.borderColor = "rgba(0,255,65,0.22)";
-                }}
+                style={{ background: "rgba(20,30,18,0.90)", border: "1px solid rgba(0,255,65,0.22)", color: "#dae6d2", padding: "8px 16px", fontFamily: "var(--font-space-mono)", fontSize: "12px", cursor: "pointer", borderRadius: "4px", transition: "all 0.12s ease", touchAction: "manipulation" }}
+                onMouseEnter={(e) => { const el = e.currentTarget; el.style.background = "#00FF41"; el.style.color = "#003907"; el.style.borderColor = "#00FF41"; }}
+                onMouseLeave={(e) => { const el = e.currentTarget; el.style.background = "rgba(20,30,18,0.90)"; el.style.color = "#dae6d2"; el.style.borderColor = "rgba(0,255,65,0.22)"; }}
               >
                 {opt}
               </button>
             ))}
           </div>
           {!field.required && (
-            <button
-              type="button"
-              onClick={() => onSubmit("N/A")}
-              style={{ ...skipBtn, marginTop: "8px", display: "block" }}
-            >
-              SKIP →
-            </button>
+            <button type="button" onClick={() => onSubmit("N/A")} style={{ ...skipBtn, marginTop: "8px", display: "block" }}>SKIP →</button>
           )}
         </div>
       </div>
     );
   }
 
-  /* ── Multiselect ── */
   if (field.type === "multiselect") {
     const toggle = (opt: string) =>
-      setMulti((prev) =>
-        prev.includes(opt) ? prev.filter((v) => v !== opt) : [...prev, opt]
-      );
+      setMulti((prev) => prev.includes(opt) ? prev.filter((v) => v !== opt) : [...prev, opt]);
     return (
-      <div style={base}>
-        <div style={inner}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "7px", marginBottom: "10px" }}>
+      <div style={{ ...base, padding: "12px 16px 14px" }}>
+        <div className="mx-auto max-w-2xl">
+          <div className="mb-3 flex flex-wrap gap-2">
             {field.options?.map((opt) => {
               const sel = multi.includes(opt);
               return (
@@ -817,38 +596,20 @@ function InputArea({
                   key={opt}
                   type="button"
                   onClick={() => toggle(opt)}
-                  style={{
-                    background:   sel ? "#00FF41" : "rgba(20,30,18,0.90)",
-                    border:       sel ? "1px solid #00FF41" : "1px solid rgba(0,255,65,0.22)",
-                    color:        sel ? "#003907" : "#dae6d2",
-                    padding:      "7px 13px",
-                    fontFamily:   "var(--font-space-mono)",
-                    fontSize:     "11px",
-                    cursor:       "pointer",
-                    borderRadius: "4px",
-                    transition:   "all 100ms ease",
-                    touchAction:  "manipulation",
-                  }}
+                  style={{ background: sel ? "#00FF41" : "rgba(20,30,18,0.90)", border: sel ? "1px solid #00FF41" : "1px solid rgba(0,255,65,0.22)", color: sel ? "#003907" : "#dae6d2", padding: "7px 14px", fontFamily: "var(--font-space-mono)", fontSize: "11px", cursor: "pointer", borderRadius: "4px", transition: "all 0.10s ease", touchAction: "manipulation" }}
                 >
                   {sel ? "✓ " : ""}{opt}
                 </button>
               );
             })}
           </div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            {!field.required
-              ? <button type="button" onClick={() => onSubmit(["N/A"])} style={skipBtn}>SKIP →</button>
-              : <span />}
+          <div className="flex items-center justify-between">
+            {!field.required ? <button type="button" onClick={() => onSubmit(["N/A"])} style={skipBtn}>SKIP →</button> : <span />}
             <button
               type="button"
               disabled={multi.length === 0}
               onClick={() => { if (multi.length > 0) { onSubmit(multi); setMulti([]); } }}
-              style={{
-                ...sendBtn,
-                background: multi.length > 0 ? "#00FF41" : "rgba(0,255,65,0.10)",
-                color:      multi.length > 0 ? "#003907" : "#3b4b37",
-                cursor:     multi.length > 0 ? "pointer" : "default",
-              }}
+              style={{ ...sendBtn, background: multi.length > 0 ? "#00FF41" : "rgba(0,255,65,0.15)", color: multi.length > 0 ? "#003907" : "#3b4b37", cursor: multi.length > 0 ? "pointer" : "default" }}
             >
               CONFIRM{multi.length > 0 ? ` (${multi.length})` : ""} →
             </button>
@@ -864,79 +625,35 @@ function InputArea({
 function TruthModal({ onAnswer }: { onAnswer: (v: TruthCheckValue) => void }) {
   return (
     <div
-      style={{
-        position:       "fixed",
-        inset:          0,
-        zIndex:         50,
-        display:        "flex",
-        alignItems:     "flex-end",
-        justifyContent: "center",
-        padding:        "0 16px 20px",
-        background:     "rgba(4,8,4,0.72)",
-      }}
+      className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-5 sm:items-center sm:pb-0"
+      style={{ background: "rgba(4,8,4,0.72)" }}
     >
       <div
-        style={{
-          width:      "100%",
-          maxWidth:   "400px",
-          background: "rgba(12,22,10,0.99)",
-          border:     "1px solid rgba(0,255,65,0.28)",
-          borderRadius: "6px",
-          boxShadow:  "0 0 40px rgba(0,255,65,0.12)",
-          padding:    "20px",
-        }}
+        className="w-full max-w-sm rounded border p-5"
+        style={{ background: "rgba(12,22,10,0.99)", border: "1px solid rgba(0,255,65,0.28)", boxShadow: "0 0 40px rgba(0,255,65,0.12)" }}
       >
         <p className="section-label">Truth Checkpoint</p>
-        <h3
-          style={{
-            marginTop:  "8px",
-            fontSize:   "15px",
-            fontWeight: 600,
-            color:      "#dae6d2",
-            fontFamily: "var(--font-inter)",
-          }}
-        >
+        <h3 className="mt-2 text-base font-semibold" style={{ color: "#dae6d2", fontFamily: "var(--font-inter)" }}>
           Are these answers based on facts or estimates?
         </h3>
-        <p
-          style={{
-            marginTop:  "4px",
-            fontSize:   "11px",
-            color:      "#84967e",
-            fontFamily: "var(--font-space-mono)",
-          }}
-        >
+        <p className="mt-1 text-xs" style={{ color: "#84967e", fontFamily: "var(--font-space-mono)" }}>
           This calibrates simulation confidence.
         </p>
-        <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
+        <div className="mt-4 space-y-2">
           {([
-            ["true",    "Based on facts I trust",         "rgba(0,255,65,0.08)",  "rgba(0,255,65,0.28)",   "#dae6d2"],
-            ["unknown", "Some parts are uncertain",        "rgba(255,184,0,0.06)", "rgba(255,184,0,0.22)",  "#dae6d2"],
-            ["skip",    "Mark unverified and continue",    "rgba(0,0,0,0.20)",     "rgba(255,255,255,0.06)","#84967e"],
-          ] as [TruthCheckValue, string, string, string, string][]).map(
-            ([val, label, bg, border, color]) => (
-              <button
-                key={val}
-                type="button"
-                onClick={() => onAnswer(val)}
-                style={{
-                  width:         "100%",
-                  background:    bg,
-                  border:        `1px solid ${border}`,
-                  color,
-                  padding:       "10px 14px",
-                  textAlign:     "left",
-                  fontFamily:    "var(--font-space-mono)",
-                  fontSize:      "12px",
-                  cursor:        "pointer",
-                  borderRadius:  "4px",
-                  touchAction:   "manipulation",
-                }}
-              >
-                {label}
-              </button>
-            )
-          )}
+            ["true",    "Based on facts I trust",        "rgba(0,255,65,0.08)",  "rgba(0,255,65,0.28)",    "#dae6d2"],
+            ["unknown", "Some parts are uncertain",       "rgba(255,184,0,0.06)", "rgba(255,184,0,0.22)",   "#dae6d2"],
+            ["skip",    "Mark unverified and continue",   "rgba(0,0,0,0.20)",     "rgba(255,255,255,0.06)", "#84967e"],
+          ] as [TruthCheckValue, string, string, string, string][]).map(([val, label, bg, border, color]) => (
+            <button
+              key={val}
+              type="button"
+              onClick={() => onAnswer(val)}
+              style={{ width: "100%", background: bg, border: `1px solid ${border}`, color, padding: "10px 14px", textAlign: "left", fontFamily: "var(--font-space-mono)", fontSize: "12px", cursor: "pointer", borderRadius: "4px", display: "block", touchAction: "manipulation" }}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
     </div>
