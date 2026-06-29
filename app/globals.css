@@ -654,3 +654,142 @@ footer {
     letter-spacing: 0.08em !important;
   }
 }
+/* OmniSim World Takeover: Matrix landscape + liquid glass, static for mobile speed */
+body {
+  background: #06110D !important;
+}
+
+body::before {
+  display: none !important;
+}
+
+.sim-world {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(38,255,135,0.20), transparent 32rem),
+    radial-gradient(circle at 18% 18%, rgba(49,95,174,0.22), transparent 26rem),
+    radial-gradient(circle at 82% 24%, rgba(219,39,119,0.18), transparent 25rem),
+    linear-gradient(180deg, #020705 0%, #06110D 46%, #E3EFE8 100%);
+}
+
+.sim-world::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(2,7,5,0.12), rgba(255,255,255,0.10) 56%, rgba(255,255,255,0.52));
+}
+
+.sim-world__curtain {
+  position: absolute;
+  inset: 0 0 30%;
+  opacity: 0.86;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+}
+
+.sim-world__curtain span {
+  position: absolute;
+  top: -1rem;
+  width: 1rem;
+  color: rgba(39,255,136,0.34);
+  font-family: var(--font-outfit), monospace;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.7;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(39,255,136,0.30);
+  writing-mode: vertical-rl;
+  transform: translateY(var(--sim-offset, 0));
+}
+
+.sim-world__horizon {
+  position: absolute;
+  left: 50%;
+  top: 49%;
+  width: min(1080px, 92vw);
+  height: 160px;
+  transform: translateX(-50%);
+  opacity: 0.78;
+  background:
+    linear-gradient(135deg, transparent 0 39%, rgba(38,255,135,0.56) 39.4% 40.2%, transparent 40.8% 100%),
+    linear-gradient(28deg, transparent 0 55%, rgba(49,95,174,0.44) 55.4% 56.1%, transparent 56.8% 100%),
+    linear-gradient(160deg, transparent 0 45%, rgba(167,139,250,0.34) 45.4% 46%, transparent 46.6% 100%);
+  clip-path: polygon(0 62%, 8% 58%, 16% 68%, 24% 40%, 33% 56%, 42% 18%, 52% 54%, 61% 35%, 70% 66%, 80% 46%, 90% 58%, 100% 50%, 100% 100%, 0 100%);
+}
+
+.sim-world__floor {
+  position: absolute;
+  left: 50%;
+  bottom: -8%;
+  width: 160vw;
+  height: 56vh;
+  transform: translateX(-50%) perspective(520px) rotateX(62deg);
+  transform-origin: center bottom;
+  background-image:
+    linear-gradient(rgba(38,255,135,0.44) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(38,255,135,0.38) 1px, transparent 1px);
+  background-size: 44px 44px;
+  border-top: 1px solid rgba(38,255,135,0.62);
+  box-shadow: 0 -14px 42px rgba(38,255,135,0.16);
+  opacity: 0.88;
+}
+
+.sim-world__wire {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: min(860px, 92vw);
+  height: 1px;
+  transform: translateX(-50%) rotate(-8deg);
+  background: linear-gradient(90deg, transparent, rgba(38,255,135,0.72), rgba(49,95,174,0.45), transparent);
+  box-shadow: 0 0 18px rgba(38,255,135,0.22);
+}
+
+.sim-world__wire--two {
+  top: 60%;
+  transform: translateX(-50%) rotate(7deg);
+  background: linear-gradient(90deg, transparent, rgba(219,39,119,0.32), rgba(38,255,135,0.55), transparent);
+}
+
+.sim-world__beams {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(116deg, transparent 0 22%, rgba(38,255,135,0.12) 22.2% 22.7%, transparent 23% 100%),
+    linear-gradient(64deg, transparent 0 72%, rgba(251,191,36,0.10) 72.2% 72.7%, transparent 73% 100%),
+    linear-gradient(90deg, rgba(38,255,135,0.09) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(38,255,135,0.06) 1px, transparent 1px);
+  background-size: auto, auto, 72px 72px, 72px 72px;
+}
+
+nav, main, footer {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.cyber-card,
+.glass-card {
+  background: rgba(255,255,255,0.78) !important;
+  border-color: rgba(192,255,219,0.34) !important;
+  box-shadow: 0 0 0 0.5px rgba(255,255,255,0.82) inset, 0 18px 44px rgba(0,0,0,0.18), 0 0 34px rgba(38,255,135,0.08) !important;
+}
+
+.matrix-rain,
+.matrix-rain span,
+.simulation-field {
+  display: none !important;
+  animation: none !important;
+}
+
+@media (max-width: 768px) {
+  .sim-world__curtain span:nth-child(n+8) { display: none; }
+  .sim-world__curtain span { font-size: 8px; color: rgba(39,255,136,0.24); }
+  .sim-world__floor { height: 46vh; width: 190vw; background-size: 34px 34px; bottom: -12%; opacity: 0.74; }
+  .sim-world__horizon { top: 48%; height: 120px; opacity: 0.62; }
+  .sim-world__wire { opacity: 0.58; }
+  .sim-world__beams { background-size: auto, auto, 56px 56px, 56px 56px; opacity: 0.72; }
+  .cyber-card, .glass-card { background: rgba(255,255,255,0.84) !important; }
+}
