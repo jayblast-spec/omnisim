@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
-import { Outfit, Playfair_Display } from "next/font/google";
+import { Inter, Space_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SimWorldBackground from "@/components/SimWorldBackground";
 
-const outfit = Outfit({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-outfit",
-  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
-const playfair = Playfair_Display({
+const spaceMono = Space_Mono({
   subsets: ["latin"],
-  variable: "--font-playfair",
-  weight: ["400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
+  variable: "--font-space-mono",
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -32,7 +31,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${playfair.variable}`}>
+    <html lang="en" className={`${inter.variable} ${spaceMono.variable}`}>
       <body>
         <SimWorldBackground />
         <Navbar />
