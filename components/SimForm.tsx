@@ -23,9 +23,9 @@ export default function SimForm({ schema }: SimFormProps) {
 
   const loadingSteps = [
     {
-      title: "Installing OmniSim Intelligence Core",
+      title: "Preparing OmniSim Intelligence",
       detail: "Mounting the scenario engine and preparing the selected simulation model.",
-      signal: "CORE ONLINE",
+      signal: "INTELLIGENCE READY",
     },
     {
       title: "Reading Every Blank You Filled",
@@ -33,7 +33,7 @@ export default function SimForm({ schema }: SimFormProps) {
       signal: "INTAKE LOCKED",
     },
     {
-      title: "Selecting Human Behavior Agents",
+      title: "Testing Human Response Patterns",
       detail: "Choosing the agent mix most likely to understand how real people would respond to this matter.",
       signal: "AGENTS READY",
     },
@@ -43,7 +43,7 @@ export default function SimForm({ schema }: SimFormProps) {
       signal: "REACTIONS ACTIVE",
     },
     {
-      title: "Applying Elite Success Parameters",
+      title: "Applying Resilience Filters",
       detail: "Checking reputation, timing, trust, leverage, safety, risk, upside, and probability of follow-through.",
       signal: "SUCCESS FILTER",
     },
