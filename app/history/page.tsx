@@ -45,12 +45,12 @@ export default function HistoryPage() {
   }, []);
 
   return (
-    <div className="min-h-screen px-5 pb-24 pt-28 sm:px-8">
+    <div className="page-shell min-h-screen px-5 pb-24 pt-28 sm:px-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-12">
           <p className="section-label">SIMULATION ARCHIVE</p>
-          <h1 className="mt-4 font-orbitron text-3xl font-black text-white">History</h1>
-          <p className="mt-3 text-sm text-white/35">
+          <h1 className="page-heading mt-4 font-orbitron text-3xl font-black">History</h1>
+          <p className="page-copy mt-3 text-sm font-semibold">
             Your past simulations. Each prediction stored for reference.
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function HistoryPage() {
 
         {!loading && records.length === 0 && (
           <div className="py-24 text-center">
-            <p className="font-orbitron text-white/25">NO SIMULATIONS YET</p>
+            <p className="font-orbitron font-bold" style={{ color: "#DDFEEB" }}>NO SIMULATIONS YET</p>
             <Link href="/simulate" className="btn-neon mt-8 inline-flex">
               RUN YOUR FIRST SIMULATION
             </Link>
@@ -83,7 +83,7 @@ export default function HistoryPage() {
               >
                 <div>
                   <div className="flex items-center gap-3">
-                    <p className="font-orbitron text-sm font-bold text-white">
+                    <p className="font-orbitron text-sm font-bold" style={{ color: "#F6FFF9" }}>
                       {typeLabels[rec.type] || rec.type}
                     </p>
                     {rec.result?.confidenceLabel && (
@@ -100,11 +100,11 @@ export default function HistoryPage() {
                     )}
                   </div>
                   {rec.result?.prediction && (
-                    <p className="mt-2 text-xs leading-6 text-white/35 line-clamp-2">
+                    <p className="mt-2 text-xs font-medium leading-6 line-clamp-2" style={{ color: "#DDFEEB" }}>
                       {rec.result.prediction}
                     </p>
                   )}
-                  <p className="mt-2 font-orbitron text-[8px] tracking-widest text-white/20">
+                  <p className="mt-2 font-orbitron text-[8px] font-bold tracking-widest" style={{ color: "#BCEFD2" }}>
                     {new Date(rec.created_at).toLocaleString()}
                   </p>
                 </div>
