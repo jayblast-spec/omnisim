@@ -263,7 +263,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
 
       {/* ── TABS ── */}
       <div className="mb-6 w-full">
-        <div className="grid w-full grid-cols-3 gap-1 rounded-2xl border p-1 sm:gap-2" style={{ borderColor: "rgba(15,23,42,0.14)", background: "rgba(255,255,255,0.78)" }}>
+        <div className="grid w-full grid-cols-3 gap-1 rounded-2xl border p-1 sm:gap-2" style={{ borderColor: "rgba(0,255,65,0.12)", background: "rgba(12,22,10,0.90)" }}>
           {(["overview", "agents", "factors"] as const).map((t) => {
             const label = t === "overview" ? "Brief" : t === "agents" ? `Agents` : "Risks";
             const count = t === "agents" ? result.agentResults.length : null;
@@ -275,7 +275,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                 aria-label={full}
                 title={full}
                 className="min-h-[42px] min-w-0 rounded-xl px-1.5 py-2 text-center text-[9px] font-black uppercase leading-tight tracking-[0.04em] transition-all sm:min-h-[48px] sm:px-4 sm:text-[11px] sm:tracking-[0.10em]"
-                style={tab === t ? { color: "#dae6d2", border: "1px solid rgba(49,95,174,0.44)", background: "rgba(49,95,174,0.16)", boxShadow: "0 8px 18px rgba(49,95,174,0.12)" } : { color: "#b9ccb2", border: "1px solid rgba(15,23,42,0.10)", background: "rgba(255,255,255,0.90)" }}
+                style={tab === t ? { color: "#dae6d2", border: "1px solid rgba(49,95,174,0.44)", background: "rgba(49,95,174,0.16)", boxShadow: "0 8px 18px rgba(49,95,174,0.12)" } : { color: "#b9ccb2", border: "1px solid rgba(0,255,65,0.14)", background: "rgba(20,30,18,0.70)" }}
               >
                 <span className="block truncate sm:hidden">{label}{count ? ` ${count}` : ""}</span>
                 <span className="hidden sm:inline">{full}</span>
@@ -387,7 +387,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                   const sc = s.color;
                   const mod = s.confidenceModifier;
                   return (
-                    <div key={s.specialistId} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.92)", border: `1px solid ${sc}33`, boxShadow: "0 12px 30px rgba(15,23,42,0.12)" }}>
+                    <div key={s.specialistId} className="rounded-xl p-4" style={{ background: "rgba(20,30,18,0.82)", border: `1px solid ${sc}28`, boxShadow: "0 0 24px rgba(0,0,0,0.30)" }}>
                       <div className="flex items-start justify-between gap-2 mb-3">
                         <div>
                           <p className="font-black text-sm" style={{ color: "#dae6d2" }}>{s.name}</p>
@@ -613,7 +613,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
                   className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.15em] transition-all"
                   style={agentFilter === f
                     ? { background: `${fc}1E`, color: fc, border: `1px solid ${fc}55` }
-                    : { background: "rgba(255,255,255,0.92)", color: "#b9ccb2", border: "1px solid rgba(15,23,42,0.22)" }}>
+                    : { background: "rgba(20,30,18,0.70)", color: "#84967e", border: "1px solid rgba(0,255,65,0.14)" }}>
                   {f === "all" ? `All (${cnt})` : `${f} (${cnt})`}
                 </button>
               );
@@ -624,7 +624,7 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
             {filtered.map((agent, i) => {
               const col = sCol(agent.sentiment);
               return (
-                <div key={agent.agentId} className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.92)", border: `1px solid ${col}33`, boxShadow: "0 12px 30px rgba(15,23,42,0.12)" }}>
+                <div key={agent.agentId} className="rounded-xl p-5" style={{ background: "rgba(20,30,18,0.82)", border: `1px solid ${col}28`, boxShadow: "0 0 24px rgba(0,0,0,0.30)" }}>
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
