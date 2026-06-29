@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Outfit, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";`nimport SimWorldBackground from "@/components/SimWorldBackground";
+import Footer from "@/components/Footer";
+import SimWorldBackground from "@/components/SimWorldBackground";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${outfit.variable} ${playfair.variable}`}>
       <body>
+        <SimWorldBackground />
         <Navbar />
         <main>{children}</main>
         <Footer />
