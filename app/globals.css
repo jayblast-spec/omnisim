@@ -1002,3 +1002,23 @@ main [style*="rgba(255,255,255,0.08"] {
     background: linear-gradient(145deg, rgba(4,24,14,0.95), rgba(7,42,24,0.90)) !important;
   }
 }
+/* Hero copy must stay readable over dark Matrix scene */
+.hero-copy > p,
+.hero-copy p {
+  color: #F4FFF8 !important;
+}
+
+.hero-copy > p:first-of-type,
+.hero-copy [class*="tracking-"] {
+  color: #B8FFD8 !important;
+}
+
+.hero-copy p:not(:first-of-type) {
+  background: rgba(2,8,5,0.58) !important;
+  border-color: rgba(125,255,192,0.22) !important;
+}
+
+.hero-copy h1 span:first-child {
+  color: #F4FFF8 !important;
+  text-shadow: 0 2px 18px rgba(0,0,0,0.88), 0 0 18px rgba(244,255,248,0.18) !important;
+}
