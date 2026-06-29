@@ -1099,3 +1099,122 @@ main [style*="rgba(255,255,255,0.08"] {
   .omnisim-wordmark::before { transform: translate3d(6px, 8px, -14px); }
   .omnisim-wordmark::after { transform: translate3d(-1px, -2px, 14px); }
 }
+/* Green Matrix glass system override */
+.matrix-navbar,
+.matrix-footer,
+.cyber-card,
+.glass-card,
+.sim-form-board,
+main section > div:not(.sim-world):not(.sim-world__curtain):not(.sim-world__floor):not(.sim-world__horizon):not(.sim-world__mountains):not(.sim-world__glow) {
+  background: linear-gradient(145deg, rgba(3,20,12,0.84), rgba(7,42,24,0.76), rgba(3,14,10,0.86)) !important;
+  border: 1px solid rgba(125,255,192,0.30) !important;
+  box-shadow: 0 0 0 0.5px rgba(188,255,220,0.24) inset, 0 22px 54px rgba(0,0,0,0.32), 0 0 40px rgba(43,255,143,0.10) !important;
+  color: #F4FFF8 !important;
+}
+
+.matrix-navbar,
+.matrix-footer {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.matrix-navbar::before,
+.matrix-footer::before,
+.cyber-card::before,
+.glass-card::before,
+.sim-form-board::before {
+  background: linear-gradient(160deg, rgba(188,255,220,0.18), rgba(255,255,255,0.06) 34%, transparent 62%) !important;
+}
+
+.matrix-navbar__mark {
+  background: radial-gradient(circle at 35% 25%, rgba(244,255,248,0.95), rgba(125,255,192,0.58) 34%, rgba(4,32,18,0.82) 72%) !important;
+  border-color: rgba(188,255,220,0.44) !important;
+  box-shadow: 0 0 18px rgba(43,255,143,0.22), 0 8px 20px rgba(0,0,0,0.24) !important;
+}
+
+.matrix-launch,
+.btn-solid,
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(190,255,223,0.58) !important;
+  background: linear-gradient(135deg, #7DFFC0, #26FF87 48%, #00D7FF) !important;
+  color: #031008 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.78rem 1.25rem;
+  box-shadow: 0 10px 24px rgba(43,255,143,0.24), 0 0 0 0.5px rgba(255,255,255,0.42) inset !important;
+}
+
+.btn-neon,
+.btn-glass,
+button:not(.matrix-launch) {
+  border-color: rgba(125,255,192,0.32) !important;
+  background: rgba(4,32,18,0.78) !important;
+  color: #D9FFE9 !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.20), 0 0 20px rgba(43,255,143,0.08) !important;
+}
+
+.form-input,
+input,
+textarea,
+select {
+  background: rgba(238,255,246,0.96) !important;
+  border-color: rgba(125,255,192,0.34) !important;
+  color: #031008 !important;
+}
+
+.cyber-card p,
+.cyber-card li,
+.cyber-card label,
+.cyber-card span,
+.glass-card p,
+.glass-card li,
+.glass-card label,
+.glass-card span,
+.matrix-footer p,
+.matrix-footer a,
+.matrix-footer span,
+.sim-form-board p,
+.sim-form-board label,
+.sim-form-board span {
+  color: #D9FFE9 !important;
+}
+
+.cyber-card h1,
+.cyber-card h2,
+.cyber-card h3,
+.glass-card h1,
+.glass-card h2,
+.glass-card h3,
+.sim-form-board h1,
+.sim-form-board h2,
+.sim-form-board h3 {
+  color: #F4FFF8 !important;
+}
+
+.section-label,
+.matrix-footer [class*="text-"],
+.cyber-card .section-label,
+.glass-card .section-label {
+  color: #7DFFC0 !important;
+}
+
+.hero-copy p:not(:first-of-type) {
+  background: linear-gradient(145deg, rgba(3,20,12,0.82), rgba(7,42,24,0.72)) !important;
+  color: #F4FFF8 !important;
+}
+
+@media (max-width: 768px) {
+  .matrix-navbar,
+  .matrix-footer,
+  .cyber-card,
+  .glass-card,
+  .sim-form-board {
+    background: linear-gradient(145deg, rgba(3,20,12,0.90), rgba(7,42,24,0.82)) !important;
+  }
+}
