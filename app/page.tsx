@@ -46,7 +46,20 @@ export default function HomePage() {
       {/* HERO */}
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-32 sm:px-8">
         <div className="simulation-field" aria-hidden="true" />
-        <div className="sim-node-rail" aria-hidden="true" />
+        <div className="matrix-rain" aria-hidden="true">
+          {Array.from({ length: 18 }).map((_, i) => (
+            <span
+              key={i}
+              style={{
+                left: `${3 + i * 5.6}%`,
+                animationDelay: `${(i % 6) * -1.8}s`,
+                animationDuration: `${10 + (i % 5) * 1.8}s`,
+              }}
+            >
+              {i % 3 === 0 ? "011010AI391010OMNISIM24" : i % 3 === 1 ? "TRUEFALSE0101RISKPATH" : "HUMANVAR4729FUTURE"}
+            </span>
+          ))}
+        </div>        <div className="sim-node-rail" aria-hidden="true" />
 
         <div className="relative z-10 mx-auto max-w-5xl text-center">
           <div className="mb-8 inline-flex items-center gap-3 rounded-sm border border-[rgba(0,245,255,0.15)] bg-[rgba(0,245,255,0.03)] px-5 py-2.5">
