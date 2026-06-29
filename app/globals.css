@@ -559,3 +559,98 @@ footer {
     transition-duration: 0.001ms !important;
   }
 }
+/* OmniSim Matrix performance correction: global, static, mobile-safe */
+body {
+  background-color: #07130F !important;
+  background-image:
+    linear-gradient(90deg, rgba(38,255,135,0.13) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(38,255,135,0.09) 1px, transparent 1px),
+    repeating-linear-gradient(90deg, transparent 0 34px, rgba(38,255,135,0.055) 35px 36px, transparent 37px 92px),
+    radial-gradient(circle at 18% 16%, rgba(38,255,135,0.24), transparent 26rem),
+    radial-gradient(circle at 82% 8%, rgba(49,95,174,0.24), transparent 28rem),
+    linear-gradient(135deg, #DCEBE5 0%, #E7F1EC 42%, #F3EAD9 100%) !important;
+  background-size: 72px 72px, 72px 72px, 160px 160px, auto, auto, auto !important;
+  background-attachment: scroll !important;
+}
+
+body::before {
+  content: "0101 AI 3910  OMNISIM  TRUE FALSE  RISK PATH  HUMAN VAR 4729  FUTURE MODEL  0101 AI 3910  OMNISIM  TRUE FALSE  RISK PATH  HUMAN VAR 4729  FUTURE MODEL  0101 AI 3910  OMNISIM  TRUE FALSE  RISK PATH  HUMAN VAR 4729  FUTURE MODEL" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  display: block !important;
+  overflow: hidden !important;
+  color: rgba(38,255,135,0.18) !important;
+  font-family: var(--font-outfit), monospace !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  line-height: 2.45 !important;
+  letter-spacing: 0.18em !important;
+  word-spacing: 1.8rem !important;
+  white-space: normal !important;
+  padding: 5.5rem 1rem 1rem !important;
+  text-shadow: 0 0 10px rgba(38,255,135,0.20) !important;
+  background: linear-gradient(180deg, rgba(4,13,10,0.40), rgba(255,255,255,0.44) 46%, rgba(255,255,255,0.82)) !important;
+  opacity: 1 !important;
+}
+
+.matrix-rain,
+.matrix-rain span {
+  display: none !important;
+  animation: none !important;
+}
+
+.simulation-field {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  background:
+    linear-gradient(180deg, rgba(4,13,10,0.36), rgba(255,255,255,0.50) 48%, rgba(255,255,255,0.78)),
+    repeating-linear-gradient(90deg, transparent 0 82px, rgba(38,255,135,0.10) 83px 84px, transparent 85px 164px) !important;
+}
+
+.simulation-field::before {
+  opacity: 0.42 !important;
+  animation: none !important;
+}
+
+.simulation-field::after {
+  color: rgba(38,255,135,0.70) !important;
+  text-shadow: 0 0 12px rgba(38,255,135,0.24) !important;
+}
+
+.cyber-card,
+.glass-card,
+.btn-neon,
+.btn-glass,
+footer {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.ticker-track,
+[style*="animation: spinRing"] {
+  animation: none !important;
+}
+
+@media (max-width: 768px) {
+  body {
+    background-size: 56px 56px, 56px 56px, 128px 128px, auto, auto, auto !important;
+  }
+
+  body::before {
+    font-size: 10px !important;
+    line-height: 2.8 !important;
+    letter-spacing: 0.12em !important;
+    word-spacing: 1rem !important;
+    padding-top: 5rem !important;
+    opacity: 0.72 !important;
+  }
+
+  .simulation-field::after {
+    top: 6.7rem !important;
+    font-size: 7px !important;
+    letter-spacing: 0.08em !important;
+  }
+}
