@@ -57,7 +57,7 @@ export interface SwarmLabRound {
 export interface SwarmLabTrace {
   engineVersion: string;
   realitySeed: string[];
-  personaSwarm: string[];
+  personaIntelligence: string[];
   simulationRounds: SwarmLabRound[];
   mutationTests: string[];
   learningLoop: string;
@@ -476,15 +476,15 @@ function buildSwarmLabTrace(
       : "neutral";
 
   return {
-    engineVersion: "OmniSim SwarmLab Core v0.2",
+    engineVersion: "OmniSim Intelligence Core v0.2",
     realitySeed: [
       `Scenario class: ${type}`,
       `Seed signals: ${uniqueWords.length ? uniqueWords.join(", ") : "truth calibration and user context"}`,
       `Population-weighted leaning: ${dominantSentiment}`,
       `Historical memory used: ${historicalCount} prior simulations`,
-      "Architecture: graph seed -> persona swarm -> environment model -> mutation tests -> report agent",
+      "Architecture: graph seed -> persona intelligence -> environment model -> mutation tests -> report agent",
     ],
-    personaSwarm: [...strongestAgents, ...strongestSpecialists].slice(0, 8),
+    personaIntelligence: [...strongestAgents, ...strongestSpecialists].slice(0, 8),
     simulationRounds: [
       {
         phase: "Graph Seed Building",
@@ -499,14 +499,14 @@ function buildSwarmLabTrace(
         confidenceImpact: 3,
       },
       {
-        phase: "Persona Swarm Calibration",
+        phase: "Persona Intelligence Calibration",
         action: `Selected ${agentResults.length} field agents and ${specialistResults.length} specialist lenses to test human response diversity.`,
         output: "Human behavior spread, incentives, fears, and likely actions mapped.",
         confidenceImpact: agentResults.length >= 15 ? 5 : 2,
       },
       {
         phase: "Parallel Outcome Simulation",
-        action: "Compared best-case, likely-case, downside, and hidden-opportunity trajectories across the swarm.",
+        action: "Compared best-case, likely-case, downside, and hidden-opportunity trajectories across the model.",
         output: `Dominant population-weighted sentiment resolved as ${dominantSentiment}.`,
         confidenceImpact: calibratedConfidence >= 75 ? 6 : calibratedConfidence >= 55 ? 3 : -2,
       },
@@ -518,7 +518,7 @@ function buildSwarmLabTrace(
       },
       {
         phase: "ReportAgent Synthesis",
-        action: "Compressed swarm reactions, specialist analysis, counter-intelligence, and historical memory into a decision-grade brief.",
+        action: "Compressed agent reactions, specialist analysis, counter-intelligence, and historical memory into a decision-grade brief.",
         output: "Final answer shaped for action, not entertainment.",
         confidenceImpact: 4,
       },
