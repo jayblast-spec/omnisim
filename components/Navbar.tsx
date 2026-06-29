@@ -35,9 +35,9 @@ export default function Navbar() {
                 href={link.href}
                 className="rounded-[14px] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.08em] transition"
                 style={{
-                  color: active ? "#0D1117" : "#2D3748",
-                  background: active ? "rgba(255,255,255,0.62)" : "transparent",
-                  boxShadow: active ? "0 0 0 0.5px rgba(255,255,255,0.9) inset" : "none",
+                  color: active ? "#031008" : "#F4FFF8",
+                  background: active ? "linear-gradient(135deg, rgba(125,255,192,0.92), rgba(0,215,255,0.72))" : "rgba(4,32,18,0.72)",
+                  border: active ? "1px solid rgba(246,255,249,0.76)" : "1px solid rgba(125,255,192,0.28)",`n                  textShadow: active ? "none" : "0 0 12px rgba(43,255,143,0.22)",`n                  boxShadow: active ? "0 0 0 0.5px rgba(255,255,255,0.62) inset, 0 0 22px rgba(0,215,255,0.18)" : "0 8px 18px rgba(0,0,0,0.22)",
                 }}
               >
                 {link.label}
