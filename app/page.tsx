@@ -135,10 +135,10 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-14 text-center">
             <p className="section-label">SIMULATION TYPES</p>
-            <h2 className="mt-4 font-orbitron text-3xl font-black text-white md:text-4xl">
+            <h2 className="home-heading mt-4 font-orbitron text-3xl font-black md:text-4xl">
               What can OMNISIM simulate?
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-white/40">
+            <p className="home-copy mx-auto mt-4 max-w-2xl text-sm font-semibold leading-8">
               Twelve categories of world-class simulations. Each powered by 20 diverse global AI agents and a comprehensive intelligence intake form.
             </p>
           </div>
@@ -171,7 +171,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-5xl">
           <div className="mb-14 text-center">
             <p className="section-label">METHODOLOGY</p>
-            <h2 className="mt-4 font-orbitron text-3xl font-black text-white md:text-4xl">
+            <h2 className="home-heading mt-4 font-orbitron text-3xl font-black md:text-4xl">
               How OMNISIM works
             </h2>
           </div>
@@ -197,7 +197,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-5xl">
           <div className="mb-14 text-center">
             <p className="section-label">USE CASES</p>
-            <h2 className="mt-4 font-orbitron text-3xl font-black text-white md:text-4xl">
+            <h2 className="home-heading mt-4 font-orbitron text-3xl font-black md:text-4xl">
               Who uses OMNISIM?
             </h2>
           </div>
@@ -217,13 +217,13 @@ export default function HomePage() {
       <section className="border-t border-[rgba(0,245,255,0.06)] bg-[rgba(0,245,255,0.01)] px-5 py-36 text-center sm:px-8">
         <div className="mx-auto max-w-2xl">
           <p className="section-label">READY TO SIMULATE?</p>
-          <h2 className="mt-6 font-orbitron text-4xl font-black text-white md:text-5xl">
+          <h2 className="home-heading mt-6 font-orbitron text-4xl font-black md:text-5xl">
             Stop guessing.<br />
             <span style={{ color: "#00F5FF", textShadow: "0 0 20px rgba(0,245,255,0.4)" }}>
               Start simulating.
             </span>
           </h2>
-          <p className="mx-auto mt-6 max-w-xl text-sm leading-9 text-white/40">
+          <p className="home-copy mx-auto mt-6 max-w-xl text-sm font-semibold leading-9">
             Governments, hedge funds, PR firms, and sports analysts already rely on simulation intelligence.
             Now you have access to the most powerful system ever built for individuals and organizations alike.
           </p>
