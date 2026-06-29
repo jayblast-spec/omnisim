@@ -1218,3 +1218,188 @@ select {
     background: linear-gradient(145deg, rgba(3,20,12,0.90), rgba(7,42,24,0.82)) !important;
   }
 }
+/* Spectrum Matrix glass: rainbow beauty + enforced readable contrast */
+:root {
+  --matrix-ink: #F6FFF9;
+  --matrix-soft: #DDFEEB;
+  --matrix-muted: #BCEFD2;
+  --matrix-dark-ink: #031008;
+  --spectrum-green: #26FF87;
+  --spectrum-cyan: #00D7FF;
+  --spectrum-blue: #4D8CFF;
+  --spectrum-violet: #A78BFA;
+  --spectrum-pink: #FF4FA3;
+  --spectrum-gold: #F7C948;
+}
+
+.sim-world {
+  background:
+    radial-gradient(circle at 14% 18%, rgba(0,215,255,0.20), transparent 22rem),
+    radial-gradient(circle at 82% 20%, rgba(255,79,163,0.16), transparent 23rem),
+    radial-gradient(circle at 50% 56%, rgba(38,255,135,0.22), transparent 24rem),
+    radial-gradient(circle at 75% 70%, rgba(167,139,250,0.14), transparent 24rem),
+    linear-gradient(180deg, #010402 0%, #020805 44%, #04110B 59%, #07190F 100%) !important;
+}
+
+.sim-world__floor {
+  background-image:
+    linear-gradient(rgba(125,255,192,0.50) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,215,255,0.34) 1px, transparent 1px) !important;
+  border-top-color: rgba(247,201,72,0.72) !important;
+  box-shadow: 0 -20px 52px rgba(38,255,135,0.18), 0 -8px 34px rgba(0,215,255,0.14), inset 0 42px 60px rgba(167,139,250,0.05) !important;
+}
+
+.sim-world__horizon,
+.sim-world::after {
+  background: linear-gradient(90deg, transparent, rgba(38,255,135,0.62), rgba(0,215,255,0.72), rgba(247,201,72,0.58), rgba(255,79,163,0.42), transparent) !important;
+}
+
+.sim-world__mountains {
+  background:
+    linear-gradient(141deg, transparent 0 39%, rgba(125,255,192,0.72) 39.25% 39.9%, transparent 40.3% 100%),
+    linear-gradient(34deg, transparent 0 55%, rgba(0,215,255,0.58) 55.25% 55.9%, transparent 56.3% 100%),
+    linear-gradient(162deg, transparent 0 47%, rgba(167,139,250,0.48) 47.25% 47.9%, transparent 48.3% 100%),
+    linear-gradient(22deg, transparent 0 63%, rgba(255,79,163,0.34) 63.25% 63.8%, transparent 64.2% 100%) !important;
+}
+
+.matrix-navbar,
+.matrix-footer,
+.cyber-card,
+.glass-card,
+.sim-form-board {
+  background:
+    linear-gradient(145deg, rgba(3,20,12,0.88), rgba(7,42,24,0.80), rgba(9,18,37,0.74), rgba(34,10,28,0.62)) !important;
+  border-image: linear-gradient(120deg, var(--spectrum-green), var(--spectrum-cyan), var(--spectrum-violet), var(--spectrum-pink), var(--spectrum-gold)) 1 !important;
+  border-color: rgba(125,255,192,0.38) !important;
+  color: var(--matrix-ink) !important;
+}
+
+.cyber-card:nth-child(5n+1),
+.glass-card:nth-child(5n+1) { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.22) inset, 0 22px 54px rgba(0,0,0,0.34), 0 0 38px rgba(38,255,135,0.14) !important; }
+.cyber-card:nth-child(5n+2),
+.glass-card:nth-child(5n+2) { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.22) inset, 0 22px 54px rgba(0,0,0,0.34), 0 0 38px rgba(0,215,255,0.14) !important; }
+.cyber-card:nth-child(5n+3),
+.glass-card:nth-child(5n+3) { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.22) inset, 0 22px 54px rgba(0,0,0,0.34), 0 0 38px rgba(167,139,250,0.14) !important; }
+.cyber-card:nth-child(5n+4),
+.glass-card:nth-child(5n+4) { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.22) inset, 0 22px 54px rgba(0,0,0,0.34), 0 0 38px rgba(255,79,163,0.13) !important; }
+.cyber-card:nth-child(5n+5),
+.glass-card:nth-child(5n+5) { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.22) inset, 0 22px 54px rgba(0,0,0,0.34), 0 0 38px rgba(247,201,72,0.12) !important; }
+
+main,
+main p,
+main li,
+main label,
+main summary,
+main span,
+.cyber-card p,
+.cyber-card li,
+.cyber-card label,
+.cyber-card span,
+.glass-card p,
+.glass-card li,
+.glass-card label,
+.glass-card span,
+.sim-form-board p,
+.sim-form-board label,
+.sim-form-board span,
+.matrix-footer p,
+.matrix-footer a,
+.matrix-footer span {
+  color: var(--matrix-soft) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.cyber-card h1,
+.cyber-card h2,
+.cyber-card h3,
+.glass-card h1,
+.glass-card h2,
+.glass-card h3,
+.sim-form-board h1,
+.sim-form-board h2,
+.sim-form-board h3 {
+  color: var(--matrix-ink) !important;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.58) !important;
+}
+
+.section-label,
+[class*="section-label"],
+main [class*="tracking-"][class*="text-"] {
+  color: var(--spectrum-cyan) !important;
+  text-shadow: 0 0 16px rgba(0,215,255,0.28) !important;
+}
+
+.cyber-card:nth-child(5n+1) .section-label,
+.glass-card:nth-child(5n+1) .section-label { color: var(--spectrum-green) !important; }
+.cyber-card:nth-child(5n+2) .section-label,
+.glass-card:nth-child(5n+2) .section-label { color: var(--spectrum-cyan) !important; }
+.cyber-card:nth-child(5n+3) .section-label,
+.glass-card:nth-child(5n+3) .section-label { color: var(--spectrum-violet) !important; }
+.cyber-card:nth-child(5n+4) .section-label,
+.glass-card:nth-child(5n+4) .section-label { color: var(--spectrum-pink) !important; }
+.cyber-card:nth-child(5n+5) .section-label,
+.glass-card:nth-child(5n+5) .section-label { color: var(--spectrum-gold) !important; }
+
+.form-input,
+input,
+textarea,
+select,
+.sim-form-board .form-input,
+.sim-form-board input,
+.sim-form-board textarea,
+.sim-form-board select {
+  background: rgba(247,255,251,0.97) !important;
+  border: 1px solid rgba(125,255,192,0.42) !important;
+  color: var(--matrix-dark-ink) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(3,16,8,0.60) !important;
+}
+
+button,
+.btn-neon,
+.btn-glass,
+[role="button"] {
+  color: var(--matrix-ink) !important;
+  background: linear-gradient(135deg, rgba(4,32,18,0.88), rgba(9,18,37,0.82)) !important;
+  border-color: rgba(0,215,255,0.34) !important;
+}
+
+.btn-solid,
+.btn-gold,
+.matrix-launch,
+.sim-form-board .btn-solid,
+.sim-form-board .btn-neon {
+  color: var(--matrix-dark-ink) !important;
+  background: linear-gradient(135deg, var(--spectrum-green), var(--spectrum-cyan), var(--spectrum-violet)) !important;
+  border-color: rgba(246,255,249,0.72) !important;
+}
+
+.hero-copy p:not(:first-of-type) {
+  background: linear-gradient(145deg, rgba(3,20,12,0.86), rgba(9,18,37,0.76), rgba(34,10,28,0.58)) !important;
+  border-image: linear-gradient(120deg, var(--spectrum-green), var(--spectrum-cyan), var(--spectrum-violet), var(--spectrum-pink)) 1 !important;
+  color: var(--matrix-ink) !important;
+}
+
+.omnisim-wordmark {
+  background: linear-gradient(180deg, #F7FFF9 0%, var(--spectrum-green) 26%, var(--spectrum-cyan) 48%, var(--spectrum-violet) 72%, var(--spectrum-pink) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+
+@media (max-width: 768px) {
+  .matrix-navbar,
+  .matrix-footer,
+  .cyber-card,
+  .glass-card,
+  .sim-form-board {
+    background: linear-gradient(145deg, rgba(3,20,12,0.92), rgba(7,42,24,0.84), rgba(9,18,37,0.76)) !important;
+  }
+}
