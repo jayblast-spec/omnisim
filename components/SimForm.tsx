@@ -469,37 +469,37 @@ export default function SimForm({ schema }: SimFormProps) {
 
 
       {pendingAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(7,10,18,0.38)" }}>
-          <div className="w-full max-w-lg rounded-2xl border p-5 shadow-2xl" style={{ background: "rgba(255,255,255,0.96)", borderColor: "rgba(15,23,42,0.18)" }}>
+        <div className="fixed inset-0 z-50 flex items-end justify-center px-3 pb-4 sm:items-center sm:pb-0" style={{ background: "rgba(7,10,18,0.24)" }}>
+          <div className="w-full max-w-sm rounded-2xl border p-4 shadow-2xl sm:max-w-md" style={{ background: "rgba(255,255,255,0.96)", borderColor: "rgba(15,23,42,0.18)" }}>
             <div className="flex items-start gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ background: "linear-gradient(135deg, rgba(49,95,174,0.18), rgba(124,58,237,0.14))", color: "#315FAE" }}>
-                <span className="text-lg font-black">i</span>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: "linear-gradient(135deg, rgba(49,95,174,0.18), rgba(124,58,237,0.14))", color: "#315FAE" }}>
+                <span className="text-base font-black">i</span>
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: "#315FAE" }}>Truth Checkpoint</p>
-                <h3 className="mt-2 text-xl font-black leading-tight" style={{ color: "#070A12" }}>{section.title}</h3>
-                <p className="mt-3 text-sm leading-7" style={{ color: "#1E293B" }}>
-                  Before OmniSim trusts this stage, were the answers you filled mostly true facts, uncertain guesses, or written from emotion?
+                <p className="text-[9px] font-black uppercase tracking-[0.16em]" style={{ color: "#315FAE" }}>Truth Checkpoint</p>
+                <h3 className="mt-1 text-base font-black leading-tight" style={{ color: "#070A12" }}>{section.title}</h3>
+                <p className="mt-2 text-xs leading-6" style={{ color: "#1E293B" }}>
+                  Are these answers mostly facts, uncertain guesses, or emotion?
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 grid gap-3">
-              <button type="button" onClick={() => answerTruthCheck("true")} className="rounded-xl px-4 py-3 text-left transition" style={{ background: "rgba(5,150,105,0.10)", border: "1px solid rgba(5,150,105,0.30)", color: "#064E3B" }}>
+            <div className="mt-4 grid gap-2">
+              <button type="button" onClick={() => answerTruthCheck("true")} className="rounded-xl px-3 py-2 text-left transition" style={{ background: "rgba(5,150,105,0.10)", border: "1px solid rgba(5,150,105,0.30)", color: "#064E3B" }}>
                 <span className="block text-sm font-black">True</span>
-                <span className="mt-1 block text-xs leading-5">These answers are based on facts, direct experience, or evidence I trust.</span>
+                <span className="mt-1 block text-xs leading-5">Based on facts or evidence I trust.</span>
               </button>
-              <button type="button" onClick={() => answerTruthCheck("unknown")} className="rounded-xl px-4 py-3 text-left transition" style={{ background: "rgba(199,134,22,0.12)", border: "1px solid rgba(199,134,22,0.32)", color: "#7A5208" }}>
+              <button type="button" onClick={() => answerTruthCheck("unknown")} className="rounded-xl px-3 py-2 text-left transition" style={{ background: "rgba(199,134,22,0.12)", border: "1px solid rgba(199,134,22,0.32)", color: "#7A5208" }}>
                 <span className="block text-sm font-black">I don&apos;t know</span>
-                <span className="mt-1 block text-xs leading-5">Some parts are uncertain. OmniSim should treat this section with lower confidence.</span>
+                <span className="mt-1 block text-xs leading-5">Some parts are uncertain; lower confidence.</span>
               </button>
-              <button type="button" onClick={() => answerTruthCheck("skip")} className="rounded-xl px-4 py-3 text-left transition" style={{ background: "rgba(15,23,42,0.06)", border: "1px solid rgba(15,23,42,0.18)", color: "#1E293B" }}>
+              <button type="button" onClick={() => answerTruthCheck("skip")} className="rounded-xl px-3 py-2 text-left transition" style={{ background: "rgba(15,23,42,0.06)", border: "1px solid rgba(15,23,42,0.18)", color: "#1E293B" }}>
                 <span className="block text-sm font-black">Don&apos;t ask me</span>
-                <span className="mt-1 block text-xs leading-5">Continue without this checkpoint. OmniSim will mark this stage as unverified.</span>
+                <span className="mt-1 block text-xs leading-5">Continue and mark this stage unverified.</span>
               </button>
             </div>
 
-            <button type="button" onClick={() => setPendingAction(null)} className="mt-4 text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "#40516D" }}>
+            <button type="button" onClick={() => setPendingAction(null)} className="mt-3 text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: "#40516D" }}>
               Back to edit
             </button>
           </div>
