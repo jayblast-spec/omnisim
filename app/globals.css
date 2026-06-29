@@ -930,3 +930,21 @@ textarea::placeholder {
 [style*="color:#FFD700"] {
   color: #8A6400 !important;
 }
+/* Form/header visibility fallback over dark simulation world */
+main > div > div:first-child:not(.sim-world),
+form > div:first-child,
+[class*="pt-28"] > div:first-child {
+  color: #07120D !important;
+}
+
+main [class*="tracking-"][class*="text-white"],
+main [class*="text-white/"],
+main [style*="rgba(255,255,255,0.2"],
+main [style*="rgba(255,255,255,0.3"],
+main [style*="rgba(255,255,255,0.4"] {
+  color: #1B2A22 !important;
+}
+
+main [style*="rgba(255,255,255,0.08"] {
+  background-color: rgba(7,18,13,0.20) !important;
+}
