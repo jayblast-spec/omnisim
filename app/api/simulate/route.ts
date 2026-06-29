@@ -799,7 +799,7 @@ MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n${categoryDepthInstructi
     body: JSON.stringify({
       model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 1700,
+      max_tokens: 1300,
       temperature: 0.7,
       response_format: { type: "json_object" },
     }),
@@ -813,7 +813,7 @@ MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n${categoryDepthInstructi
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 1400,
+        max_tokens: 1000,
         temperature: 0.62,
         response_format: { type: "json_object" },
       }),
@@ -822,7 +822,22 @@ MODE INSTRUCTION:\n${privateScenarioInstruction(type)}\n${categoryDepthInstructi
 
   if (!resp.ok) {
     const errText = await resp.text();
-    throw new Error(`Groq synthesis error ${resp.status}: ${errText}`);
+    console.error(`Groq synthesis error ${resp.status}: ${errText}`);
+    return {
+      executiveSummary: "OmniSim completed the agent and specialist analysis, but the final synthesis model was temporarily rate-limited. This fallback brief preserves the intelligence signals instead of failing the simulation.\n\nReview the expert panel, field agents, risk matrix, and Deep Read. The next best action is to verify the weakest assumptions and rerun once the model lane clears.\n\nThe result is usable as a resilience-first decision draft, not the final polished synthesis.",
+      prediction: "The simulation produced enough agent and specialist signal to continue, but the final narrative synthesis was rate-limited. Treat this as a provisional intelligence brief. Focus on the highest-intensity agent reactions, specialist risks, truth calibration, and the Deep Read action plan. If the scenario is high-stakes, rerun after adding more verified facts.",
+      confidenceLabel: "PROVISIONAL - MODEL BUSY",
+      confidenceScore: 58,
+      confidenceReasoning: "Confidence is reduced because the final synthesis model was rate-limited. Agent and specialist signals still exist, but the polished cross-domain conclusion could not be completed in this pass.",
+      cascadeEffects: [],
+      scenarioBranches: [],
+      keyFactors: ["Truth calibration", "Specialist panel", "Field-agent disagreement", "Real-world constraints"],
+      risks: ["Final synthesis unavailable", "User may over-trust provisional output", "Missing facts can shift outcome"],
+      opportunities: ["Rerun with verified facts", "Use Deep Read as action draft", "Compare field-agent patterns"],
+      strategicActions: ["Verify the top unknown", "Protect the downside boundary", "Take one evidence-producing action", "Rerun the simulation with new facts"],
+      recommendation: "Use this as a temporary decision draft. Do not treat it as the strongest OmniSim output until the synthesis model completes normally.",
+      timeline: [],
+    };
   }
 
   const data = (await resp.json()) as { choices: { message: { content: string } }[] };
