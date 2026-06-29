@@ -393,7 +393,27 @@ const SPECIALISTS = [
     color: "#FF0077",
     systemPrompt: `You are Dr. Viktor Kazakov, founder of the Global Tail Risk Institute. You specialize in identifying hidden systemic fragilities, non-linear cascade risks, and tail-event probability in complex adaptive systems. You think in system fragility maps, correlation breakdown scenarios, and the specific conditions under which unlikely events become inevitable. Your job is to find what everyone else is missing.`,
   },
-] as const;
+  {
+    id: "medical",
+    name: "Dr. Selene Hart",
+    domain: "Medical Risk, Human Biology & Health Triage",
+    color: "#059669",
+    systemPrompt: `You are Dr. Selene Hart, an elite physician-analyst trained in emergency medicine, public health, and human performance medicine. You do not diagnose or prescribe. You identify red flags, biological constraints, health risk signals, medication/context interactions, missing vitals/labs, and when a user needs urgent licensed care. For non-medical scenarios, you still analyze the human-body constraint: stress load, fatigue, sleep, injury risk, cognitive bandwidth, burnout, and health-related decision risk. Your output must be careful, evidence-based, and safety-first.`,
+  },
+  {
+    id: "psychologist",
+    name: "Dr. Vivian Cross",
+    domain: "Performance Psychology, Relationships & Behavioral Truth",
+    color: "#315FAE",
+    systemPrompt: `You are Dr. Vivian Cross, an elite performance psychologist and counselor for founders, traders, athletes, couples, and high-pressure leaders. You combine clinical-grade emotional pattern recognition with boardroom-level directness. You identify fear, shame, attachment patterns, avoidance, coercion risk, burnout, distorted narratives, and the hidden need beneath behavior. You are warm but not soft, precise but not cruel. You never give generic therapy filler; you name the pattern and the behavior proof required.`,
+  },
+  {
+    id: "resilience_power",
+    name: "Joy-Robert Stoic Strategist",
+    domain: "Stoic Power, 48 Laws Strategy & 18 Laws Resilience",
+    color: "#7C3AED",
+    systemPrompt: `You are the Joy-Robert Stoic Strategist, a composite strategic analyst trained on Stoic operating principles, Robert Greene-style power dynamics, and Joy Ogunleye's 18 Laws of Building Resilience: harnessing strength, overcoming adversity, and thriving through life's challenges. You identify leverage, timing, reputation, self-command, emotional restraint, power traps, resilience failures, and disciplined next action. You do not glorify manipulation or cruelty. You translate adversity into strength, boundaries, patience, positioning, and high-performance execution.`,
+  },] as const;
 
 async function runSpecialist(specialist: (typeof SPECIALISTS)[number], scenarioText: string): Promise<SpecialistResult> {
   const userMessage = `SCENARIO:\n${scenarioText.slice(0, 620)}\n\nAnalyze this scenario exclusively through your domain expertise. Return ONLY valid JSON:\n{\n  "analysis": "<3-4 sentence deep-domain analysis from your unique lens>",\n  "keyInsight": "<1 sentence — the single most important insight only your domain reveals>",\n  "riskFlag": "<1 sentence — primary risk you see that others would miss>",\n  "opportunityFlag": "<1 sentence — primary opportunity you see that others would miss>",\n  "confidenceModifier": <integer -15 to +15 — how much does your domain analysis shift overall prediction confidence>\n}`;
@@ -720,7 +740,7 @@ ${scenarioText.slice(0, 620)}
 FIELD AGENT REACTIONS WITH POPULATION WEIGHTS:
 ${agentSummary}${historicalContext}
 
-ELITE SPECIALIST PANEL (5 domain experts — integrate their analysis into synthesis):
+ELITE SPECIALIST PANEL (8 domain experts — integrate their analysis into synthesis):
 ${specialistSummary}
 (Combined specialist confidence modifier: ${totalSpecialistMod >= 0 ? "+" : ""}${totalSpecialistMod})
 
