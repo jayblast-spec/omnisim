@@ -72,16 +72,8 @@ export default function HomePage() {
             </span>
           </div>
 
-          <h1 className="font-orbitron text-7xl font-black leading-none tracking-tight sm:text-9xl lg:text-[11rem]">
-            <span className="text-white">OMNI</span>
-            <span
-              style={{
-                color: "#00F5FF",
-                textShadow: "0 0 20px #00F5FF, 0 0 60px rgba(0,245,255,0.25)",
-              }}
-            >
-              SIM
-            </span>
+          <h1 className="omnisim-wordmark font-orbitron text-7xl font-black leading-none tracking-tight sm:text-9xl lg:text-[11rem]" data-text="OMNISIM">
+            <span>OMNI</span><span>SIM</span>
           </h1>
 
           <p className="mt-6 font-orbitron text-xs font-black tracking-[0.18em] sm:tracking-[0.32em]" style={{ color: "#B8FFD8", textShadow: "0 0 18px rgba(43,255,143,0.45), 0 2px 12px rgba(0,0,0,0.75)" }}>
