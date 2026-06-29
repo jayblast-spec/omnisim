@@ -38,44 +38,52 @@ function flattenQuestions(schema: FormSchema): FlatQuestion[] {
 }
 
 const LOADING_STEPS = [
-  { title: "Reading Your Scenario",          signal: "INTAKE LOCKED" },
-  { title: "Preparing 35 Global Agents",      signal: "AGENTS READY" },
-  { title: "Running Reaction Tests",          signal: "REACTIONS ACTIVE" },
-  { title: "Elite Specialist Analysis",       signal: "SPECIALISTS IN" },
-  { title: "Mathematical Calibration",        signal: "CONFIDENCE SET" },
-  { title: "Cascade Chain Modeling",          signal: "PATHS FORMED" },
-  { title: "Devil’s Advocate Check",    signal: "COUNTER CHECK" },
-  { title: "Writing Intel Report",            signal: "REPORT BUILD" },
-  { title: "Final Trust Pass",                signal: "READY" },
+  { title: "Reading Your Scenario",     signal: "INTAKE LOCKED" },
+  { title: "Preparing 35 Global Agents", signal: "AGENTS READY" },
+  { title: "Running Reaction Tests",     signal: "REACTIONS ACTIVE" },
+  { title: "Elite Specialist Analysis",  signal: "SPECIALISTS IN" },
+  { title: "Mathematical Calibration",   signal: "CONFIDENCE SET" },
+  { title: "Cascade Chain Modeling",     signal: "PATHS FORMED" },
+  { title: "Devil’s Advocate Check", signal: "COUNTER CHECK" },
+  { title: "Writing Intel Report",       signal: "REPORT BUILD" },
+  { title: "Final Trust Pass",           signal: "READY" },
 ];
 
 export default function SimForm({ schema }: SimFormProps) {
-  const router = useRouter();
-  const flatQ = useRef(flattenQuestions(schema)).current;
-  const total = flatQ.length;
+  const router  = useRouter();
+  const flatQ   = useRef(flattenQuestions(schema)).current;
+  const total   = flatQ.length;
 
-  const [qIdx,           setQIdx]           = useState(0);
-  const [answers,        setAnswers]        = useState<Record<string, string | string[]>>({});
-  const [history,        setHistory]        = useState<ChatEntry[]>([]);
-  const [typedText,      setTypedText]      = useState("");
-  const [isTyping,       setIsTyping]       = useState(false);
-  const [textInput,      setTextInput]      = useState("");
-  const [isSubmitting,   setIsSubmitting]   = useState(false);
-  const [loadingStep,    setLoadingStep]    = useState(0);
-  const [elapsed,        setElapsed]        = useState(0);
-  const [error,          setError]          = useState<string | null>(null);
-  const [truthPending,   setTruthPending]   = useState(false);
-  const [truthChecks,    setTruthChecks]    = useState<Record<number, TruthCheckValue>>({});
+  const [qIdx,         setQIdx]         = useState(0);
+  const [answers,      setAnswers]      = useState<Record<string, string | string[]>>({});
+  const [history,      setHistory]      = useState<ChatEntry[]>([]);
+  const [typedText,    setTypedText]    = useState("");
+  const [isTyping,     setIsTyping]     = useState(false);
+  const [textInput,    setTextInput]    = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadingStep,  setLoadingStep]  = useState(0);
+  const [elapsed,      setElapsed]      = useState(0);
+  const [error,        setError]        = useState<string | null>(null);
+  const [truthPending, setTruthPending] = useState(false);
+  const [truthChecks,  setTruthChecks] = useState<Record<number, TruthCheckValue>>({});
 
-  const chatEndRef  = useRef<HTMLDivElement>(null);
-  const typingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
+  const typingTimer   = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const currentQ = flatQ[qIdx];
-  const isDone   = qIdx >= total;
+  const currentQ  = flatQ[qIdx];
+  const isDone    = qIdx >= total;
+  const showInput = !isDone && !isTyping && !truthPending && !!currentQ;
 
-  /* ── Auto-scroll ─────────────────────────────────────────────── */
+  /* ── Scroll to bottom ─────────────────────────────────────────── */
+  function scrollToBottom() {
+    requestAnimationFrame(() => {
+      const el = chatScrollRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }
+
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    scrollToBottom();
   }, [history, typedText]);
 
   /* ── Typewriter ──────────────────────────────────────────────── */
@@ -116,7 +124,7 @@ export default function SimForm({ schema }: SimFormProps) {
       : q.field.label;
 
     if (q.isFirstInSection) {
-      typeOut(`\/\/ ${q.sectionTitle}`, "section", () => {
+      typeOut(`// ${q.sectionTitle}`, "section", () => {
         setTimeout(() => typeOut(questionText, "bot"), 160);
       });
     } else {
@@ -208,7 +216,7 @@ export default function SimForm({ schema }: SimFormProps) {
     }
   }
 
-  /* ═══════════════════════════ LOADING SCREEN ═════════════════════ */
+  /* ═══════════════════════════ LOADING SCREEN ════════════════════ */
   if (isSubmitting) {
     const step     = LOADING_STEPS[loadingStep];
     const progress = ((loadingStep + 1) / LOADING_STEPS.length) * 100;
@@ -220,9 +228,9 @@ export default function SimForm({ schema }: SimFormProps) {
         <div
           className="w-full max-w-2xl rounded border p-8"
           style={{
-            background:  "rgba(12,22,10,0.97)",
-            border:      "1px solid rgba(0,255,65,0.25)",
-            boxShadow:   "0 0 60px rgba(0,255,65,0.10)",
+            background: "rgba(12,22,10,0.97)",
+            border:     "1px solid rgba(0,255,65,0.25)",
+            boxShadow:  "0 0 60px rgba(0,255,65,0.10)",
           }}
         >
           <p className="section-label">OMNISIM INTELLIGENCE ENGINE · LIVE</p>
@@ -235,7 +243,6 @@ export default function SimForm({ schema }: SimFormProps) {
             <span style={{ color: "#00FF41" }} className="animate-pulse">\_</span>
           </h2>
 
-          {/* Progress bar */}
           <div
             className="mt-5 h-1 overflow-hidden rounded-full"
             style={{ background: "rgba(0,255,65,0.12)" }}
@@ -246,7 +253,6 @@ export default function SimForm({ schema }: SimFormProps) {
             />
           </div>
 
-          {/* Log */}
           <div className="mt-6 space-y-2">
             {LOADING_STEPS.slice(0, loadingStep + 1)
               .slice(-5)
@@ -257,9 +263,7 @@ export default function SimForm({ schema }: SimFormProps) {
                     key={s.signal}
                     className="flex items-center gap-3 rounded px-3 py-2"
                     style={{
-                      background: isActive
-                        ? "rgba(0,255,65,0.08)"
-                        : "rgba(0,255,65,0.02)",
+                      background: isActive ? "rgba(0,255,65,0.08)" : "rgba(0,255,65,0.02)",
                     }}
                   >
                     <div
@@ -271,11 +275,11 @@ export default function SimForm({ schema }: SimFormProps) {
                     />
                     <span
                       style={{
-                        fontFamily:     "var(--font-space-mono)",
-                        fontSize:       "10px",
-                        letterSpacing:  "0.10em",
-                        color:          isActive ? "#00FF41" : "#3b4b37",
-                        textTransform:  "uppercase",
+                        fontFamily:    "var(--font-space-mono)",
+                        fontSize:      "10px",
+                        letterSpacing: "0.10em",
+                        color:         isActive ? "#00FF41" : "#3b4b37",
+                        textTransform: "uppercase",
                       }}
                     >
                       {s.signal}
@@ -288,7 +292,6 @@ export default function SimForm({ schema }: SimFormProps) {
               })}
           </div>
 
-          {/* Stats row */}
           <div
             className="mt-6 flex gap-6 border-t pt-5"
             style={{ borderColor: "rgba(0,255,65,0.10)" }}
@@ -328,46 +331,63 @@ export default function SimForm({ schema }: SimFormProps) {
     );
   }
 
-  /* ═══════════════════════════ CHAT UI ════════════════════════════ */
+  /* ═══════════════════════════ CHAT UI ══════════════════════════ */
   return (
     <div
-      className="flex flex-col"
-      style={{ height: "100svh", background: "var(--bg)", paddingTop: "72px" }}
+      style={{
+        position:        "fixed",
+        inset:           0,
+        paddingTop:      "72px",
+        display:         "flex",
+        flexDirection:   "column",
+        background:      "var(--bg)",
+        overflow:        "hidden",
+      }}
     >
       {/* ── Top bar ── */}
       <div
-        className="shrink-0 border-b px-4 py-2.5 sm:px-6"
         style={{
+          flexShrink:  0,
           background:  "rgba(7,17,6,0.96)",
-          borderColor: "rgba(0,255,65,0.12)",
+          borderBottom: "1px solid rgba(0,255,65,0.12)",
+          padding:     "10px 16px",
         }}
       >
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-2">
-            <span style={{ fontSize: "15px" }}>{schema.icon}</span>
+        <div style={{ margin: "0 auto", maxWidth: "672px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
+            <span style={{ fontSize: "15px", flexShrink: 0 }}>{schema.icon}</span>
             <span
-              className="truncate"
               style={{
                 fontFamily:    "var(--font-space-mono)",
                 fontSize:      "10px",
                 color:         "#00FF41",
                 letterSpacing: "0.10em",
                 textTransform: "uppercase",
+                overflow:      "hidden",
+                textOverflow:  "ellipsis",
+                whiteSpace:    "nowrap",
               }}
             >
               {schema.type.replace(/-/g, " ")} SIMULATION
             </span>
           </div>
-          <div className="flex shrink-0 items-center gap-3">
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
             <div
-              className="h-1 w-24 overflow-hidden rounded-full"
-              style={{ background: "rgba(0,255,65,0.12)" }}
+              style={{
+                height:   "4px",
+                width:    "80px",
+                background: "rgba(0,255,65,0.12)",
+                borderRadius: "2px",
+                overflow: "hidden",
+              }}
             >
               <div
-                className="h-full rounded-full transition-all duration-500"
                 style={{
-                  width:      `${Math.min((qIdx / total) * 100, 100)}%`,
-                  background: "#00FF41",
+                  height:     "100%",
+                  borderRadius: "2px",
+                  transition:   "width 500ms ease",
+                  width:        `${Math.min((qIdx / total) * 100, 100)}%`,
+                  background:   "#00FF41",
                 }}
               />
             </div>
@@ -384,20 +404,27 @@ export default function SimForm({ schema }: SimFormProps) {
         </div>
       </div>
 
-      {/* ── Chat scroll ── */}
+      {/* ── Chat scroll ──
+           flex:1 + minHeight:0 is the correct flex pattern to allow
+           this div to shrink and scroll without overflowing the parent */}
       <div
-        className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-6 sm:px-6"
+        ref={chatScrollRef}
+        style={{
+          flex:                    1,
+          minHeight:               0,
+          overflowY:               "auto",
+          overscrollBehavior:      "contain",
+          WebkitOverflowScrolling: "touch",
+          padding:                 "24px 16px 16px",
+        }}
       >
-        <div className="mx-auto max-w-2xl space-y-3">
+        <div style={{ margin: "0 auto", maxWidth: "672px", display: "flex", flexDirection: "column", gap: "12px" }}>
 
           {history.map((entry) => {
             if (entry.role === "section") {
               return (
-                <div key={entry.id} className="flex items-center gap-3 py-1">
-                  <div
-                    className="h-px flex-1"
-                    style={{ background: "rgba(0,255,65,0.12)" }}
-                  />
+                <div key={entry.id} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "4px 0" }}>
+                  <div style={{ flex: 1, height: "1px", background: "rgba(0,255,65,0.12)" }} />
                   <span
                     style={{
                       fontFamily:    "var(--font-space-mono)",
@@ -409,25 +436,24 @@ export default function SimForm({ schema }: SimFormProps) {
                   >
                     {entry.text}
                   </span>
-                  <div
-                    className="h-px flex-1"
-                    style={{ background: "rgba(0,255,65,0.12)" }}
-                  />
+                  <div style={{ flex: 1, height: "1px", background: "rgba(0,255,65,0.12)" }} />
                 </div>
               );
             }
 
             if (entry.role === "user") {
               return (
-                <div key={entry.id} className="flex justify-end">
+                <div key={entry.id} style={{ display: "flex", justifyContent: "flex-end" }}>
                   <div
-                    className="max-w-[78%] rounded px-4 py-2.5"
                     style={{
-                      background:  "#00FF41",
-                      color:       "#003907",
-                      fontFamily:  "var(--font-space-mono)",
-                      fontSize:    "13px",
-                      lineHeight:  "1.6",
+                      maxWidth:   "78%",
+                      borderRadius: "4px",
+                      padding:    "10px 16px",
+                      background: "#00FF41",
+                      color:      "#003907",
+                      fontFamily: "var(--font-space-mono)",
+                      fontSize:   "13px",
+                      lineHeight: "1.6",
                     }}
                   >
                     {entry.text}
@@ -436,20 +462,21 @@ export default function SimForm({ schema }: SimFormProps) {
               );
             }
 
-            /* bot */
             return (
-              <div key={entry.id} className="flex items-start gap-3">
+              <div key={entry.id} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
                 <BotAvatar />
                 <div
-                  className="max-w-[84%] rounded px-4 py-2.5"
                   style={{
-                    background:  "rgba(20,30,18,0.80)",
-                    border:      "1px solid rgba(0,255,65,0.12)",
-                    color:       "#dae6d2",
-                    fontFamily:  "var(--font-space-mono)",
-                    fontSize:    "13px",
-                    lineHeight:  "1.7",
-                    whiteSpace:  "pre-line",
+                    maxWidth:   "84%",
+                    borderRadius: "4px",
+                    padding:    "10px 16px",
+                    background: "rgba(20,30,18,0.80)",
+                    border:     "1px solid rgba(0,255,65,0.12)",
+                    color:      "#dae6d2",
+                    fontFamily: "var(--font-space-mono)",
+                    fontSize:   "13px",
+                    lineHeight: "1.7",
+                    whiteSpace: "pre-line",
                   }}
                 >
                   {entry.text}
@@ -460,11 +487,13 @@ export default function SimForm({ schema }: SimFormProps) {
 
           {/* Typing indicator */}
           {(isTyping || typedText) && (
-            <div className="flex items-start gap-3">
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
               <BotAvatar pulsing />
               <div
-                className="max-w-[84%] rounded px-4 py-2.5"
                 style={{
+                  maxWidth:   "84%",
+                  borderRadius: "4px",
+                  padding:    "10px 16px",
                   background: "rgba(20,30,18,0.80)",
                   border:     "1px solid rgba(0,255,65,0.12)",
                   color:      "#dae6d2",
@@ -482,28 +511,46 @@ export default function SimForm({ schema }: SimFormProps) {
             </div>
           )}
 
-          <div ref={chatEndRef} />
+          {/* Anchor — scrolled into view after each message */}
+          <div style={{ height: "1px" }} />
         </div>
       </div>
 
-      {/* ── Input area ── */}
-      {!isDone && !isTyping && !truthPending && currentQ && (
-        <InputArea
-          key={qIdx}
-          field={currentQ.field}
-          textValue={textInput}
-          onTextChange={setTextInput}
-          onSubmit={submitAnswer}
-        />
-      )}
+      {/* ── Input zone ──
+           ALWAYS in the DOM with a stable minimum height.
+           Only opacity and pointer-events change so the chat area
+           never reflows when a question transitions. */}
+      <div
+        style={{
+          flexShrink:    0,
+          background:    showInput ? "rgba(7,17,6,0.97)" : "rgba(7,17,6,0.60)",
+          borderTop:     "1px solid rgba(0,255,65,0.10)",
+          minHeight:     "72px",
+          opacity:       showInput ? 1 : 0,
+          pointerEvents: showInput ? "auto" : "none",
+          transition:    "opacity 180ms ease",
+        }}
+      >
+        {currentQ && (
+          <InputArea
+            key={qIdx}
+            field={currentQ.field}
+            textValue={textInput}
+            onTextChange={setTextInput}
+            onSubmit={submitAnswer}
+          />
+        )}
+      </div>
 
-      {/* ── Error ── */}
+      {/* ── Error bar ── */}
       {error && (
         <div
-          className="shrink-0 border-t px-4 py-2 text-center"
           style={{
-            borderColor: "rgba(255,0,119,0.2)",
+            flexShrink:  0,
+            borderTop:   "1px solid rgba(255,0,119,0.2)",
             background:  "rgba(255,0,119,0.06)",
+            padding:     "8px 16px",
+            textAlign:   "center",
           }}
         >
           <p
@@ -511,6 +558,7 @@ export default function SimForm({ schema }: SimFormProps) {
               color:      "#FF0077",
               fontSize:   "11px",
               fontFamily: "var(--font-space-mono)",
+              margin:     0,
             }}
           >
             {error}
@@ -524,26 +572,32 @@ export default function SimForm({ schema }: SimFormProps) {
   );
 }
 
-/* ════════════ SUB-COMPONENTS ════════════════════════════════════════ */
+/* ════════════ SUB-COMPONENTS ════════════════════════════════ */
 
 function BotAvatar({ pulsing }: { pulsing?: boolean }) {
   return (
     <div
-      className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded"
       style={{
-        background: "rgba(0,255,65,0.08)",
-        border:     "1px solid rgba(0,255,65,0.22)",
-        flexShrink: 0,
+        marginTop:    "4px",
+        width:        "28px",
+        height:       "28px",
+        flexShrink:   0,
+        borderRadius: "4px",
+        background:   "rgba(0,255,65,0.08)",
+        border:       "1px solid rgba(0,255,65,0.22)",
+        display:      "flex",
+        alignItems:   "center",
+        justifyContent: "center",
       }}
     >
       <div
         className={pulsing ? "animate-pulse" : ""}
         style={{
-          width:     "8px",
-          height:    "8px",
+          width:        "8px",
+          height:       "8px",
           borderRadius: "50%",
-          background: "#00FF41",
-          boxShadow: pulsing ? "0 0 8px #00FF41" : "0 0 4px #00FF41",
+          background:   "#00FF41",
+          boxShadow:    pulsing ? "0 0 8px #00FF41" : "0 0 4px #00FF41",
         }}
       />
     </div>
@@ -564,10 +618,7 @@ function InputArea({
   const [multi, setMulti] = useState<string[]>([]);
 
   const base: React.CSSProperties = {
-    background:  "rgba(7,17,6,0.97)",
-    borderTop:   "1px solid rgba(0,255,65,0.12)",
-    padding:     "12px 16px",
-    flexShrink:  0,
+    padding:    "12px 16px 14px",
   };
 
   const sendBtn: React.CSSProperties = {
@@ -582,6 +633,7 @@ function InputArea({
     cursor:        "pointer",
     borderRadius:  "4px",
     flexShrink:    0,
+    minHeight:     "38px",
   };
 
   const skipBtn: React.CSSProperties = {
@@ -592,6 +644,7 @@ function InputArea({
     border:        "none",
     cursor:        "pointer",
     letterSpacing: "0.12em",
+    padding:       0,
   };
 
   const inputStyle: React.CSSProperties = {
@@ -605,6 +658,14 @@ function InputArea({
     outline:      "none",
     flex:         1,
     minWidth:     0,
+    boxShadow:    "none",
+    width:        "100%",
+    borderRadius: 0,
+  };
+
+  const inner: React.CSSProperties = {
+    margin:    "0 auto",
+    maxWidth:  "672px",
   };
 
   /* ── Text / number / date ── */
@@ -614,21 +675,29 @@ function InputArea({
     };
     return (
       <div style={base}>
-        <div className="mx-auto max-w-2xl">
-          <div className="flex items-end gap-3">
+        <div style={inner}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: "10px" }}>
             <input
-              autoFocus
               type={field.type === "date" ? "date" : field.type === "number" ? "number" : "text"}
               value={textValue}
               onChange={(e) => onTextChange(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
               placeholder={field.placeholder || (field.required ? "Type your answer..." : "Type or skip →")}
               style={inputStyle}
             />
             <button type="button" onClick={handleSend} style={sendBtn}>SEND →</button>
           </div>
           {!field.required && (
-            <button type="button" onClick={() => onSubmit("N/A")} style={{ ...skipBtn, marginTop: "6px", display: "block" }}>
+            <button
+              type="button"
+              onClick={() => onSubmit("N/A")}
+              style={{ ...skipBtn, marginTop: "6px", display: "block" }}
+            >
               SKIP →
             </button>
           )}
@@ -641,22 +710,20 @@ function InputArea({
   if (field.type === "textarea") {
     return (
       <div style={base}>
-        <div className="mx-auto max-w-2xl">
+        <div style={inner}>
           <textarea
-            autoFocus
-            rows={Math.min(field.rows || 3, 4)}
+            rows={Math.min(field.rows || 3, 3)}
             value={textValue}
             onChange={(e) => onTextChange(e.target.value)}
             placeholder={field.placeholder || "Type your answer..."}
             style={{
               ...inputStyle,
               display: "block",
-              width:   "100%",
               resize:  "none",
               flex:    "unset",
             }}
           />
-          <div className="mt-2 flex items-center justify-between">
+          <div style={{ marginTop: "8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             {!field.required
               ? <button type="button" onClick={() => onSubmit("N/A")} style={skipBtn}>SKIP →</button>
               : <span />}
@@ -673,39 +740,46 @@ function InputArea({
     );
   }
 
-  /* ── Select / radio — tap to instantly answer ── */
+  /* ── Select / radio — tap option to instantly answer ── */
   if (field.type === "select" || field.type === "radio") {
     return (
-      <div style={{ ...base, padding: "12px 16px 14px" }}>
-        <div className="mx-auto max-w-2xl">
-          <div className="flex flex-wrap gap-2">
+      <div style={base}>
+        <div style={inner}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
             {field.options?.map((opt) => (
               <button
                 key={opt}
                 type="button"
                 onClick={() => onSubmit(opt)}
                 style={{
-                  background:    "rgba(20,30,18,0.90)",
-                  border:        "1px solid rgba(0,255,65,0.22)",
-                  color:         "#dae6d2",
-                  padding:       "8px 16px",
-                  fontFamily:    "var(--font-space-mono)",
-                  fontSize:      "12px",
-                  cursor:        "pointer",
-                  borderRadius:  "4px",
-                  transition:    "all 0.12s ease",
+                  background:   "rgba(20,30,18,0.90)",
+                  border:       "1px solid rgba(0,255,65,0.22)",
+                  color:        "#dae6d2",
+                  padding:      "8px 14px",
+                  fontFamily:   "var(--font-space-mono)",
+                  fontSize:     "11px",
+                  cursor:       "pointer",
+                  borderRadius: "4px",
+                  transition:   "background 100ms ease, color 100ms ease",
+                  touchAction:  "manipulation",
+                }}
+                onTouchStart={(e) => {
+                  const el = e.currentTarget;
+                  el.style.background  = "#00FF41";
+                  el.style.color       = "#003907";
+                  el.style.borderColor = "#00FF41";
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget;
-                  el.style.background    = "#00FF41";
-                  el.style.color         = "#003907";
-                  el.style.borderColor   = "#00FF41";
+                  el.style.background  = "#00FF41";
+                  el.style.color       = "#003907";
+                  el.style.borderColor = "#00FF41";
                 }}
                 onMouseLeave={(e) => {
                   const el = e.currentTarget;
-                  el.style.background    = "rgba(20,30,18,0.90)";
-                  el.style.color         = "#dae6d2";
-                  el.style.borderColor   = "rgba(0,255,65,0.22)";
+                  el.style.background  = "rgba(20,30,18,0.90)";
+                  el.style.color       = "#dae6d2";
+                  el.style.borderColor = "rgba(0,255,65,0.22)";
                 }}
               >
                 {opt}
@@ -713,7 +787,11 @@ function InputArea({
             ))}
           </div>
           {!field.required && (
-            <button type="button" onClick={() => onSubmit("N/A")} style={{ ...skipBtn, marginTop: "8px", display: "block" }}>
+            <button
+              type="button"
+              onClick={() => onSubmit("N/A")}
+              style={{ ...skipBtn, marginTop: "8px", display: "block" }}
+            >
               SKIP →
             </button>
           )}
@@ -722,16 +800,16 @@ function InputArea({
     );
   }
 
-  /* ── Multiselect — toggle chips, then confirm ── */
+  /* ── Multiselect ── */
   if (field.type === "multiselect") {
     const toggle = (opt: string) =>
       setMulti((prev) =>
         prev.includes(opt) ? prev.filter((v) => v !== opt) : [...prev, opt]
       );
     return (
-      <div style={{ ...base, padding: "12px 16px 14px" }}>
-        <div className="mx-auto max-w-2xl">
-          <div className="mb-3 flex flex-wrap gap-2">
+      <div style={base}>
+        <div style={inner}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "7px", marginBottom: "10px" }}>
             {field.options?.map((opt) => {
               const sel = multi.includes(opt);
               return (
@@ -743,12 +821,13 @@ function InputArea({
                     background:   sel ? "#00FF41" : "rgba(20,30,18,0.90)",
                     border:       sel ? "1px solid #00FF41" : "1px solid rgba(0,255,65,0.22)",
                     color:        sel ? "#003907" : "#dae6d2",
-                    padding:      "7px 14px",
+                    padding:      "7px 13px",
                     fontFamily:   "var(--font-space-mono)",
                     fontSize:     "11px",
                     cursor:       "pointer",
                     borderRadius: "4px",
-                    transition:   "all 0.10s ease",
+                    transition:   "all 100ms ease",
+                    touchAction:  "manipulation",
                   }}
                 >
                   {sel ? "✓ " : ""}{opt}
@@ -756,7 +835,7 @@ function InputArea({
               );
             })}
           </div>
-          <div className="flex items-center justify-between">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             {!field.required
               ? <button type="button" onClick={() => onSubmit(["N/A"])} style={skipBtn}>SKIP →</button>
               : <span />}
@@ -766,7 +845,7 @@ function InputArea({
               onClick={() => { if (multi.length > 0) { onSubmit(multi); setMulti([]); } }}
               style={{
                 ...sendBtn,
-                background: multi.length > 0 ? "#00FF41" : "rgba(0,255,65,0.15)",
+                background: multi.length > 0 ? "#00FF41" : "rgba(0,255,65,0.10)",
                 color:      multi.length > 0 ? "#003907" : "#3b4b37",
                 cursor:     multi.length > 0 ? "pointer" : "default",
               }}
@@ -785,35 +864,55 @@ function InputArea({
 function TruthModal({ onAnswer }: { onAnswer: (v: TruthCheckValue) => void }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-5 sm:items-center sm:pb-0"
-      style={{ background: "rgba(4,8,4,0.72)" }}
+      style={{
+        position:       "fixed",
+        inset:          0,
+        zIndex:         50,
+        display:        "flex",
+        alignItems:     "flex-end",
+        justifyContent: "center",
+        padding:        "0 16px 20px",
+        background:     "rgba(4,8,4,0.72)",
+      }}
     >
       <div
-        className="w-full max-w-sm rounded border p-5"
         style={{
+          width:      "100%",
+          maxWidth:   "400px",
           background: "rgba(12,22,10,0.99)",
           border:     "1px solid rgba(0,255,65,0.28)",
+          borderRadius: "6px",
           boxShadow:  "0 0 40px rgba(0,255,65,0.12)",
+          padding:    "20px",
         }}
       >
         <p className="section-label">Truth Checkpoint</p>
         <h3
-          className="mt-2 text-base font-semibold"
-          style={{ color: "#dae6d2", fontFamily: "var(--font-inter)" }}
+          style={{
+            marginTop:  "8px",
+            fontSize:   "15px",
+            fontWeight: 600,
+            color:      "#dae6d2",
+            fontFamily: "var(--font-inter)",
+          }}
         >
           Are these answers based on facts or estimates?
         </h3>
         <p
-          className="mt-1 text-xs"
-          style={{ color: "#84967e", fontFamily: "var(--font-space-mono)" }}
+          style={{
+            marginTop:  "4px",
+            fontSize:   "11px",
+            color:      "#84967e",
+            fontFamily: "var(--font-space-mono)",
+          }}
         >
           This calibrates simulation confidence.
         </p>
-        <div className="mt-4 space-y-2">
+        <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
           {([
-            ["true",    "Based on facts I trust",           "rgba(0,255,65,0.08)",  "rgba(0,255,65,0.28)", "#dae6d2"],
-            ["unknown", "Some parts are uncertain",          "rgba(255,184,0,0.06)", "rgba(255,184,0,0.22)", "#dae6d2"],
-            ["skip",    "Mark unverified and continue",      "rgba(0,0,0,0.20)",     "rgba(255,255,255,0.06)", "#84967e"],
+            ["true",    "Based on facts I trust",         "rgba(0,255,65,0.08)",  "rgba(0,255,65,0.28)",   "#dae6d2"],
+            ["unknown", "Some parts are uncertain",        "rgba(255,184,0,0.06)", "rgba(255,184,0,0.22)",  "#dae6d2"],
+            ["skip",    "Mark unverified and continue",    "rgba(0,0,0,0.20)",     "rgba(255,255,255,0.06)","#84967e"],
           ] as [TruthCheckValue, string, string, string, string][]).map(
             ([val, label, bg, border, color]) => (
               <button
@@ -831,7 +930,7 @@ function TruthModal({ onAnswer }: { onAnswer: (v: TruthCheckValue) => void }) {
                   fontSize:      "12px",
                   cursor:        "pointer",
                   borderRadius:  "4px",
-                  display:       "block",
+                  touchAction:   "manipulation",
                 }}
               >
                 {label}
