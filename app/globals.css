@@ -948,3 +948,57 @@ main [style*="rgba(255,255,255,0.4"] {
 main [style*="rgba(255,255,255,0.08"] {
   background-color: rgba(7,18,13,0.20) !important;
 }
+/* Dark green simulation board */
+.sim-form-board {
+  background: linear-gradient(145deg, rgba(4,24,14,0.92), rgba(7,42,24,0.86), rgba(4,18,13,0.94)) !important;
+  border-color: rgba(125,255,192,0.34) !important;
+  box-shadow: 0 0 0 0.5px rgba(188,255,220,0.34) inset, 0 22px 54px rgba(0,0,0,0.36), 0 0 44px rgba(43,255,143,0.12) !important;
+  color: #F4FFF8 !important;
+}
+
+.sim-form-board::before {
+  background: linear-gradient(160deg, rgba(188,255,220,0.16), rgba(255,255,255,0.06) 34%, transparent 62%) !important;
+}
+
+.sim-form-board p,
+.sim-form-board span,
+.sim-form-board label,
+.sim-form-board h2,
+.sim-form-board h3,
+.sim-form-board button {
+  text-shadow: none !important;
+}
+
+.sim-form-board .form-input,
+.sim-form-board input,
+.sim-form-board textarea,
+.sim-form-board select {
+  background: rgba(246,255,250,0.96) !important;
+  border: 1px solid rgba(125,255,192,0.32) !important;
+  color: #031008 !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.16) !important;
+}
+
+.sim-form-board .form-input::placeholder,
+.sim-form-board textarea::placeholder,
+.sim-form-board input::placeholder {
+  color: rgba(3,16,8,0.58) !important;
+}
+
+.sim-form-board select option {
+  background: #F6FFFA !important;
+  color: #031008 !important;
+}
+
+.sim-form-board .btn-neon,
+.sim-form-board .btn-solid,
+.sim-form-board .btn-gold,
+.sim-form-board .btn-glass {
+  color: #031008 !important;
+}
+
+@media (max-width: 768px) {
+  .sim-form-board {
+    background: linear-gradient(145deg, rgba(4,24,14,0.95), rgba(7,42,24,0.90)) !important;
+  }
+}
