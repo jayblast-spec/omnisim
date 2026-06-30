@@ -556,7 +556,6 @@ function InputArea({
         <div className="mx-auto max-w-2xl">
           <div className="flex items-end gap-3">
             <input
-              autoFocus
               type={field.type === "date" ? "date" : field.type === "number" ? "number" : "text"}
               value={textValue}
               onChange={(e) => onTextChange(e.target.value)}
@@ -582,7 +581,6 @@ function InputArea({
       <div style={base}>
         <div className="mx-auto max-w-2xl">
           <textarea
-            autoFocus
             rows={Math.min(field.rows || 3, 4)}
             value={textValue}
             onChange={(e) => onTextChange(e.target.value)}
