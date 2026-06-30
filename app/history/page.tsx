@@ -80,7 +80,7 @@ export default function HistoryPage() {
           <div className="cyber-card mx-auto max-w-xl p-8 text-center">
             <p className="font-orbitron text-sm font-bold uppercase tracking-[0.2em]" style={{ color: "#00FF41" }}>Private Archive</p>
             <p className="mt-4 text-sm font-semibold leading-7" style={{ color: "#DDFEEB" }}>
-              History is private. Sign in to view only your own simulations. Anonymous and other users&apos; records are not shown here.
+              History is private. Sign in to view your own simulations only. No sign in, no history.
             </p>
             <Link href="/simulate" className="btn-neon mt-8 inline-flex">
               RUN NEW SIMULATION
