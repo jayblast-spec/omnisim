@@ -35,6 +35,22 @@ interface ScenarioBranch { label: string; probability: number; description: stri
 interface KeyFactor { factor: string; impact: number; probability: number; explanation: string; }
 interface RiskItem { risk: string; severity: "critical" | "high" | "medium" | "low"; probability: number; mitigation: string; }
 interface OpportunityItem { opportunity: string; potential: "high" | "medium" | "low"; window: string; howToCapture: string; }
+interface RealityLedger {
+  scenarioClass: string;
+  truthScore: number;
+  knownFacts: string;
+  unknowns: string;
+  constraints: string;
+  evidenceQuality: string;
+  idealOutcome: string;
+  downsideBoundary: string;
+  missingData: string[];
+  calibration: string[];
+  operatingRule: string;
+}
+interface VariableLabItem { variable: string; current: string; improveBy: string; expectedEffect: string; }
+interface ActionPlan { mode: string; nextSevenDays: string[]; firstMove: string; stopRule: string; updateRule: string; }
+interface MemorySnapshot { priorSimulationsUsed: number; patternStatus: string; learningRule: string; scenarioClass: string; }
 
 export interface SpecialistResult {
   specialistId: string;
@@ -145,6 +161,11 @@ export interface SimulationResult {
   swarmLabTrace?: SwarmLabTrace;
   deepRead?: DeepRead;
   relationshipDeepDive?: RelationshipDeepDive;
+  truthScore?: number;
+  realityLedger?: RealityLedger;
+  variableLab?: VariableLabItem[];
+  actionPlan?: ActionPlan;
+  memorySnapshot?: MemorySnapshot;
 }
 
 function isPrivateResult(type: string) { return ["relationship", "legacy-view", "health-signal"].includes(type); }
@@ -202,6 +223,11 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
   const phoneReach = result.phoneReachIntelligence;
   const deepRead = result.deepRead ?? buildFallbackDeepRead(result);
   const relDeep = result.relationshipDeepDive;
+  const realityLedger = result.realityLedger;
+  const variableLab = result.variableLab ?? [];
+  const actionPlan = result.actionPlan;
+  const memorySnapshot = result.memorySnapshot;
+  const truthScore = result.truthScore ?? realityLedger?.truthScore ?? Math.max(20, Math.min(96, result.confidenceScore - 8));
 
   return (
     <div>
@@ -260,6 +286,82 @@ export function ResultsDashboard({ result }: { result: SimulationResult }) {
           </div>
         </div>
       </div>
+
+      {/* ── OPERATIONAL INTELLIGENCE ── */}
+      {(realityLedger || variableLab.length > 0 || actionPlan || memorySnapshot) && (
+        <div className="mb-6 rounded-2xl p-5" style={{ background: "rgba(8,18,10,0.86)", border: `1px solid ${GREEN}22`, boxShadow: `0 0 32px ${GREEN}08` }}>
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em]" style={{ color: GREEN }}>Operational Intelligence Layer</p>
+              <p className="mt-1 text-xs leading-5" style={{ color: "#b9ccb2" }}>Truth calibration, live variables, memory, and the exact next actions this simulation depends on.</p>
+            </div>
+            <div className="rounded-xl px-4 py-2 text-right" style={{ background: `${cc}12`, border: `1px solid ${cc}35` }}>
+              <p className="text-[8px] font-black uppercase tracking-[0.18em]" style={{ color: "#b9ccb2" }}>Truth Score</p>
+              <p className="font-mono text-2xl font-black leading-none" style={{ color: cc }}>{truthScore}%</p>
+            </div>
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-3">
+            {realityLedger && (
+              <div className="rounded-xl p-4" style={{ background: "#0D0B1A", border: `1px solid ${NEON}20` }}>
+                <p className="mb-3 text-[9px] font-black uppercase tracking-[0.22em]" style={{ color: NEON }}>Reality Ledger</p>
+                <div className="space-y-3">
+                  {[
+                    ["Known", realityLedger.knownFacts],
+                    ["Unknown", realityLedger.unknowns],
+                    ["Constraint", realityLedger.constraints],
+                    ["Boundary", realityLedger.downsideBoundary],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <p className="text-[8px] font-black uppercase tracking-[0.16em]" style={{ color: "#84967e" }}>{label}</p>
+                      <p className="text-xs leading-5" style={{ color: "#dae6d2" }}>{value || "Not specified"}</p>
+                    </div>
+                  ))}
+                </div>
+                {realityLedger.missingData.length > 0 && (
+                  <p className="mt-3 rounded-lg px-3 py-2 text-[10px] leading-5" style={{ background: `${GOLD}10`, color: "#f3dfa0", border: `1px solid ${GOLD}22` }}>Missing: {realityLedger.missingData.join(", ")}</p>
+                )}
+              </div>
+            )}
+
+            {variableLab.length > 0 && (
+              <div className="rounded-xl p-4" style={{ background: "#0D0B1A", border: `1px solid ${PURPLE}24` }}>
+                <p className="mb-3 text-[9px] font-black uppercase tracking-[0.22em]" style={{ color: PURPLE }}>Variable Lab</p>
+                <div className="space-y-3">
+                  {variableLab.slice(0, 4).map((item, i) => (
+                    <div key={`${item.variable}-${i}`} className="rounded-lg px-3 py-2" style={{ background: `${PURPLE}0A`, border: `1px solid ${PURPLE}1F` }}>
+                      <p className="text-xs font-black" style={{ color: "#dae6d2" }}>{item.variable}</p>
+                      <p className="mt-1 text-[10px] leading-5" style={{ color: "#b9ccb2" }}>{item.improveBy}</p>
+                      <p className="mt-1 text-[10px] leading-5" style={{ color: PURPLE }}>{item.expectedEffect}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {actionPlan && (
+              <div className="rounded-xl p-4" style={{ background: "#0D0B1A", border: `1px solid ${GREEN}24` }}>
+                <p className="mb-3 text-[9px] font-black uppercase tracking-[0.22em]" style={{ color: GREEN }}>Next 7 Days</p>
+                <div className="space-y-2">
+                  {actionPlan.nextSevenDays.slice(0, 7).map((step, i) => (
+                    <div key={i} className="flex gap-3 rounded-lg px-3 py-2" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}18` }}>
+                      <span className="font-mono text-[10px] font-black" style={{ color: GREEN }}>{String(i + 1).padStart(2, "0")}</span>
+                      <p className="text-[11px] leading-5" style={{ color: "#dae6d2" }}>{step}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-3 text-[10px] leading-5" style={{ color: "#b9ccb2" }}>{actionPlan.stopRule}</p>
+              </div>
+            )}
+          </div>
+
+          {memorySnapshot && (
+            <div className="mt-3 rounded-xl px-4 py-3" style={{ background: `${NEON}08`, border: `1px solid ${NEON}18` }}>
+              <p className="text-[10px] leading-5" style={{ color: "#b9ccb2" }}><span style={{ color: NEON }}>Memory:</span> {memorySnapshot.patternStatus} {memorySnapshot.learningRule}</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── TABS ── */}
       <div className="mb-6 w-full">
