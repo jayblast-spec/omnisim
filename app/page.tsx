@@ -77,11 +77,11 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-6 font-orbitron text-xs font-black tracking-[0.18em] sm:tracking-[0.32em]" style={{ color: "#B8FFD8", textShadow: "0 0 18px rgba(43,255,143,0.45), 0 2px 12px rgba(0,0,0,0.75)" }}>
-            SIMULATE BEFORE IT HAPPENS
+            PREDICT WITH PRECISION. START SIMULATING REALITY.
           </p>
 
           <p className="mx-auto mt-8 max-w-2xl rounded-2xl border px-5 py-4 text-sm font-semibold leading-8 sm:leading-9" style={{ color: "#F4FFF8", background: "rgba(2,8,5,0.58)", borderColor: "rgba(125,255,192,0.22)", textShadow: "0 2px 12px rgba(0,0,0,0.78)", boxShadow: "0 18px 44px rgba(0,0,0,0.22), 0 0 30px rgba(43,255,143,0.08)" }}>
-            Before you risk money, reputation, time, love, health, or a major decision, run the moment through OMNISIM. Watch the likely paths, hidden pressure points, human reactions, and smartest next move appear before reality charges you for guessing.
+            High-stakes strategy doesn&apos;t survive on intuition. OMNISIM stress-tests your critical decisions against millions of probabilistic futures, exposing hidden vulnerabilities, modeling competitive responses, and illuminating the optimal path before you commit a single resource.
           </p>
 
           <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
