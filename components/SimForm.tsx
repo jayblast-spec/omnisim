@@ -561,7 +561,6 @@ function InputArea({
               value={textValue}
               onChange={(e) => onTextChange(e.target.value)}
             onFocus={() => setTimeout(() => window.dispatchEvent(new Event("omnisim-input-focus")), 80)}
-              onFocus={() => setTimeout(() => window.dispatchEvent(new Event("omnisim-input-focus")), 80)}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
               placeholder={field.placeholder || (field.required ? "Type your answer..." : "Type or skip →")}
               style={inputStyle}
