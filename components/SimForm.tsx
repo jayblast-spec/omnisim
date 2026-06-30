@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { FormSchema, FormField } from "@/lib/formSchemas";
+import { supabase } from "@/lib/supabaseClient";
 
 type TruthCheckValue = "true" | "unknown" | "skip";
 
@@ -190,9 +191,13 @@ export default function SimForm({ schema }: SimFormProps) {
     );
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+
       const res = await fetch("/api/simulate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           type: schema.type,
           data: { ...answers, __truthStageChecks: truthPayload },
