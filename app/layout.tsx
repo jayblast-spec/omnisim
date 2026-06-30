@@ -20,11 +20,11 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: "OMNISIM — Simulate Before It Happens",
   description:
-    "The world's most powerful AI simulation platform. Deploy intelligent agents to simulate real-world scenarios before they unfold.",
+    "Run major decisions through OmniSim before reality charges you for guessing. Simulate human reactions, risk paths, hidden pressure points, and smarter next moves.",
   openGraph: {
     title: "OMNISIM — Simulate Before It Happens",
     description:
-      "Simulate PR crises, elections, market movements, sports matches, relationship futures, profit paths, and geopolitical events.",
+      "Before you risk money, reputation, time, health, love, or a major decision, test the likely futures with OmniSim.",
     type: "website",
   },
 };
