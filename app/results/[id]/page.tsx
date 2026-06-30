@@ -25,19 +25,30 @@ export default function ResultsPage() {
       } catch {}
     }
 
-    supabase
-      .from("simulations")
-      .select("result")
-      .eq("id", id)
-      .single()
-      .then(({ data, error }) => {
-        if (error || !data) {
+    async function loadResult() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers: Record<string, string> = {};
+        if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+        const res = await fetch(`/api/results/${id}`, { headers, cache: "no-store" });
+        if (!res.ok) {
           setNotFound(true);
-        } else {
-          setResult(data.result as SimulationResult);
+          return;
         }
+        const payload = (await res.json()) as { result?: SimulationResult };
+        if (!payload.result) {
+          setNotFound(true);
+          return;
+        }
+        setResult(payload.result);
+      } catch {
+        setNotFound(true);
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+
+    void loadResult();
   }, [id]);
 
   if (loading) {
