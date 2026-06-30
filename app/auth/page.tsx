@@ -5,9 +5,17 @@ import { useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
+const AUTH_ORIGIN = "https://omnisim-platform.vercel.app";
+
+function safeRedirectPath(value: string) {
+  if (!value.startsWith("/")) return "/history";
+  if (value.startsWith("//")) return "/history";
+  return value;
+}
+
 function AuthInner() {
   const params = useSearchParams();
-  const redirectTo = params.get("redirect") || "/history";
+  const redirectTo = safeRedirectPath(params.get("redirect") || "/history");
   const [email, setEmail] = useState("");
   const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -17,6 +25,9 @@ function AuthInner() {
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
       if (mounted) setSessionEmail(data.session?.user.email ?? null);
+      if (window.location.hash.includes("access_token=")) {
+        window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+      }
     });
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSessionEmail(session?.user.email ?? null);
@@ -34,7 +45,7 @@ function AuthInner() {
 
     setStatus("sending");
     setMessage("");
-    const origin = window.location.origin;
+    const origin = AUTH_ORIGIN;
     const { error } = await supabase.auth.signInWithOtp({
       email: cleanEmail,
       options: {
