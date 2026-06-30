@@ -8,6 +8,7 @@ const navLinks = [
   { href: "/about",   label: "About" },
   { href: "/simulate", label: "Simulate" },
   { href: "/history", label: "History" },
+  { href: "/auth",    label: "Account" },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -69,12 +70,12 @@ export default function Navbar() {
           <div className="flex items-center gap-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
             {navLinks.map((link, index) => {
               const active = isActive(pathname, link.href);
-              const glow = index === 0 ? "#00FF41" : index === 1 ? "#00F5FF" : index === 2 ? "#BF00FF" : "#FFD700";
+              const glow = ["#00FF41", "#00F5FF", "#BF00FF", "#FFD700", "#FF0077"][index] || "#00FF41";
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="group relative flex min-h-[42px] min-w-[76px] flex-1 items-center justify-center overflow-hidden rounded-[14px] px-3 text-center text-[9px] font-black uppercase leading-none tracking-[0.08em] transition"
+                  className="group relative flex min-h-[42px] min-w-[68px] flex-1 items-center justify-center overflow-hidden rounded-[14px] px-2 text-center text-[8.5px] font-black uppercase leading-none tracking-[0.06em] transition"
                   style={{
                     fontFamily: "var(--font-space-mono), 'Space Mono', monospace",
                     color: active ? "#041208" : "rgba(221,254,235,0.92)",
