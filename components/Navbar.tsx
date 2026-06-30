@@ -50,9 +50,7 @@ export default function Navbar() {
               </span>
             </div>
           </Link>
-          <Link href="/simulate" className="matrix-launch min-h-[36px] px-3 py-1.5 text-[9px] md:hidden">
-            Launch
-          </Link>
+
         </div>
 
         {/* Mobile command rail */}
@@ -88,14 +86,7 @@ export default function Navbar() {
                     textShadow: active ? "none" : "0 0 10px rgba(0,255,65,0.26)",
                   }}
                 >
-                  <span
-                    aria-hidden="true"
-                    className="absolute left-2 top-1.5 font-mono text-[7px]"
-                    style={{ color: active ? "rgba(4,18,8,0.58)" : `${glow}99` }}
-                  >
-                    0{index + 1}
-                  </span>
-                  <span className="pt-2">{link.label}</span>
+                  <span>{link.label}</span>
                 </Link>
               );
             })}
@@ -125,14 +116,6 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Desktop CTA */}
-        <Link
-          href="/simulate"
-          className="matrix-launch hidden text-[10px] md:inline-flex"
-          style={{ padding: "0.55rem 1.1rem" }}
-        >
-          Launch Simulation
-        </Link>
       </div>
     </nav>
   );
