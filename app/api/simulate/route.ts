@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabaseClient";
+import { getRequestUser } from "@/lib/serverAuth";
+import { buildActionPlan, buildMemorySnapshot, buildRealityLedger, buildTruthScore, buildVariableLab } from "@/lib/simulationIntelligence";
 import { selectAgentsForSimulation } from "@/lib/agentProfiles";
 import type { AgentProfile } from "@/lib/agentProfiles";
 
@@ -980,6 +982,8 @@ export async function POST(request: Request) {
 
     if (!process.env.GROQ_API_KEY) return NextResponse.json({ error: "Simulation engine unavailable" }, { status: 503 });
 
+    const user = await getRequestUser(request);
+
     // Parallel: fetch history + select agents
     const [historicalIntel, agents] = await Promise.all([
       fetchHistoricalIntelligence(type),
@@ -1018,13 +1022,23 @@ export async function POST(request: Request) {
 
     const id = crypto.randomUUID();
     const guaranteedDeepRead = prediction.deepRead ?? buildGuaranteedDeepRead(type, data, prediction, calibratedConfidence);
+    const truthScore = buildTruthScore(data, calibratedConfidence);
+    const realityLedger = buildRealityLedger(type, data, calibratedConfidence);
+    const variableLab = buildVariableLab(type, data, prediction);
+    const actionPlan = buildActionPlan(type, guaranteedDeepRead, prediction);
+    const memorySnapshot = buildMemorySnapshot(type, historicalIntel.count);
     const simulationResult = {
       id, type, ...prediction,
       confidenceScore: calibratedConfidence,
+      truthScore,
       sentimentData, populationWeightedSentiment,
       phoneReachIntelligence,
       historicalIntelligenceUsed: historicalIntel.count,
       deepRead: guaranteedDeepRead,
+      realityLedger,
+      variableLab,
+      actionPlan,
+      memorySnapshot,
       swarmLabTrace,
       specialistResults,
       counterIntelligence,
@@ -1034,7 +1048,25 @@ export async function POST(request: Request) {
 
     try {
       const db = createServiceClient();
-      await db.from("simulations").insert({ id, type, scenario_data: data, result: simulationResult, status: "complete" });
+      const upgradedRow = {
+        id,
+        type,
+        scenario_data: data,
+        result: simulationResult,
+        status: "complete",
+        user_id: user?.id ?? null,
+        visibility: user ? "private" : "unlisted",
+        truth_score: truthScore,
+        reality_ledger: realityLedger,
+        variable_lab: variableLab,
+        action_plan: actionPlan,
+        memory_snapshot: memorySnapshot,
+      };
+      const { error: upgradedError } = await db.from("simulations").insert(upgradedRow);
+      if (upgradedError) {
+        const { error: legacyError } = await db.from("simulations").insert({ id, type, scenario_data: data, result: simulationResult, status: "complete" });
+        if (legacyError) throw legacyError;
+      }
     } catch (dbErr) {
       console.error("Supabase store error:", dbErr);
     }
