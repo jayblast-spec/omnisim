@@ -18,13 +18,13 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OMNISIM — Simulate Before It Happens",
+  title: "OMNISIM — Predict with Precision",
   description:
-    "Run major decisions through OmniSim before reality charges you for guessing. Simulate human reactions, risk paths, hidden pressure points, and smarter next moves.",
+    "High-stakes strategy does not survive on intuition. OMNISIM stress-tests critical decisions against probabilistic futures before you commit resources.",
   openGraph: {
-    title: "OMNISIM — Simulate Before It Happens",
+    title: "OMNISIM — Predict with Precision",
     description:
-      "Before you risk money, reputation, time, health, love, or a major decision, test the likely futures with OmniSim.",
+      "Stress-test critical decisions, expose hidden vulnerabilities, model competitive responses, and illuminate the optimal path before you commit resources.",
     type: "website",
   },
 };
