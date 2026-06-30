@@ -19,8 +19,8 @@ export default function Footer() {
               SIMULATE BEFORE IT HAPPENS
             </p>
             <p className="mt-4 text-xs leading-7 text-[#B8EACF]">
-              The world&apos;s most powerful AI simulation platform.
-              35+ global agents. Real predictions.
+              Run the future before you risk the real thing.
+              Human reactions, pressure points, and smarter next moves.
             </p>
           </div>
 
