@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
 
 interface HistoryRecord {
   id: string;
@@ -33,15 +34,26 @@ const typeLabels: Record<string, string> = {
 export default function HistoryPage() {
   const [records, setRecords] = useState<HistoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authRequired, setAuthRequired] = useState(false);
 
   useEffect(() => {
-    fetch("/api/history")
-      .then((r) => r.json())
-      .then((data: { records?: HistoryRecord[] }) => {
+    async function loadHistory() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers: Record<string, string> = {};
+        if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+        const response = await fetch("/api/history", { headers, cache: "no-store" });
+        const data = (await response.json()) as { records?: HistoryRecord[]; authRequired?: boolean };
         setRecords(data.records || []);
+        setAuthRequired(response.status === 401 || !!data.authRequired);
+      } catch {
+        setRecords([]);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    }
+
+    void loadHistory();
   }, []);
 
   return (
@@ -64,7 +76,19 @@ export default function HistoryPage() {
           </div>
         )}
 
-        {!loading && records.length === 0 && (
+        {!loading && authRequired && (
+          <div className="cyber-card mx-auto max-w-xl p-8 text-center">
+            <p className="font-orbitron text-sm font-bold uppercase tracking-[0.2em]" style={{ color: "#00FF41" }}>Private Archive</p>
+            <p className="mt-4 text-sm font-semibold leading-7" style={{ color: "#DDFEEB" }}>
+              History is private. Sign in to view only your own simulations. Anonymous and other users&apos; records are not shown here.
+            </p>
+            <Link href="/simulate" className="btn-neon mt-8 inline-flex">
+              RUN NEW SIMULATION
+            </Link>
+          </div>
+        )}
+
+        {!loading && !authRequired && records.length === 0 && (
           <div className="py-24 text-center">
             <p className="font-orbitron font-bold" style={{ color: "#DDFEEB" }}>NO SIMULATIONS YET</p>
             <Link href="/simulate" className="btn-neon mt-8 inline-flex">
@@ -73,7 +97,7 @@ export default function HistoryPage() {
           </div>
         )}
 
-        {!loading && records.length > 0 && (
+        {!loading && !authRequired && records.length > 0 && (
           <div className="space-y-4">
             {records.map((rec) => (
               <Link
