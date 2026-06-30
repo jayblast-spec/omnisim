@@ -76,6 +76,36 @@ export default function SimForm({ schema }: SimFormProps) {
   // showInput controls visibility only — the zone stays in DOM at all times
   const showInput = !isDone && !isTyping && !truthPending && !!currentQ;
 
+  /* ── Mobile viewport lock ────────────────────────────────── */
+  useEffect(() => {
+    const root = document.documentElement;
+    const body = document.body;
+    const prevBodyOverflow = body.style.overflow;
+    const prevRootOverscroll = root.style.overscrollBehavior;
+
+    function setStableHeight() {
+      const vv = window.visualViewport;
+      const height = vv?.height || window.innerHeight;
+      root.style.setProperty("--omnisim-vh", `${Math.round(height)}px`);
+    }
+
+    body.style.overflow = "hidden";
+    root.style.overscrollBehavior = "none";
+    setStableHeight();
+    window.visualViewport?.addEventListener("resize", setStableHeight);
+    window.visualViewport?.addEventListener("scroll", setStableHeight);
+    window.addEventListener("orientationchange", setStableHeight);
+
+    return () => {
+      body.style.overflow = prevBodyOverflow;
+      root.style.overscrollBehavior = prevRootOverscroll;
+      root.style.removeProperty("--omnisim-vh");
+      window.visualViewport?.removeEventListener("resize", setStableHeight);
+      window.visualViewport?.removeEventListener("scroll", setStableHeight);
+      window.removeEventListener("orientationchange", setStableHeight);
+    };
+  }, []);
+
   /* ── Scroll to bottom ────────────────────────────────────── */
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -84,6 +114,14 @@ export default function SimForm({ schema }: SimFormProps) {
     });
   }, [history, typedText]);
 
+  useEffect(() => {
+    function pinToBottom() {
+      const el = chatScrollRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    }
+    window.addEventListener("omnisim-input-focus", pinToBottom);
+    return () => window.removeEventListener("omnisim-input-focus", pinToBottom);
+  }, []);
   /* ── Typewriter ────────────────────────────────────────── */
   function typeOut(
     text: string,
@@ -291,13 +329,11 @@ export default function SimForm({ schema }: SimFormProps) {
     <div
       className="flex flex-col"
       style={{
-        // 100dvh = dynamic viewport height: shrinks correctly when
-        // the mobile keyboard opens, preventing hard layout reflow.
-        // 100svh had this right in theory but combined with paddingTop
-        // it could overshoot and cause a scroll at the document level.
-        height:     "100dvh",
+        height:     "var(--omnisim-vh, 100dvh)",
         paddingTop: "72px",
         background: "var(--bg)",
+        overflow:   "hidden",
+        touchAction: "manipulation",
       }}
     >
       {/* ── Top bar ── */}
@@ -524,6 +560,8 @@ function InputArea({
               type={field.type === "date" ? "date" : field.type === "number" ? "number" : "text"}
               value={textValue}
               onChange={(e) => onTextChange(e.target.value)}
+            onFocus={() => setTimeout(() => window.dispatchEvent(new Event("omnisim-input-focus")), 80)}
+              onFocus={() => setTimeout(() => window.dispatchEvent(new Event("omnisim-input-focus")), 80)}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
               placeholder={field.placeholder || (field.required ? "Type your answer..." : "Type or skip →")}
               style={inputStyle}
@@ -549,6 +587,7 @@ function InputArea({
             rows={Math.min(field.rows || 3, 4)}
             value={textValue}
             onChange={(e) => onTextChange(e.target.value)}
+            onFocus={() => setTimeout(() => window.dispatchEvent(new Event("omnisim-input-focus")), 80)}
             placeholder={field.placeholder || "Type your answer..."}
             style={{ ...inputStyle, display: "block", resize: "none", flex: "unset", width: "100%" }}
           />
