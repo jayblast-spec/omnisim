@@ -81,17 +81,15 @@ export default function HomePage() {
           </p>
 
           <p className="mx-auto mt-8 max-w-2xl rounded-2xl border px-5 py-4 text-sm font-semibold leading-8 sm:leading-9" style={{ color: "#F4FFF8", background: "rgba(2,8,5,0.58)", borderColor: "rgba(125,255,192,0.22)", textShadow: "0 2px 12px rgba(0,0,0,0.78)", boxShadow: "0 18px 44px rgba(0,0,0,0.22), 0 0 30px rgba(43,255,143,0.08)" }}>
-            The world&apos;s most powerful AI simulation platform. Deploy 35+ intelligent global agents to
-            predict public reactions, election outcomes, market movements, sports results, and geopolitical
-            events — before they happen.
+            Before you risk money, reputation, time, love, health, or a major decision, run the moment through OMNISIM. Watch the likely paths, hidden pressure points, human reactions, and smartest next move appear before reality charges you for guessing.
           </p>
 
           <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/simulate" className="btn-solid">
-              LAUNCH SIMULATION ⚡
+              RUN YOUR FIRST FUTURE TEST
             </Link>
             <Link href="/about" className="btn-neon">
-              HOW IT WORKS
+              SEE HOW IT THINKS
             </Link>
           </div>
 
@@ -139,7 +137,7 @@ export default function HomePage() {
               What can OMNISIM simulate?
             </h2>
             <p className="home-copy mx-auto mt-4 max-w-2xl text-sm font-semibold leading-8">
-              Twelve categories of world-class simulations. Each powered by 20 diverse global AI agents and a comprehensive intelligence intake form.
+              Pick the life, market, public, health, relationship, or business question you cannot afford to guess on. OmniSim turns it into a structured future test.
             </p>
           </div>
 
@@ -166,7 +164,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
+      {/* SEE HOW IT THINKS */}
       <section className="border-t border-[rgba(0,245,255,0.06)] bg-[rgba(0,245,255,0.01)] px-5 py-28 sm:px-8">
         <div className="mx-auto max-w-5xl">
           <div className="mb-14 text-center">
