@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SimWorldBackground from "@/components/SimWorldBackground";
+import OmniGuide from "@/components/OmniGuide";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SimWorldBackground />
         <Navbar />
         <main>{children}</main>
+        <OmniGuide />
         <Footer />
       </body>
     </html>
