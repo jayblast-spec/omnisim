@@ -7,18 +7,18 @@ export const metadata: Metadata = {
 };
 
 const agentExamples = [
-  { name: "Maya Chen", role: "Tech Worker, San Francisco", flag: "🇺🇸", pol: "Progressive" },
-  { name: "Carlos Rivera", role: "Veteran, San Antonio", flag: "🇺🇸", pol: "Conservative" },
-  { name: "Ngozi Adeola", role: "Teacher, Lagos", flag: "🇳🇬", pol: "Pan-African" },
-  { name: "Li Wei", role: "Engineer, Shenzhen", flag: "🇨🇳", pol: "Nationalist" },
-  { name: "Elena Petrova", role: "Administrator, Moscow", flag: "🇷🇺", pol: "Statist" },
-  { name: "Thomas Harrington", role: "Banker, New York", flag: "🇺🇸", pol: "Libertarian" },
-  { name: "Amara Diallo", role: "NGO Director, Dakar", flag: "🇸🇳", pol: "Progressive" },
-  { name: "Fatima Al-Hassan", role: "Marketing, Dubai", flag: "🇦🇪", pol: "Moderate" },
-  { name: "Kevin Park", role: "Crypto Trader, Singapore", flag: "🇸🇬", pol: "Libertarian" },
-  { name: "Roberto Santos", role: "Union Org., São Paulo", flag: "🇧🇷", pol: "Left-Wing" },
-  { name: "Priya Sharma", role: "IT Manager, Bangalore", flag: "🇮🇳", pol: "Centrist" },
-  { name: "Pierre Dubois", role: "Professor, Paris", flag: "🇫🇷", pol: "Social Liberal" },
+  { name: "Maya Chen", role: "Tech Worker, San Francisco", flag: "🇺🇸", code: "US", country: "United States", pol: "Progressive" },
+  { name: "Carlos Rivera", role: "Veteran, San Antonio", flag: "🇺🇸", code: "US", country: "United States", pol: "Conservative" },
+  { name: "Ngozi Adeola", role: "Teacher, Lagos", flag: "🇳🇬", code: "NG", country: "Nigeria", pol: "Pan-African" },
+  { name: "Li Wei", role: "Engineer, Shenzhen", flag: "🇨🇳", code: "CN", country: "China", pol: "Nationalist" },
+  { name: "Elena Petrova", role: "Administrator, Moscow", flag: "🇷🇺", code: "RU", country: "Russia", pol: "Statist" },
+  { name: "Thomas Harrington", role: "Banker, New York", flag: "🇺🇸", code: "US", country: "United States", pol: "Libertarian" },
+  { name: "Amara Diallo", role: "NGO Director, Dakar", flag: "🇸🇳", code: "SN", country: "Senegal", pol: "Progressive" },
+  { name: "Fatima Al-Hassan", role: "Marketing, Dubai", flag: "🇦🇪", code: "AE", country: "United Arab Emirates", pol: "Moderate" },
+  { name: "Kevin Park", role: "Crypto Trader, Singapore", flag: "🇸🇬", code: "SG", country: "Singapore", pol: "Libertarian" },
+  { name: "Roberto Santos", role: "Union Org., São Paulo", flag: "🇧🇷", code: "BR", country: "Brazil", pol: "Left-Wing" },
+  { name: "Priya Sharma", role: "IT Manager, Bangalore", flag: "🇮🇳", code: "IN", country: "India", pol: "Centrist" },
+  { name: "Pierre Dubois", role: "Professor, Paris", flag: "🇫🇷", code: "FR", country: "France", pol: "Social Liberal" },
 ];
 
 const principles = [
@@ -53,7 +53,26 @@ export default function AboutPage() {
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
             {agentExamples.map((agent) => (
               <div key={agent.name} className="cyber-card p-4">
-                <div className="mb-2 text-2xl">{agent.flag}</div>
+                <div
+                  aria-label={`${agent.country} field agent`}
+                  className="mb-3 inline-flex h-9 min-w-16 items-center gap-2 rounded-[4px] border px-2"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(0,255,65,0.22), rgba(0,245,255,0.13), rgba(255,0,119,0.10))",
+                    borderColor: "rgba(0,255,65,0.38)",
+                    color: "#F6FFF9",
+                    boxShadow: "0 0 18px rgba(0,255,65,0.14)",
+                  }}
+                >
+                  <span
+                    className="text-xl leading-none"
+                    style={{ fontFamily: "Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif" }}
+                  >
+                    {agent.flag}
+                  </span>
+                  <span className="font-orbitron text-[10px] font-black tracking-widest" style={{ color: "#00FF41" }}>
+                    {agent.code}
+                  </span>
+                </div>
                 <p className="font-orbitron text-xs font-bold" style={{ color: "#F6FFF9" }}>{agent.name}</p>
                 <p className="mt-1 text-[10px] font-medium" style={{ color: "#DDFEEB" }}>{agent.role}</p>
                 <p className="mt-2 font-orbitron text-[8px] tracking-widest" style={{ color: "#00F5FF" }}>
